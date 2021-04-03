@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -142,6 +143,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private val currentEntryPolyline by lazy {
         map.addPolyline(PolylineOptions().addAll(emptyList()))
     }
+    private var currentRoutePolyline: Polyline? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -191,6 +193,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
 
     override fun subscribe() {
         viewModel.routes.subscribe { routes ->
+            currentRoutePolyline?.remove()
             routeMarkers.forEach {
                 it.remove()
             }
@@ -206,11 +209,11 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
 
     private fun onMarkerClick(marker: Marker) {
         val route = marker.tag as? Route ?: return
+        drawRoute(route)
         map.animateCamera(
             CameraUpdateFactory.newLatLngZoom(route.points.first().toLatLng(), 15F),
             object : GoogleMap.CancelableCallback {
                 override fun onFinish() {
-                    drawRoute(route, marker)
                     viewModel.openRouteDetailsBottomSheet(route)
                 }
 
@@ -218,8 +221,10 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             })
     }
 
-    private fun drawRoute(route: Route, marker: Marker) {
-        marker.remove()
+    private fun drawRoute(route: Route) {
+        routeMarkers.forEach { it.remove() }
+        currentRoutePolyline?.remove()
+        currentRoutePolyline = map.addPolyline(PolylineOptions().color(Color.BLUE).addAll(route.points.map { it.toLatLng() }))
     }
 
     private fun onLocationUpdate(location: Location) {

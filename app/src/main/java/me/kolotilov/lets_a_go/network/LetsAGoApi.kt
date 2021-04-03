@@ -3,7 +3,10 @@ package me.kolotilov.lets_a_go.network
 import io.reactivex.Completable
 import io.reactivex.Single
 import me.kolotilov.lets_a_go.network.input.*
-import me.kolotilov.lets_a_go.network.output.*
+import me.kolotilov.lets_a_go.network.output.EntryDto
+import me.kolotilov.lets_a_go.network.output.RouteDetailsDto
+import me.kolotilov.lets_a_go.network.output.TokenDto
+import me.kolotilov.lets_a_go.network.output.UserDetailsDto
 import retrofit2.http.*
 
 private const val AUTH = "auth"
@@ -40,7 +43,7 @@ interface LetsAGoApi {
     fun deleteEntry(@Path("id") id: Int): Completable
 
     @GET("/$MAP/routes")
-    fun getRoutes(): Single<List<RoutePreviewDto>>
+    fun getRoutes(): Single<List<RouteDetailsDto>>
 
     @POST("/$MAP/routes")
     fun createRoute(@Body route: CreateRouteDto): Single<RouteDetailsDto>
@@ -58,5 +61,5 @@ interface LetsAGoApi {
     fun createEntry(@Path("id") id: Int, @Body createEntryDto: CreateEntryDto): Single<RouteDetailsDto>
 
     @POST("/$MAP/routes/search")
-    fun searchRoutes(@Query("name") name: String?, filter: FilterDto): Single<List<RoutePreviewDto>>
+    fun searchRoutes(@Query("name") name: String?, filter: FilterDto): Single<List<RouteDetailsDto>>
 }
