@@ -1,0 +1,131 @@
+package me.kolotilov.lets_a_go.ui.base
+
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.annotation.CallSuper
+import androidx.annotation.IdRes
+import androidx.annotation.LayoutRes
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
+import io.reactivex.Completable
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import me.kolotilov.lets_a_go.presentation.BaseViewModel
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.android.x.closestDI
+
+/**
+ * Базовый фрагмент.
+ */
+abstract class BaseFragment(@LayoutRes layoutRes: Int) : Fragment(layoutRes), DIAware {
+
+    private val compositeDisposable = CompositeDisposable()
+    private val delegates = mutableListOf<ViewDelegate<*>>()
+
+    override val di: DI by closestDI()
+
+    final override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    @CallSuper
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        fillViews()
+        bind()
+        defaultSubscribe()
+        subscribe()
+        viewModel.attach()
+    }
+
+    final override fun onDestroyView() {
+        super.onDestroyView()
+        compositeDisposable.clear()
+        delegates.forEach { it.dispose() }
+        viewModel.detach()
+    }
+
+    /**
+     * Вьюмодель.
+     */
+    protected abstract val viewModel: BaseViewModel
+
+    /**
+     * Наполнение вьюшек.
+     */
+    protected open fun fillViews() = Unit
+
+    /**
+     * Проталкивает события UI во ViewModel.
+     */
+    protected open fun bind() = Unit
+
+    /**
+     * Подписывается на изменения ViewModel.
+     */
+    protected open fun subscribe() = Unit
+
+    private fun defaultSubscribe() {
+        viewModel.popup.subscribe {
+            Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+        }.autoDispose()
+    }
+
+    protected fun checkPermission(permission: String): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            requireContext(),
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    //region Расширения
+
+    /**
+     * Ищет View по ID.
+     *
+     * @param id ID.
+     */
+    protected fun <T : View> lazyView(@IdRes id: Int): ViewDelegate<T> {
+        val delegate = ViewDelegate<T>(id)
+        delegates.add(delegate)
+        return delegate
+    }
+
+    /**
+     * Автоматически останавливает подписку.
+     */
+    protected fun Disposable.autoDispose() {
+        compositeDisposable.add(this)
+    }
+
+    protected fun <T> Observable<T>.emptySubscribe(): Disposable {
+        return subscribe({}, {
+            Log.e("ERROR", it.toString())
+        })
+    }
+
+    protected fun <T> Single<T>.emptySubscribe(): Disposable {
+        return subscribe({}, {
+            Log.e("ERROR", it.toString())
+        })
+    }
+
+    protected fun Completable.emptySubscribe(): Disposable {
+        return subscribe({}, {
+            Log.e("ERROR", it.toString())
+        })
+    }
+    //endregion
+}

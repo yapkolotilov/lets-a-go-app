@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">lets-a-go</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="email_hint">Почта</string>
+    <string name="password_hint">Пароль</string>
+    <string name="login_button">Войти</string>
+    <string name="register_button">Зарегистрироваться</string>
+    <string name="test_text">Test</string>
+    <string name="user_already_registered_error">Пользователь с таким ником уже зарегистрирован!</string>
+    <string name="invalid_credentials_error">Неправильные логин или пароль!</string>
+    <string name="enter_your_basic_info_title">Введите свои параметры</string>
+    <string name="skip_button">Пропустить</string>
+    <string name="next_button">Далее</string>
+    <string name="age_hint">Возраст</string>
+    <string name="height_hint">Рост</string>
+    <string name="weight_hint">Вес</string>
+    <string name="name_hint">Имя</string>
+    <string name="log_out_button">Выйти из аккаунта</string>
+    <string name="repeat_password_hint">Повторите пароль</string>
+    <string name="search_illness_hint">Введите название болезни</string>
+    <string name="content_description">Icon</string>
+    <string name="edit_button">Редактировать</string>
+    <string name="enter_details_title">Пожалуйста, заполните данные о своём здоровье, чтобы мы подобрать подходящие для вас маршруты</string>
+    <string name="fill_button">Заполнить</string>
+    <string name="icon">icon</string>
+    <string name="new_route_title">Новый маршрут</string>
+    <string name="route_type_title">Тип</string>
+    <string name="route_name_hint">Название</string>
+    <string name="ground_type_hint">Покрытие</string>
+    <string name="ground_asphalt">Земля</string>
+    <string name="ground_track">Асфальт</string>
+    <string name="switch_public_hint">Опубликовать</string>
+    <string name="save_button">Сохранить</string>
+</resources>
