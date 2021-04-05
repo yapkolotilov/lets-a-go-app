@@ -18,7 +18,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import me.kolotilov.lets_a_go.presentation.BaseViewModel
+import me.kolotilov.lets_a_go.presentation.base.BaseBottomSheetViewModel
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.x.closestDI
@@ -27,8 +27,6 @@ abstract class BaseBottomSheetFragment(
     @LayoutRes
     private val layoutRes: Int
 ) : BottomSheetDialogFragment(), DIAware {
-
-    protected var onDismiss = {}
 
     private val compositeDisposable = CompositeDisposable()
     private val delegates = mutableListOf<ViewDelegate<*>>()
@@ -62,13 +60,13 @@ abstract class BaseBottomSheetFragment(
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        onDismiss()
+        viewModel.onDismiss()
     }
 
     /**
      * Вьюмодель.
      */
-    protected abstract val viewModel: BaseViewModel
+    protected abstract val viewModel: BaseBottomSheetViewModel
 
     /**
      * Наполнение вьюшек.

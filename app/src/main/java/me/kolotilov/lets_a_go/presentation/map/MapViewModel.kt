@@ -1,7 +1,10 @@
 package me.kolotilov.lets_a_go.presentation.map
 
+import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
+import me.kolotilov.lets_a_go.models.Entry
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.network.Repository
@@ -19,27 +22,54 @@ class MapViewModel(
     val routes: Observable<List<Route>> get() = routesSubject
     private val routesSubject = BehaviorSubject.create<List<Route>>()
 
+    val startEntry: Observable<Unit> get() = startEntrySubject
+    private val startEntrySubject = PublishSubject.create<Unit>()
+
     override fun attach() {
         loadRoutes()
     }
 
-    fun openEditRouteBottomSheet(recordedPoints: MutableList<Point>) {
+    fun openEditEntryBottomSheet(route: Route?, recordedPoints: MutableList<Point>, callback: () -> Unit) {
+        params.editEntry.route = route
+        params.editEntry.entry = Entry(recordedPoints, -1)
+        params.editRoute.callback = {
+            loadRoutes()
+            callback()
+        }
+        router.navigateTo(Screens.EditEntry)
+    }
+
+    fun openEditRouteBottomSheet(recordedPoints: MutableList<Point>, callback: () -> Unit) {
         params.editRoute.points = recordedPoints
-        router.navigateTo(Screens.EditRoute { loadRoutes() })
+        params.editRoute.callback = {
+            loadRoutes()
+            callback()
+        }
+        router.navigateTo(Screens.EditRoute)
     }
 
     fun openRouteDetailsBottomSheet(route: Route) {
         params.routeDetails.id = route.id
-        router.navigateTo(Screens.RouteDetails { loadRoutes() })
+        params.routeDetails.callback = {
+            loadRoutes()
+            if (it)
+                startEntrySubject.onNext(Unit)
+        }
+        router.navigateTo(Screens.RouteDetails)
     }
 
-    fun loadRoutes() {
-        repository.getAllRoutes()
+    private fun loadRoutes() {
+        repository.getAllRoutes(false) // TODO: Убрать заглушку
             .load()
             .doOnSuccess {
+                Log.d("BRUH", it.toString())
                 routesSubject.onNext(it)
             }
             .emptySubscribe()
             .autoDispose()
+    }
+
+    fun openUserDetails() {
+        router.navigateTo(Screens.UserDetailsScreen)
     }
 }

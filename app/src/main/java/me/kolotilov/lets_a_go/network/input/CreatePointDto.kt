@@ -13,7 +13,6 @@ data class CreatePointDto(
     val timestamp: Date
 )
 
-
 fun Point.toCreatePointDto() = CreatePointDto(
     latitude = latitude,
     longitude = longitude,

@@ -21,15 +21,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
-class EditRouteBottomSheet @Deprecated("newInstance()") constructor() : BaseBottomSheetFragment(R.layout.fragment_edit_route) {
-
-    companion object {
-
-        @Suppress("DEPRECATION")
-        fun newInstance(onDismiss: () -> Unit): EditRouteBottomSheet {
-            return EditRouteBottomSheet().also { it.onDismiss = onDismiss }
-        }
-    }
+class EditRouteBottomSheet : BaseBottomSheetFragment(R.layout.fragment_edit_route) {
 
     override val viewModel by instance<EditRouteViewModel>()
 

@@ -31,6 +31,7 @@ import me.kolotilov.lets_a_go.models.distance
 import me.kolotilov.lets_a_go.presentation.map.MapViewModel
 import me.kolotilov.lets_a_go.ui.base.BaseFragment
 import me.kolotilov.lets_a_go.ui.toLatLng
+import me.kolotilov.lets_a_go.ui.toPoint
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.kodein.di.instance
@@ -94,7 +95,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private inner class Routing : State() {
 
         override fun processLocation(location: Location) {
-            val point = Point(location.latitude, location.longitude, DateTime.now(), -1)
+            val point = location.toPoint()
             recordedPoints.add(point)
             currentEntryPolyline.points = recordedPoints.map { LatLng(it.latitude, it.longitude) }
         }
@@ -107,22 +108,34 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             recordButton.text = "Записать"
             updateRecordingPanel(0)
             timerDisposable?.dispose()
-            currentEntryPolyline.remove()
-            viewModel.openEditRouteBottomSheet(recordedPoints)
+            viewModel.openEditRouteBottomSheet(recordedPoints) {
+                currentEntryPolyline.remove()
+            }
         }
     }
 
     private inner class Entrying : State() {
 
-        override fun processLocation(location: Location) = Unit
+        override fun processLocation(location: Location) {
+            val point = location.toPoint()
+            recordedPoints.add(point)
+        }
 
-        override fun onRecordClick() = Unit
+        override fun onRecordClick() {
+            state = Idle()
+            recordPanel.isVisible = false
+            recordButton.text = "Записать"
+            updateRecordingPanel(0)
+            timerDisposable?.dispose()
+            viewModel.openEditEntryBottomSheet(selectedRoute, recordedPoints) {}
+        }
     }
 
     private val recordButton: Button by lazyView(R.id.record_button)
     private val recordPanel: View by lazyView(R.id.top_menu)
     private val durationTextView: TextView by lazyView(R.id.duration_TextView)
     private val distanceTextView: TextView by lazyView(R.id.length_TextView)
+    private val userDetailsButton: Button by lazyView(R.id.user_details_button)
     override val viewModel: MapViewModel by instance()
 
     private var timerDisposable: Disposable? = null
@@ -133,6 +146,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private var state: State = Idle()
     private lateinit var map: GoogleMap
     private var moved: Boolean = false
+    private var selectedRoute: Route? = null
     private val currentPositionMarker by lazy {
         map.addMarker(
             MarkerOptions().title("Локация").position(LatLng(0.0, 0.0)).icon(
@@ -162,13 +176,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     }
 
     private fun onRecordClick() {
-        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            state.onRecordClick()
-        } else
-            requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_REQUEST_CODE
-            )
+        state.onRecordClick()
     }
 
     override fun onRequestPermissionsResult(
@@ -178,15 +186,24 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     ) {
         if (requestCode == LOCATION_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                onRecordClick()
+                requestLocationUpdates()
             }
         }
     }
 
-    @SuppressLint("MissingPermission")
     override fun bind() {
+        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            requestLocationUpdates()
+        } else {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_REQUEST_CODE)
+        }
+        userDetailsButton.setOnClickListener { viewModel.openUserDetails() }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun requestLocationUpdates() {
         val client = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        client.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f) {
+        client.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 5f) {
             onLocationUpdate(it)
         }
     }
@@ -205,10 +222,16 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                 ).also { it.tag = route }
             }
         }.autoDispose()
+
+        viewModel.startEntry.subscribe {
+            state.onRecordClick()
+            state = Entrying()
+        }.autoDispose()
     }
 
     private fun onMarkerClick(marker: Marker) {
         val route = marker.tag as? Route ?: return
+        selectedRoute = route
         drawRoute(route)
         map.animateCamera(
             CameraUpdateFactory.newLatLngZoom(route.points.first().toLatLng(), 15F),
@@ -224,7 +247,9 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private fun drawRoute(route: Route) {
         routeMarkers.forEach { it.remove() }
         currentRoutePolyline?.remove()
-        currentRoutePolyline = map.addPolyline(PolylineOptions().color(Color.BLUE).addAll(route.points.map { it.toLatLng() }))
+        currentRoutePolyline = map.addPolyline(
+            PolylineOptions().color(Color.BLUE).addAll(route.points.map { it.toLatLng() })
+        )
     }
 
     private fun onLocationUpdate(location: Location) {

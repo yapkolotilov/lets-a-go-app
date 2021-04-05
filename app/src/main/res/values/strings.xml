@@ -21,7 +21,7 @@
     <string name="search_illness_hint">Введите название болезни</string>
     <string name="content_description">Icon</string>
     <string name="edit_button">Редактировать</string>
-    <string name="enter_details_title">Пожалуйста, заполните данные о своём здоровье, чтобы мы подобрать подходящие для вас маршруты</string>
+    <string name="enter_details_title">Пожалуйста, заполните данные о своём здоровье, чтобы мы могли подобрать подходящие для вас маршруты</string>
     <string name="fill_button">Заполнить</string>
     <string name="icon">icon</string>
     <string name="new_route_title">Новый маршрут</string>

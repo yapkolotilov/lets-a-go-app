@@ -35,6 +35,10 @@ fun List<Point>.duration(): Duration {
     return Duration(firstOrNull()?.timestamp ?: DateTime.now(), lastOrNull()?.timestamp ?:DateTime.now())
 }
 
+fun List<Point>.speed(): Double {
+    return distance() / duration().standardHours
+}
+
 // https://stackoverflow.com/a/16794680
 private fun distance(lat1: Double, lat2: Double, lon1: Double, lon2: Double): Double {
     val el1 = 0.0

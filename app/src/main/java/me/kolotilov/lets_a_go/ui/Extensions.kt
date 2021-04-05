@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
 import io.reactivex.Single
 import me.kolotilov.lets_a_go.models.Point
+import org.joda.time.DateTime
 
 @SuppressLint("MissingPermission")
 fun Task<Location>.toSingle(): Single<Location> {
@@ -25,6 +26,10 @@ fun Task<Location>.toSingle(): Single<Location> {
 }
 
 fun Point.toLatLng() = LatLng(latitude, longitude)
+
+fun LatLng.toPoint() = Point(latitude, longitude, DateTime.now(), -1)
+
+fun Location.toPoint() = Point(latitude, longitude, DateTime(time), -1)
 
 fun Location.toLatLng() = LatLng(latitude, longitude)
 
