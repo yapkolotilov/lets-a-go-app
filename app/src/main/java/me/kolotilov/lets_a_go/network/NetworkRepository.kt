@@ -160,16 +160,15 @@ class NetworkRepositoryImpl(
     }
 
     private fun parseError(throwable: Throwable): Throwable {
+        val converter: Converter<ResponseBody, ErrorDto> =
+            retrofit.responseBodyConverter(ErrorDto::class.java, emptyArray())
+
         if (throwable is HttpException) runCatching {
-            val converter: Converter<ResponseBody, ErrorDto> =
-                retrofit.responseBodyConverter(ErrorDto::class.java, emptyArray())
             val error = throwable.response()?.errorBody()?.let { converter.convert(it) }
             if (error != null)
                 return ServerException(error.error)
         }
         if (throwable is retrofit2.adapter.rxjava2.HttpException) runCatching {
-            val converter: Converter<ResponseBody, ErrorDto> =
-                retrofit.responseBodyConverter(ErrorDto::class.java, emptyArray())
             val error = throwable.response()?.errorBody()?.let { converter.convert(it) }
             if (error != null)
                 return ServerException(error.error)
