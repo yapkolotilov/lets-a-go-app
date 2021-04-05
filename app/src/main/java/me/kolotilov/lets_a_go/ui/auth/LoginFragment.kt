@@ -4,6 +4,8 @@ import android.widget.Button
 import com.google.android.material.textfield.TextInputLayout
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.presentation.auth.LoginViewModel
+import me.kolotilov.lets_a_go.presentation.base.ButtonData
+import me.kolotilov.lets_a_go.presentation.base.showDialog
 import me.kolotilov.lets_a_go.ui.base.BaseFragment
 import me.kolotilov.lets_a_go.ui.doAfterTextChanged
 import me.kolotilov.lets_a_go.ui.text
@@ -28,6 +30,13 @@ class LoginFragment : BaseFragment(R.layout.fragment_auth) {
     override fun subscribe() {
         viewModel.loginEnabled.subscribe {
             loginButton.isEnabled = it
+        }.autoDispose()
+
+        viewModel.errorDialog.subscribe {
+            showDialog(
+                title = it,
+                positiveButton = ButtonData(getString(R.string.ok_button))
+            )
         }.autoDispose()
     }
 

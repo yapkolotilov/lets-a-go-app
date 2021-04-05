@@ -17,6 +17,9 @@ class LoginViewModel(
     val loginEnabled: Observable<Boolean> get() = loginEnabledSubject
     private val loginEnabledSubject: Subject<Boolean> = BehaviorSubject.create()
 
+    val errorDialog: Observable<String> get() = errorDialogSubject
+    private val errorDialogSubject: Subject<String> = BehaviorSubject.create()
+
     fun updateLoginButton(email: String, password: String) {
         val enabled = email.isNotEmpty() && password.isNotEmpty()
         loginEnabledSubject.onNext(enabled)
@@ -30,7 +33,7 @@ class LoginViewModel(
             }
             .doOnError {
                 if (it is ServerException)
-                    showPopup(it.message)
+                    errorDialogSubject.onNext(it.message.toString())
             }
             .emptySubscribe()
             .autoDispose()
