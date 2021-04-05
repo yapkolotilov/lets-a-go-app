@@ -7,9 +7,9 @@ import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.models.distance
 import me.kolotilov.lets_a_go.models.duration
 import me.kolotilov.lets_a_go.network.Repository
-import me.kolotilov.lets_a_go.presentation.BaseViewModel
 import me.kolotilov.lets_a_go.presentation.Params
 import me.kolotilov.lets_a_go.presentation.Screens
+import me.kolotilov.lets_a_go.presentation.base.BaseBottomSheetViewModel
 import me.kolotilov.lets_a_go.ui.base.Grid
 import org.joda.time.Duration
 import ru.terrakok.cicerone.Router
@@ -18,7 +18,7 @@ class EditRouteViewModel(
     private val params: Params,
     private val repository: Repository,
     private val router: Router
-) : BaseViewModel() {
+) : BaseBottomSheetViewModel() {
 
     class Data(
         val duration: Duration,
@@ -27,9 +27,6 @@ class EditRouteViewModel(
 
     val data: Observable<Data> get() = dataSubject
     private val dataSubject = BehaviorSubject.create<Data>()
-
-//    val dismiss: Observable<Unit> get() = dismissSubject
-//    private val dismissSubject = PublishSubject.create<Unit>()
 
     private var name: String? = null
     private var type: Route.Type? = null
@@ -89,8 +86,7 @@ class EditRouteViewModel(
         fun parseResult(route: Route) {
             params.routeDetails.id = route.id
             router.exit()
-            router.navigateTo(Screens.RouteDetails())
-//            dismissSubject.onNext(Unit)
+            router.navigateTo(Screens.RouteDetails)
         }
 
         if (id == null) {
@@ -123,17 +119,19 @@ class EditRouteViewModel(
 
     fun delete() {
         if (id == null) {
-            router.exit()        }
-//            dismissSubject.onNext(Unit)
-        else
+            router.exit()
+        } else
             repository.deleteRoute(id ?: 0)
                 .load()
                 .doOnComplete {
                     repeat(2) { router.exit() }
-//                    dismissSubject.onNext(Unit)
                 }
                 .emptySubscribe()
                 .autoDispose()
+    }
+
+    override fun onDismiss() {
+        params.editRoute.callback()
     }
 }
 

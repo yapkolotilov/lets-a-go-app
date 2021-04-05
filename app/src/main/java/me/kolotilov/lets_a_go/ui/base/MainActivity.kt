@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity(), DIAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        supportActionBar?.hide()
 
         val rootScreen =
             if (repository.token.isNotEmpty()) Screens.MapScreen else Screens.LoginScreen

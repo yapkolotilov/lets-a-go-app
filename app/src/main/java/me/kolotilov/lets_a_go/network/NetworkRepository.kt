@@ -4,6 +4,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import me.kolotilov.lets_a_go.models.*
 import me.kolotilov.lets_a_go.network.input.*
+import me.kolotilov.lets_a_go.network.output.toEntry
 import me.kolotilov.lets_a_go.network.output.toRoute
 import me.kolotilov.lets_a_go.network.output.toUserDetails
 import okhttp3.ResponseBody
@@ -42,7 +43,13 @@ interface NetworkRepository {
 
     fun deleteRoute(id: Int): Completable
 
-    fun getAllRoutes(): Single<List<Route>>
+    fun getAllRoutes(filter: Boolean): Single<List<Route>>
+
+    fun getEntries(): Single<List<Entry>>
+
+    fun createEntry(route: Route, entry: Entry): Single<Route>
+
+    fun searchRoutes(query: String?, filter: Filter?): Single<List<Route>>
 }
 
 class NetworkRepositoryImpl(
@@ -137,8 +144,19 @@ class NetworkRepositoryImpl(
         return api.deleteRoute(id)
     }
 
-    override fun getAllRoutes(): Single<List<Route>> {
-        return api.getRoutes().map { routes -> routes.map { it.toRoute() } }
+    override fun getAllRoutes(filter: Boolean): Single<List<Route>> {
+        return api.getRoutes(filter).map { routes -> routes.map { it.toRoute() } }
+    }
+
+    override fun getEntries(): Single<List<Entry>> {
+        return api.getEntries().map { entries -> entries.map { it.toEntry() } }
+    }
+
+    override fun createEntry(route: Route, entry: Entry): Single<Route> {
+        return api.createEntry(route.id, entry.toCreateEntryDto()).map { it.toRoute()} }
+
+    override fun searchRoutes(query: String?, filter: Filter?): Single<List<Route>> {
+        return api.searchRoutes(query, filter?.toFilterDto()).map { routes -> routes.map { it.toRoute() } }
     }
 
     private fun parseError(throwable: Throwable): Throwable {

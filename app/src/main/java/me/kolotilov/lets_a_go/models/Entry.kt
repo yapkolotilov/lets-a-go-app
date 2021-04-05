@@ -12,8 +12,23 @@ import org.joda.time.Duration
  * @param id ID похода.
  */
 data class Entry(
-        val timestamp: DateTime,
-        val duration: Duration,
-        val finished: Boolean,
-        val id: Int
-)
+    val points: List<Point>,
+    val id: Int
+) {
+
+    fun finished(route: Route): Boolean {
+        return points.last().distance(route.points.last()) < 100
+    }
+
+    fun startDate(): DateTime {
+        return points.first().timestamp
+    }
+
+    fun duration(): Duration {
+        return points.duration()
+    }
+
+    fun distance(): Double {
+        return points.distance()
+    }
+}

@@ -9,9 +9,7 @@ import me.kolotilov.lets_a_go.presentation.details.ChooseIllnessesViewModel
 import me.kolotilov.lets_a_go.presentation.details.ChooseSymptomsViewModel
 import me.kolotilov.lets_a_go.presentation.details.UserDetailsViewModel
 import me.kolotilov.lets_a_go.presentation.details.onboarding.OnboardingTitleViewModel
-import me.kolotilov.lets_a_go.presentation.map.EditRouteViewModel
-import me.kolotilov.lets_a_go.presentation.map.MapViewModel
-import me.kolotilov.lets_a_go.presentation.map.RouteDetailsViewModel
+import me.kolotilov.lets_a_go.presentation.map.*
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance
@@ -34,5 +32,7 @@ fun uiModule() = DI.Module("App") {
     bind<OnboardingTitleViewModel>() with provider { OnboardingTitleViewModel(instance()) }
     bind<MapViewModel>() with provider { MapViewModel(instance(), instance(), instance()) }
     bind<EditRouteViewModel>() with provider { EditRouteViewModel(instance(), instance(), instance()) }
+    bind<EditEntryViewModel>() with provider { EditEntryViewModel(instance(), instance(), instance()) }
+    bind<EntryDetailsViewModel>() with provider { EntryDetailsViewModel(instance()) }
     bind<RouteDetailsViewModel>() with provider { RouteDetailsViewModel(instance(), instance(), instance()) }
 }

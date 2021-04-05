@@ -7,9 +7,7 @@ import me.kolotilov.lets_a_go.ui.details.ChooseIllnessesFragment
 import me.kolotilov.lets_a_go.ui.details.ChooseSymptomsFragment
 import me.kolotilov.lets_a_go.ui.details.onboarding.OnboardingTitleFragment
 import me.kolotilov.lets_a_go.ui.details.user.UserDetailsFragment
-import me.kolotilov.lets_a_go.ui.map.EditRouteBottomSheet
-import me.kolotilov.lets_a_go.ui.map.MapFragment
-import me.kolotilov.lets_a_go.ui.map.RouteDetailsBottomSheet
+import me.kolotilov.lets_a_go.ui.map.*
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 class
@@ -47,15 +45,19 @@ Screens {
         override fun getFragment() = MapFragment()
     }
 
-    class EditRoute(
-        private val onClose: () -> Unit = {}
-    ) : SupportAppScreen() {
-        override fun getFragment() = EditRouteBottomSheet.newInstance(onClose)
+    object EditRoute : SupportAppScreen() {
+        override fun getFragment() = EditRouteBottomSheet()
     }
 
-    class RouteDetails(
-        private val onClose: () -> Unit = {}
-    ) : SupportAppScreen() {
-        override fun getFragment() = RouteDetailsBottomSheet.newInstance(onClose)
+    object RouteDetails : SupportAppScreen() {
+        override fun getFragment() = RouteDetailsBottomSheet()
+    }
+
+    object EditEntry : SupportAppScreen() {
+        override fun getFragment() = EditEntryBottomSheet()
+    }
+
+    object EntryDetails : SupportAppScreen() {
+        override fun getFragment() = EntryDetailsBottomSheet()
     }
 }
