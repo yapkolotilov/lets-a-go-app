@@ -68,4 +68,8 @@ class MapViewModel(
             .emptySubscribe()
             .autoDispose()
     }
+
+    fun openUserDetails() {
+        router.navigateTo(Screens.UserDetailsScreen)
+    }
 }
