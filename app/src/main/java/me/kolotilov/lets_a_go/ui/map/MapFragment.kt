@@ -135,6 +135,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private val recordPanel: View by lazyView(R.id.top_menu)
     private val durationTextView: TextView by lazyView(R.id.duration_TextView)
     private val distanceTextView: TextView by lazyView(R.id.length_TextView)
+    private val userDetailsButton: Button by lazyView(R.id.user_details_button)
     override val viewModel: MapViewModel by instance()
 
     private var timerDisposable: Disposable? = null
@@ -190,13 +191,13 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         }
     }
 
-
     override fun bind() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
             requestLocationUpdates()
         } else {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_REQUEST_CODE)
         }
+        userDetailsButton.setOnClickListener { viewModel.openUserDetails() }
     }
 
     @SuppressLint("MissingPermission")
