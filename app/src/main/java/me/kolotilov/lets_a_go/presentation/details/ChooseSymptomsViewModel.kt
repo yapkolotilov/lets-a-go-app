@@ -30,7 +30,7 @@ class ChooseSymptomsViewModel(
         )
             .load()
             .doOnSuccess {
-                router.navigateTo(Screens.UserDetailsScreen)
+                router.navigateTo(Screens.userDetails())
             }
             .emptySubscribe()
             .autoDispose()

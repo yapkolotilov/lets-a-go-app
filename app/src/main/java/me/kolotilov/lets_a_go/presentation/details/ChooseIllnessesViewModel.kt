@@ -18,6 +18,6 @@ class ChooseIllnessesViewModel(
 
     override fun next() {
         container.illnesses = selectedCache.map { it.name }
-        router.navigateTo(Screens.ChooseSymptomsScreen)
+        router.navigateTo(Screens.chooseSymptoms())
     }
 }

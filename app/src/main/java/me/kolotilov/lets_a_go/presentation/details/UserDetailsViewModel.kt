@@ -29,6 +29,6 @@ class UserDetailsViewModel(
 
     fun logOut() {
         repository.token = ""
-        router.newRootScreen(Screens.LoginScreen)
+        router.newRootScreen(Screens.login())
     }
 }

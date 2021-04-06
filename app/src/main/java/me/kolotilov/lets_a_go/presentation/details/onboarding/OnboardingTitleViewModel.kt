@@ -9,10 +9,10 @@ class OnboardingTitleViewModel(
 ) : BaseViewModel() {
 
     fun fill() {
-        router.navigateTo(Screens.BasicInfoScreen)
+        router.navigateTo(Screens.basicInfo())
     }
 
     fun skip() {
-        router.navigateTo(Screens.UserDetailsScreen)
+        router.navigateTo(Screens.userDetails())
     }
 }

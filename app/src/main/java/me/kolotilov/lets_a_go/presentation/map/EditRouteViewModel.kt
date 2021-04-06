@@ -86,7 +86,7 @@ class EditRouteViewModel(
         fun parseResult(route: Route) {
             params.routeDetails.id = route.id
             router.exit()
-            router.navigateTo(Screens.RouteDetails)
+            router.navigateTo(Screens.routeDetails())
         }
 
         if (id == null) {

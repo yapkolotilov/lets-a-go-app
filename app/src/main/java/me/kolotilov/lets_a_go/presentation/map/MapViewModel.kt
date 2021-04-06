@@ -1,6 +1,5 @@
 package me.kolotilov.lets_a_go.presentation.map
 
-import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
@@ -36,7 +35,7 @@ class MapViewModel(
             loadRoutes()
             callback()
         }
-        router.navigateTo(Screens.EditEntry)
+        router.navigateTo(Screens.editEntry())
     }
 
     fun openEditRouteBottomSheet(recordedPoints: MutableList<Point>, callback: () -> Unit) {
@@ -45,7 +44,7 @@ class MapViewModel(
             loadRoutes()
             callback()
         }
-        router.navigateTo(Screens.EditRoute)
+        router.navigateTo(Screens.editRoute())
     }
 
     fun openRouteDetailsBottomSheet(route: Route) {
@@ -55,14 +54,13 @@ class MapViewModel(
             if (it)
                 startEntrySubject.onNext(Unit)
         }
-        router.navigateTo(Screens.RouteDetails)
+        router.navigateTo(Screens.routeDetails())
     }
 
     private fun loadRoutes() {
         repository.getAllRoutes(false) // TODO: Убрать заглушку
             .load()
             .doOnSuccess {
-                Log.d("BRUH", it.toString())
                 routesSubject.onNext(it)
             }
             .emptySubscribe()
@@ -70,6 +68,6 @@ class MapViewModel(
     }
 
     fun openUserDetails() {
-        router.navigateTo(Screens.UserDetailsScreen)
+        router.navigateTo(Screens.userDetails())
     }
 }

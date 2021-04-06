@@ -166,12 +166,12 @@ class NetworkRepositoryImpl(
         if (throwable is HttpException) runCatching {
             val error = throwable.response()?.errorBody()?.let { converter.convert(it) }
             if (error != null)
-                return ServerException(error.error)
+                return error.toServiceException()
         }
         if (throwable is retrofit2.adapter.rxjava2.HttpException) runCatching {
             val error = throwable.response()?.errorBody()?.let { converter.convert(it) }
             if (error != null)
-                return ServerException(error.error)
+                return error.toServiceException()
         }
         return throwable
     }

@@ -33,4 +33,12 @@
     <string name="switch_public_hint">Опубликовать</string>
     <string name="save_button">Сохранить</string>
     <string name="ok_button">ОК</string>
+    <string name="invalid_email_title">Пользователя с таким e-mail не существует</string>
+    <string name="invalid_email_message">Попробуйте ещё раз</string>
+    <string name="invalid_password_title">Неправильный пароль</string>
+    <string name="invalid_password_message">Попробуйте ещё раз</string>
+    <string name="login_hint">Войдите в приложение</string>
+    <string name="min_password_characters_error_title">Пароль должен содержать не менее 8 символов</string>
+    <string name="user_already_registered_title">Пользователь с таким email уже зарегистрирован</string>
+    <string name="user_already_registered_message">Войдите в приложение или зарегистрируйте нового пользователя</string>
 </resources>

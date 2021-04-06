@@ -18,6 +18,11 @@ fun <T> Any.castTo(): T {
     return this as T
 }
 
+@Suppress("UNCHECKED_CAST")
+fun <T> Any.castToOrNull(): T? {
+    return this as? T
+}
+
 fun <T> Subject<T>.emitNext(value: T?) {
     if (value != null)
         onNext(value)

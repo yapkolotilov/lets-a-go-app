@@ -46,7 +46,7 @@ class EditEntryViewModel(
                 params.routeDetails.id = it.id
                 router.exit()
                 params.routeDetails.id = params.editEntry.route?.id
-                router.navigateTo(Screens.RouteDetails)
+                router.navigateTo(Screens.routeDetails())
             }
             .emptySubscribe()
             .autoDispose()

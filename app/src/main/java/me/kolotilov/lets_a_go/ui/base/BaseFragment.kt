@@ -10,6 +10,8 @@ import android.widget.Toast
 import androidx.annotation.CallSuper
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import io.reactivex.Completable
@@ -18,6 +20,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
+import me.kolotilov.lets_a_go.utils.castTo
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.x.closestDI
@@ -25,12 +28,15 @@ import org.kodein.di.android.x.closestDI
 /**
  * Базовый фрагмент.
  */
-abstract class BaseFragment(@LayoutRes layoutRes: Int) : Fragment(layoutRes), DIAware {
+abstract class BaseFragment(
+    @LayoutRes layoutRes: Int
+) : Fragment(layoutRes), DIAware {
 
     private val compositeDisposable = CompositeDisposable()
     private val delegates = mutableListOf<ViewDelegate<*>>()
 
     override val di: DI by closestDI()
+    protected open val toolbar: Toolbar? = null
 
     final override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,6 +49,7 @@ abstract class BaseFragment(@LayoutRes layoutRes: Int) : Fragment(layoutRes), DI
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        defaultFillViews()
         fillViews()
         bind()
         defaultSubscribe()
@@ -76,6 +83,19 @@ abstract class BaseFragment(@LayoutRes layoutRes: Int) : Fragment(layoutRes), DI
      * Подписывается на изменения ViewModel.
      */
     protected open fun subscribe() = Unit
+
+    private fun defaultFillViews() {
+        if (toolbar != null) {
+            requireActivity().castTo<AppCompatActivity>().let { activity ->
+                activity.setSupportActionBar(toolbar)
+                activity.supportActionBar!!.apply {
+                    setDisplayHomeAsUpEnabled(true)
+                    setDisplayShowHomeEnabled(true)
+
+                }
+            }
+        }
+    }
 
     private fun defaultSubscribe() {
         viewModel.popup.subscribe {

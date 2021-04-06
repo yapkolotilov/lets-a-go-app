@@ -60,11 +60,11 @@ class BasicInfoViewModel(
                 weight = weightSubject.value
             }
         }
-        router.navigateTo(Screens.ChooseIllnessesScreen)
+        router.navigateTo(Screens.chooseIllnesses())
     }
 
     fun skip() {
-        router.navigateTo(Screens.UserDetailsScreen)
+        router.navigateTo(Screens.userDetails())
     }
 
     private fun validate(): Boolean {

@@ -1,5 +1,8 @@
 package me.kolotilov.lets_a_go.presentation
 
+import androidx.annotation.AnimRes
+import androidx.fragment.app.Fragment
+import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.ui.auth.LoginFragment
 import me.kolotilov.lets_a_go.ui.auth.RegisterFragment
 import me.kolotilov.lets_a_go.ui.details.BasicInfoFragment
@@ -10,54 +13,66 @@ import me.kolotilov.lets_a_go.ui.details.user.UserDetailsFragment
 import me.kolotilov.lets_a_go.ui.map.*
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
-class
-Screens {
+object Screens {
 
-    object LoginScreen : SupportAppScreen() {
-        override fun getFragment() = LoginFragment()
-    }
+    fun login() = LetsScreen(animation = null) { LoginFragment() }
 
-    object RegisterScreen : SupportAppScreen() {
-        override fun getFragment() = RegisterFragment()
-    }
+    fun register() = LetsScreen(animation = ScreenAnimation.SLIDE_LEFT) { RegisterFragment() }
 
-    object BasicInfoScreen : SupportAppScreen() {
-        override fun getFragment() = BasicInfoFragment()
-    }
+    fun basicInfo() = LetsScreen { BasicInfoFragment() }
 
-    object ChooseIllnessesScreen : SupportAppScreen() {
-        override fun getFragment() = ChooseIllnessesFragment()
-    }
+    fun chooseIllnesses() = LetsScreen { ChooseIllnessesFragment() }
 
-    object ChooseSymptomsScreen : SupportAppScreen() {
-        override fun getFragment() = ChooseSymptomsFragment()
-    }
+    fun chooseSymptoms() = LetsScreen { ChooseSymptomsFragment() }
 
-    object UserDetailsScreen : SupportAppScreen() {
-        override fun getFragment() = UserDetailsFragment()
-    }
+    fun userDetails() = LetsScreen { UserDetailsFragment() }
 
-    object OnboardingTitleScreen : SupportAppScreen() {
-        override fun getFragment() = OnboardingTitleFragment()
-    }
+    fun onboarding() = LetsScreen { OnboardingTitleFragment() }
 
-    object MapScreen : SupportAppScreen() {
-        override fun getFragment() = MapFragment()
-    }
+    fun map() = LetsScreen { MapFragment() }
 
-    object EditRoute : SupportAppScreen() {
-        override fun getFragment() = EditRouteBottomSheet()
-    }
+    fun editRoute() = LetsScreen { EditRouteBottomSheet() }
 
-    object RouteDetails : SupportAppScreen() {
-        override fun getFragment() = RouteDetailsBottomSheet()
-    }
+    fun routeDetails() = LetsScreen { RouteDetailsBottomSheet() }
 
-    object EditEntry : SupportAppScreen() {
-        override fun getFragment() = EditEntryBottomSheet()
-    }
+    fun editEntry() = LetsScreen { EditEntryBottomSheet() }
 
-    object EntryDetails : SupportAppScreen() {
-        override fun getFragment() = EntryDetailsBottomSheet()
-    }
+    fun entryDetails() = LetsScreen { EntryDetailsBottomSheet() }
+}
+
+class LetsScreen(
+    val animation: ScreenAnimation? = ScreenAnimation.SLIDE_RIGHT,
+    private val factory: () -> Fragment
+) : SupportAppScreen() {
+
+    override fun getFragment() = factory()
+}
+
+/**
+ * Анимация.
+ */
+enum class ScreenAnimation(
+    @AnimRes
+    val enter: Int,
+    @AnimRes
+    val exit: Int,
+    @AnimRes
+    val popEnter: Int,
+    @AnimRes
+    val popExit: Int
+) {
+
+    SLIDE_LEFT(
+        enter = R.anim.enter_from_left,
+        exit = R.anim.exit_to_right,
+        popEnter = R.anim.enter_from_right,
+        popExit = R.anim.exit_to_left
+    ),
+
+    SLIDE_RIGHT(
+        enter = R.anim.enter_from_right,
+        exit = R.anim.exit_to_left,
+        popEnter = R.anim.enter_from_left,
+        popExit = R.anim.exit_to_right
+    ),
 }
