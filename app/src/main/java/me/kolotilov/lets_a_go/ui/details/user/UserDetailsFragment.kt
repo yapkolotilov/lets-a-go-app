@@ -11,6 +11,7 @@ import me.kolotilov.lets_a_go.ui.base.BaseFragment
 import me.kolotilov.lets_a_go.ui.base.Grid
 import me.kolotilov.lets_a_go.ui.base.Recycler
 import me.kolotilov.lets_a_go.ui.details.BaseDetailsView
+import me.kolotilov.lets_a_go.utils.smartSetText
 import org.kodein.di.instance
 import java.text.SimpleDateFormat
 
@@ -42,11 +43,12 @@ class UserDetailsFragment : BaseFragment(R.layout.fragment_user_details) {
 
     override fun bind() {
         logOutButton.setOnClickListener { viewModel.logOut() }
+        baseDetailsView.setOnClickListener { viewModel.editBasicInfo() }
     }
 
     override fun subscribe() {
         viewModel.userDetails.subscribe {
-            usernameTextView.text = it.username
+            usernameTextView smartSetText it.username
             baseDetailsView.setData(
                 name = it.name,
                 age = it.age,

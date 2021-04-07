@@ -11,6 +11,7 @@ import me.kolotilov.lets_a_go.ui.details.ChooseSymptomsFragment
 import me.kolotilov.lets_a_go.ui.details.onboarding.OnboardingTitleFragment
 import me.kolotilov.lets_a_go.ui.details.user.UserDetailsFragment
 import me.kolotilov.lets_a_go.ui.map.*
+import org.joda.time.DateTime
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
@@ -19,7 +20,20 @@ object Screens {
 
     fun register() = LetsScreen(animation = ScreenAnimation.SLIDE_LEFT) { RegisterFragment() }
 
-    fun basicInfo() = LetsScreen { BasicInfoFragment() }
+    /**
+     * Экран редактирования базовой информации.
+     *
+     * @param name Название.
+     * @param birthDate Дата рождения.
+     * @param height Высота (см).
+     * @param weight Вес (кг).
+     */
+    fun basicInfo(
+        name: String? = null,
+        birthDate: DateTime? = null,
+        height: Int? = null,
+        weight: Int? = null
+    ) = LetsScreen { BasicInfoFragment.newInstance(name, birthDate, height, weight) }
 
     fun chooseIllnesses() = LetsScreen { ChooseIllnessesFragment() }
 

@@ -8,6 +8,7 @@ import me.kolotilov.lets_a_go.network.output.toEntry
 import me.kolotilov.lets_a_go.network.output.toRoute
 import me.kolotilov.lets_a_go.network.output.toUserDetails
 import okhttp3.ResponseBody
+import org.joda.time.DateTime
 import retrofit2.Converter
 import retrofit2.HttpException
 import retrofit2.Retrofit
@@ -21,14 +22,14 @@ interface NetworkRepository {
     fun getDetails(): Single<UserDetails>
 
     fun editDetails(
-        name: String?,
-        age: Int?,
-        height: Int?,
-        weight: Int?,
-        illnesses: List<String>?,
-        symptoms: List<String>?,
-        filter: Filter?,
-        updateFilter: Boolean
+        name: String? = null,
+        birthDate: DateTime? = null,
+        height: Int? = null,
+        weight: Int? = null,
+        illnesses: List<String>? = null,
+        symptoms: List<String>? = null,
+        filter: Filter? = null,
+        updateFilter: Boolean = false
     ): Single<UserDetails>
 
     fun changePassword(password: String): Single<UserDetails>
@@ -80,7 +81,7 @@ class NetworkRepositoryImpl(
 
     override fun editDetails(
         name: String?,
-        age: Int?,
+        birthDate: DateTime?,
         height: Int?,
         weight: Int?,
         illnesses: List<String>?,
@@ -91,7 +92,7 @@ class NetworkRepositoryImpl(
         return api.editDetails(
             EditDetailsDto(
                 name,
-                age,
+                birthDate?.toDate(),
                 height,
                 weight,
                 illnesses,

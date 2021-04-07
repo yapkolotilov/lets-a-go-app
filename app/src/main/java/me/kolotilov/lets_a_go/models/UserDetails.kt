@@ -1,5 +1,7 @@
 package me.kolotilov.lets_a_go.models
 
+import org.joda.time.DateTime
+
 /**
  * Пользователь.
  *
@@ -7,7 +9,7 @@ package me.kolotilov.lets_a_go.models
  * @param password Пароль.
  * @param confirmationUrl URL подтверждения.
  * @param name ФИО.
- * @param age Возраст.
+ * @param birthDate Возраст.
  * @param height Рост.
  * @param weight Вес.
  * @param illnesses Заболевания.
@@ -18,8 +20,9 @@ package me.kolotilov.lets_a_go.models
  */
 data class UserDetails(
     val username: String,
-    val name: String = "",
+    val name: String?,
     val age: Int? = null,
+    val birthDate: DateTime? = null,
     val height: Int? = null,
     val weight: Int? = null,
     val illnesses: List<String> = emptyList(),

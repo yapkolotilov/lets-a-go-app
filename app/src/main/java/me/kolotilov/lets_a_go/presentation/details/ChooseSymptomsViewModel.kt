@@ -2,7 +2,6 @@ package me.kolotilov.lets_a_go.presentation.details
 
 import io.reactivex.Single
 import me.kolotilov.lets_a_go.network.Repository
-import me.kolotilov.lets_a_go.presentation.Screens
 import ru.terrakok.cicerone.Router
 
 class ChooseSymptomsViewModel(
@@ -18,21 +17,21 @@ class ChooseSymptomsViewModel(
 
     override fun next() {
         container.symptoms = selectedCache.map { it.name }
-        repository.editDetails(
-            name = container.name,
-            age = container.age,
-            height = container.height,
-            weight = container.weight,
-            illnesses = container.illnesses,
-            symptoms = container.symptoms,
-            filter = null,
-            updateFilter = true
-        )
-            .load()
-            .doOnSuccess {
-                router.navigateTo(Screens.userDetails())
-            }
-            .emptySubscribe()
-            .autoDispose()
+//        repository.editDetails(
+//            name = container.name,
+//            birthDate = container.age,
+//            height = container.height,
+//            weight = container.weight,
+//            illnesses = container.illnesses,
+//            symptoms = container.symptoms,
+//            filter = null,
+//            updateFilter = true
+//        )
+//            .load()
+//            .doOnSuccess {
+//                router.navigateTo(Screens.userDetails())
+//            }
+//            .emptySubscribe()
+//            .autoDispose()
     }
 }

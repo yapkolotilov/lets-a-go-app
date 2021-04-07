@@ -1,6 +1,8 @@
 package me.kolotilov.lets_a_go.utils
 
-import android.widget.EditText
+import android.widget.TextView
+import androidx.core.view.isVisible
+import com.google.android.material.textfield.TextInputLayout
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 import org.joda.time.DateTime
@@ -53,10 +55,20 @@ fun <T : Any> BehaviorSubject<T>.value(): T {
  *
  * @param text Текст.
  */
-fun EditText.smartSetText(text: CharSequence) {
+infix fun TextInputLayout.smartSetText(text: CharSequence?) {
     if (hasFocus())
         return
+    editText?.setText(text)
+}
+
+/**
+ * Устанавливает значение.
+ *
+ * @param text Текст.
+ */
+infix fun TextView.smartSetText(text: CharSequence?) {
     setText(text)
+    isVisible = !text.isNullOrEmpty()
 }
 
 //endregion
