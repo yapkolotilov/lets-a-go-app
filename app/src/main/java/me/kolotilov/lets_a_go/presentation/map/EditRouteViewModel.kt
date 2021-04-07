@@ -10,7 +10,6 @@ import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.Params
 import me.kolotilov.lets_a_go.presentation.Screens
 import me.kolotilov.lets_a_go.presentation.base.BaseBottomSheetViewModel
-import me.kolotilov.lets_a_go.ui.base.Grid
 import org.joda.time.Duration
 import ru.terrakok.cicerone.Router
 
@@ -134,8 +133,3 @@ class EditRouteViewModel(
         params.editRoute.callback()
     }
 }
-
-class KeyValueModel(
-    val key: String,
-    val value: String
-) : Grid.ViewModel

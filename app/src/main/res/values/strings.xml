@@ -41,4 +41,16 @@
     <string name="min_password_characters_error_title">Пароль должен содержать не менее 8 символов</string>
     <string name="user_already_registered_title">Пользователь с таким email уже зарегистрирован</string>
     <string name="user_already_registered_message">Войдите в приложение или зарегистрируйте нового пользователя</string>
+    <string name="user_details_title">Профиль</string>
+    <string name="age_key">Возраст</string>
+    <string name="height_key">Рост</string>
+    <string name="weight_key">Вес</string>
+    <string name="cm">см.</string>
+    <string name="kg">кг.</string>
+    <plurals name="age">
+        <item quantity="one">год</item>
+        <item quantity="few">года</item>
+        <item quantity="many">лет</item>
+        <item quantity="other">лет</item>
+    </plurals>
 </resources>

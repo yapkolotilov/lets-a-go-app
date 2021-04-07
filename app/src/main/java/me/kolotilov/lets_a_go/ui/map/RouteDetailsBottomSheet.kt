@@ -12,10 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.Entry
 import me.kolotilov.lets_a_go.models.Route
-import me.kolotilov.lets_a_go.presentation.map.KeyValueModel
 import me.kolotilov.lets_a_go.presentation.map.RouteDetailsViewModel
 import me.kolotilov.lets_a_go.ui.base.BaseBottomSheetFragment
 import me.kolotilov.lets_a_go.ui.base.Grid
+import me.kolotilov.lets_a_go.ui.base.KeyValueModel
 import me.kolotilov.lets_a_go.ui.base.Recycler
 import org.kodein.di.instance
 import java.text.DecimalFormat

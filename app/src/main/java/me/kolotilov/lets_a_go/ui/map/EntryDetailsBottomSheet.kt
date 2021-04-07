@@ -3,9 +3,9 @@ package me.kolotilov.lets_a_go.ui.map
 import android.widget.GridLayout
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.presentation.map.EntryDetailsViewModel
-import me.kolotilov.lets_a_go.presentation.map.KeyValueModel
 import me.kolotilov.lets_a_go.ui.base.BaseBottomSheetFragment
 import me.kolotilov.lets_a_go.ui.base.Grid
+import me.kolotilov.lets_a_go.ui.base.KeyValueModel
 import org.kodein.di.instance
 import java.text.SimpleDateFormat
 

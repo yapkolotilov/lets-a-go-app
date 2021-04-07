@@ -19,6 +19,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
 import me.kolotilov.lets_a_go.utils.castTo
 import org.kodein.di.DI
@@ -57,7 +58,8 @@ abstract class BaseFragment(
         viewModel.attach()
     }
 
-    final override fun onDestroyView() {
+    @CallSuper
+    override fun onDestroyView() {
         super.onDestroyView()
         compositeDisposable.clear()
         delegates.forEach { it.dispose() }
@@ -86,12 +88,12 @@ abstract class BaseFragment(
 
     private fun defaultFillViews() {
         if (toolbar != null) {
+            toolbar?.setNavigationIcon(R.drawable.ic_back_button)
             requireActivity().castTo<AppCompatActivity>().let { activity ->
                 activity.setSupportActionBar(toolbar)
                 activity.supportActionBar!!.apply {
                     setDisplayHomeAsUpEnabled(true)
                     setDisplayShowHomeEnabled(true)
-
                 }
             }
         }

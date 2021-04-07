@@ -15,7 +15,7 @@ import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
 
-    fun login() = LetsScreen(animation = null) { LoginFragment() }
+    fun login() = LetsScreen { LoginFragment() }
 
     fun register() = LetsScreen(animation = ScreenAnimation.SLIDE_LEFT) { RegisterFragment() }
 

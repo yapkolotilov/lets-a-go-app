@@ -1,5 +1,6 @@
 package me.kolotilov.lets_a_go.ui
 
+import android.content.Context
 import android.location.Location
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
@@ -36,4 +37,4 @@ fun TextInputLayout.doAfterTextChanged(callback: (String) -> Unit) {
 
 //endregion
 
-val RecyclerView.ViewHolder.context get() = itemView.context
+val RecyclerView.ViewHolder.context: Context get() = itemView.context

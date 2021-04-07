@@ -11,10 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.presentation.map.EditRouteViewModel
-import me.kolotilov.lets_a_go.presentation.map.KeyValueModel
-import me.kolotilov.lets_a_go.ui.base.BaseBottomSheetFragment
-import me.kolotilov.lets_a_go.ui.base.Grid
-import me.kolotilov.lets_a_go.ui.base.Recycler
+import me.kolotilov.lets_a_go.ui.base.*
 import me.kolotilov.lets_a_go.ui.context
 import org.kodein.di.instance
 import java.text.SimpleDateFormat
@@ -140,16 +137,5 @@ class StatsFactory : Grid.Factory {
         val keyView = TextView(parent.context)
         val valueView = TextView(parent.context)
         return KeyValueViewHolder(keyView, valueView)
-    }
-}
-
-class KeyValueViewHolder(
-    private val keyView: TextView,
-    private val valueView: TextView
-) : Grid.ViewHolder<KeyValueModel>(listOf(keyView, valueView)) {
-
-    override fun bind(element: KeyValueModel) {
-        keyView.text = element.key
-        valueView.text = element.value
     }
 }

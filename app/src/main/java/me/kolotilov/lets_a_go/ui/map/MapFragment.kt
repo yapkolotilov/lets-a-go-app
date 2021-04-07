@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.text.format.DateUtils
@@ -41,7 +42,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 
-class MapFragment : BaseFragment(R.layout.fragment_map) {
+class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
 
     private companion object {
 
@@ -158,6 +159,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         map.addPolyline(PolylineOptions().addAll(emptyList()))
     }
     private var currentRoutePolyline: Polyline? = null
+    private lateinit var client: LocationManager
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -191,6 +193,16 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        client.removeUpdates(this)
+    }
+
+    override fun onLocationChanged(location: Location) {
+        currentPositionMarker.position = location.toLatLng()
+        state.processLocation(location)
+    }
+
     override fun bind() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
             requestLocationUpdates()
@@ -202,10 +214,8 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
 
     @SuppressLint("MissingPermission")
     private fun requestLocationUpdates() {
-        val client = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        client.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 5f) {
-            onLocationUpdate(it)
-        }
+        client = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        client.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 5f, this)
     }
 
     override fun subscribe() {
@@ -250,11 +260,6 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         currentRoutePolyline = map.addPolyline(
             PolylineOptions().color(Color.BLUE).addAll(route.points.map { it.toLatLng() })
         )
-    }
-
-    private fun onLocationUpdate(location: Location) {
-        currentPositionMarker.position = location.toLatLng()
-        state.processLocation(location)
     }
 
     private fun updateRecordingPanel(duration: Long) {
