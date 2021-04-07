@@ -3,11 +3,14 @@ package me.kolotilov.lets_a_go.presentation
 import androidx.annotation.AnimRes
 import androidx.fragment.app.Fragment
 import me.kolotilov.lets_a_go.R
+import me.kolotilov.lets_a_go.models.Illness
+import me.kolotilov.lets_a_go.models.Symptom
 import me.kolotilov.lets_a_go.ui.auth.LoginFragment
 import me.kolotilov.lets_a_go.ui.auth.RegisterFragment
-import me.kolotilov.lets_a_go.ui.details.BasicInfoFragment
+import me.kolotilov.lets_a_go.ui.details.BaseChooseFragment
 import me.kolotilov.lets_a_go.ui.details.ChooseIllnessesFragment
 import me.kolotilov.lets_a_go.ui.details.ChooseSymptomsFragment
+import me.kolotilov.lets_a_go.ui.details.EditBasicInfoFragment
 import me.kolotilov.lets_a_go.ui.details.onboarding.OnboardingTitleFragment
 import me.kolotilov.lets_a_go.ui.details.user.UserDetailsFragment
 import me.kolotilov.lets_a_go.ui.map.*
@@ -33,11 +36,13 @@ object Screens {
         birthDate: DateTime? = null,
         height: Int? = null,
         weight: Int? = null
-    ) = LetsScreen { BasicInfoFragment.newInstance(name, birthDate, height, weight) }
+    ) = LetsScreen { EditBasicInfoFragment.newInstance(name, birthDate, height, weight) }
 
-    fun chooseIllnesses() = LetsScreen { ChooseIllnessesFragment() }
+    fun chooseIllnesses(type: BaseChooseFragment.Type, illnesses: List<Illness>) =
+        LetsScreen { ChooseIllnessesFragment.newInstance(type, illnesses) }
 
-    fun chooseSymptoms() = LetsScreen { ChooseSymptomsFragment() }
+    fun chooseSymptoms(type: BaseChooseFragment.Type, symptoms: List<Symptom>) =
+        LetsScreen { ChooseSymptomsFragment.newInstance(type, symptoms) }
 
     fun userDetails() = LetsScreen { UserDetailsFragment() }
 

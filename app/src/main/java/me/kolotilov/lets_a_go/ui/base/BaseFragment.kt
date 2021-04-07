@@ -39,12 +39,6 @@ abstract class BaseFragment(
     override val di: DI by closestDI()
     protected open val toolbar: Toolbar? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (arguments != null)
-            requireArguments().readArguments()
-    }
-
     final override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -62,6 +56,8 @@ abstract class BaseFragment(
         defaultSubscribe()
         subscribe()
         viewModel.attach()
+        if (arguments != null)
+            requireArguments().readArguments()
     }
 
     @CallSuper

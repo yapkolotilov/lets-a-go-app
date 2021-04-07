@@ -12,6 +12,9 @@ import me.kolotilov.lets_a_go.ui.base.InfoView
 import me.kolotilov.lets_a_go.ui.base.KeyValueFactory
 import me.kolotilov.lets_a_go.ui.base.toKeyValueModel
 
+/**
+ * Базовая информация о здоровье.
+ */
 class BaseDetailsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null

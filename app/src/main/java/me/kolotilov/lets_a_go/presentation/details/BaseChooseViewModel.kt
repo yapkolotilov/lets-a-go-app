@@ -3,36 +3,55 @@ package me.kolotilov.lets_a_go.presentation.details
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
 
-abstract class BaseChooseViewModel : BaseViewModel() {
+/**
+ * Базовая логика экрана выбора
+ */
+abstract class BaseChooseViewModel<T> : BaseViewModel() {
 
-    private var itemsCache = mutableListOf<IllnessModel>()
-    protected var selectedCache = mutableSetOf<IllnessModel>()
+    private var itemsCache = mutableListOf<T>()
+    protected var selectedCache = mutableSetOf<T>()
 
-    val items: Observable<List<IllnessModel>> get() = itemsSubject
-    private val itemsSubject: Subject<List<IllnessModel>> = BehaviorSubject.create()
+    val items: Observable<List<T>> get() = itemsSubject
+    private val itemsSubject: Subject<List<T>> = BehaviorSubject.create()
 
-    val selectedItems: Observable<Set<IllnessModel>> get() = selectedItemsSubject
-    private val selectedItemsSubject: Subject<Set<IllnessModel>> = BehaviorSubject.create()
+    val selectedItems: Observable<Set<T>> get() = selectedItemsSubject
+    private val selectedItemsSubject: Subject<Set<T>> = BehaviorSubject.create()
+
+    /**
+     * Приказ показать диалог для обновления деталей.
+     */
+    val updateFilterDialog: Observable<Unit> get() = updateFilterDialogSubject
+    private val updateFilterDialogSubject: Subject<Unit> = PublishSubject.create()
+
+    private var healthUpdated: Boolean = false
 
     override fun attach() {
         loadItems()
+            .map { it.sorted() }
             .load()
             .doOnSuccess {
-                itemsCache = it.map { it.toApprovedModel() }.toMutableList()
+                itemsCache = it.map { it.toItem() }.toMutableList()
                 itemsSubject.onNext(itemsCache)
             }
             .emptySubscribe()
     }
 
+    fun init(selectedItems: List<T>) {
+        selectedCache = selectedItems.toMutableSet()
+        selectedItemsSubject.onNext(selectedCache)
+    }
+
     fun search(query: String) {
-        val foundItems = itemsCache.filter { it.name.contains(query, ignoreCase = true) }
+        val foundItems = itemsCache.filter { it.name().contains(query, ignoreCase = true) }
         itemsSubject.onNext(foundItems)
     }
 
-    fun select(item: IllnessModel) {
+    fun select(item: T) {
+        healthUpdated = true
         if (selectedCache.contains(item))
             selectedCache.remove(item)
         else
@@ -40,26 +59,20 @@ abstract class BaseChooseViewModel : BaseViewModel() {
         selectedItemsSubject.onNext(selectedCache)
     }
 
+    fun save() {
+        if (healthUpdated)
+            updateFilterDialogSubject.onNext(Unit)
+        else
+            performSave(false)
+    }
+
     abstract fun next()
+
+    abstract fun performSave(updateFilter: Boolean)
 
     protected abstract fun loadItems(): Single<List<String>>
 
-    private fun String.toApprovedModel() = IllnessModel.Approved(this)
-}
+    protected abstract fun String.toItem(): T
 
-sealed class IllnessModel {
-
-    data class Approved(
-        override val name: String
-    ) : IllnessModel()
-
-    data class Custom(
-        override val name: String
-    ) : IllnessModel()
-
-    data class New(
-        override val name: String
-    ) : IllnessModel()
-
-    abstract val name: String
+    protected abstract fun T.name(): String
 }

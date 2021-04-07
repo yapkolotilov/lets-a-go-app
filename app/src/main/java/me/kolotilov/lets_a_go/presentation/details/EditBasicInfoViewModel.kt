@@ -12,7 +12,7 @@ import ru.terrakok.cicerone.Router
 /**
  * Логика редактирования базовой информации.
  */
-class BasicInfoViewModel(
+class EditBasicInfoViewModel(
     private val router: Router,
     private val repository: Repository,
 ) : BaseViewModel() {

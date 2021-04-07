@@ -11,7 +11,7 @@ import me.kolotilov.lets_a_go.presentation.Tags
 import me.kolotilov.lets_a_go.presentation.base.ButtonData
 import me.kolotilov.lets_a_go.presentation.base.showCompat
 import me.kolotilov.lets_a_go.presentation.base.showDialog
-import me.kolotilov.lets_a_go.presentation.details.BasicInfoViewModel
+import me.kolotilov.lets_a_go.presentation.details.EditBasicInfoViewModel
 import me.kolotilov.lets_a_go.ui.base.BaseFragment
 import me.kolotilov.lets_a_go.ui.base.NumberPickerDialog
 import me.kolotilov.lets_a_go.ui.buildArguments
@@ -25,7 +25,7 @@ import org.joda.time.format.DateTimeFormatter
 import org.kodein.di.instance
 import java.util.*
 
-class BasicInfoFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
+class EditBasicInfoFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
     BaseFragment(R.layout.fragment_basic_info) {
 
     companion object {
@@ -49,8 +49,8 @@ class BasicInfoFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor(
             birthDate: DateTime?,
             height: Int?,
             weight: Int?
-        ): BasicInfoFragment {
-            return BasicInfoFragment().buildArguments {
+        ): EditBasicInfoFragment {
+            return EditBasicInfoFragment().buildArguments {
                 putString(NAME, name)
                 putSerializable(BIRTH_DATE, birthDate?.toDate())
                 putInt(HEIGHT, height ?: -1)
@@ -59,7 +59,7 @@ class BasicInfoFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor(
         }
     }
 
-    override val viewModel: BasicInfoViewModel by instance()
+    override val viewModel: EditBasicInfoViewModel by instance()
     private val birthDateFormatter: DateTimeFormatter by instance(Tags.BIRTH_DATE)
 
     override val toolbar: Toolbar by lazyView(R.id.toolbar)

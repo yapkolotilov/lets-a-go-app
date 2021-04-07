@@ -77,7 +77,7 @@ class Recycler {
 
         fun getType(item: T): Int
 
-        fun getViewHolder(type: Int, view: View, delegate: Delegate<T>): Recycler.ViewHolder<T>
+        fun getViewHolder(type: Int, itemView: View, delegate: Delegate<T>): Recycler.ViewHolder<T>
     }
 
     class SimpleFactory<T>(
@@ -89,24 +89,12 @@ class Recycler {
 
         override fun getViewHolder(
             type: Int,
-            view: View,
+            itemView: View,
             delegate: Delegate<T>
-        ): ViewHolder<T> = viewHolderFactory(view, delegate)
+        ): ViewHolder<T> = viewHolderFactory(itemView, delegate)
     }
 
     interface Delegate<T> {
-
-        companion object {
-
-            fun <T> create(onClick: (item: T) -> Unit): Delegate<T> {
-                return object : Delegate<T> {
-
-                    override fun onClick(item: T) {
-                        onClick(item)
-                    }
-                }
-            }
-        }
 
         fun onClick(item: T) = Unit
     }

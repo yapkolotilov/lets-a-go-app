@@ -12,9 +12,9 @@ class IllnessFactory : Recycler.Factory<String> {
 
     override fun getViewHolder(
         type: Int,
-        view: View,
+        itemView: View,
         delegate: Recycler.Delegate<String>
     ): Recycler.ViewHolder<String> {
-        return IllnessViewHolder(view, delegate)
+        return IllnessViewHolder(itemView, delegate)
     }
 }

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="margin_content_extra_small">4dp</dimen>
     <dimen name="margin_content_small">8dp</dimen>
     <dimen name="margin_content">12dp</dimen>
     <dimen name="padding_button">12dp</dimen>
     <dimen name="card_radius">16dp</dimen>
     <dimen name="margin_default">16dp</dimen>
+    <dimen name="padding_content_small">24dp</dimen>
     <dimen name="padding_content">32dp</dimen>
 </resources>

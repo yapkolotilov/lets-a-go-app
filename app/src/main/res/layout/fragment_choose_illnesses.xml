@@ -10,6 +10,7 @@
         android:id="@+id/search_illness_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:iconifiedByDefault="false"
         app:queryHint="@string/search_illness_hint" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -21,8 +22,17 @@
 
     <Button
         android:id="@+id/next_button"
+        style="@style/LetsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/next_button" />
+
+    <Button
+        android:id="@+id/save_button"
+        android:visibility="gone"
+        style="@style/LetsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/save_button" />
 
 </LinearLayout>

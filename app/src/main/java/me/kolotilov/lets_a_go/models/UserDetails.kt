@@ -25,8 +25,8 @@ data class UserDetails(
     val birthDate: DateTime? = null,
     val height: Int? = null,
     val weight: Int? = null,
-    val illnesses: List<String> = emptyList(),
-    val symptoms: List<String> = emptyList(),
+    val illnesses: List<Illness> = emptyList(),
+    val symptoms: List<Symptom> = emptyList(),
     val filter: Filter = Filter(null, null, null, null, 0),
     val routes: List<Route> = emptyList(),
     val entries: List<Entry> = emptyList()

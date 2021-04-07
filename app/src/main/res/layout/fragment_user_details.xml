@@ -12,84 +12,67 @@
         android:layout_height="wrap_content"
         app:title="@string/user_details_title" />
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingTop="@dimen/padding_content"
-        android:paddingBottom="@dimen/margin_content">
+        android:fillViewport="true">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:contentDescription="@string/icon"
-            android:src="@drawable/ic_user_details" />
-
-        <TextView
-            android:id="@+id/username_text_view"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            tools:text="yaroslavattacher@gmail.com" />
+            android:orientation="vertical"
+            android:paddingTop="@dimen/padding_content"
+            android:paddingBottom="@dimen/margin_content">
 
-        <me.kolotilov.lets_a_go.ui.details.BaseDetailsView
-            android:id="@+id/base_details_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_content" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:contentDescription="@string/icon"
+                android:src="@drawable/ic_user_details" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/illnesses_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:paddingHorizontal="@dimen/padding_content"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            <TextView
+                android:id="@+id/username_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                tools:text="yaroslavattacher@gmail.com" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/symptoms_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            <me.kolotilov.lets_a_go.ui.details.BaseDetailsView
+                android:id="@+id/base_details_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_content" />
 
-        <Button
-            android:id="@+id/edit_details_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/edit_button" />
+            <me.kolotilov.lets_a_go.ui.details.IllnessesView
+                android:id="@+id/illnesses_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Рекомендации" />
+            <me.kolotilov.lets_a_go.ui.details.SymptomsView
+                android:id="@+id/symptoms_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-        <GridLayout
-            android:id="@+id/filter_grid"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:columnCount="2" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
-        <Button
-            android:id="@+id/edit_filter_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/edit_button" />
+            <Button
+                android:id="@+id/log_out_button"
+                style="@style/LetsTextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/padding_content"
+                android:layout_marginTop="@dimen/margin_content"
+                android:text="@string/log_out_button"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/log_out_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/log_out_button"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
-    </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

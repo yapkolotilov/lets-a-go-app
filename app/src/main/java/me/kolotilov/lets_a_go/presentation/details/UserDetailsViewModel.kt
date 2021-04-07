@@ -7,6 +7,7 @@ import me.kolotilov.lets_a_go.models.UserDetails
 import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
 import me.kolotilov.lets_a_go.presentation.Screens
+import me.kolotilov.lets_a_go.ui.details.BaseChooseFragment
 import ru.terrakok.cicerone.Router
 
 /**
@@ -41,12 +42,38 @@ class UserDetailsViewModel(
      */
     fun editBasicInfo() {
         val userDetailsCache = userDetailsCache ?: return
-        router.navigateTo(Screens.basicInfo(
-            name = userDetailsCache.name,
-            birthDate = userDetailsCache.birthDate,
-            height = userDetailsCache.height,
-            weight = userDetailsCache.weight
-        ))
+        router.navigateTo(
+            Screens.basicInfo(
+                name = userDetailsCache.name,
+                birthDate = userDetailsCache.birthDate,
+                height = userDetailsCache.height,
+                weight = userDetailsCache.weight
+            )
+        )
+    }
+
+    /**
+     * Изменение информации о болезнях.
+     */
+    fun editIllnesses() {
+        router.navigateTo(
+            Screens.chooseIllnesses(
+                BaseChooseFragment.Type.USER_DETAILS,
+                userDetailsCache?.illnesses ?: emptyList()
+            )
+        )
+    }
+
+    /**
+     * Изменение информации о жалобах.
+     */
+    fun editSymptoms() {
+        router.navigateTo(
+            Screens.chooseSymptoms(
+                BaseChooseFragment.Type.USER_DETAILS,
+                userDetailsCache?.symptoms ?: emptyList()
+            )
+        )
     }
 
     /**

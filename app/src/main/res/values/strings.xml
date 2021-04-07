@@ -59,7 +59,11 @@
     <string name="update_filter_message">Мы обновим рекомендации в соответствии с новыми данными о вашем здоровье</string>
     <string name="yes_button">ДА</string>
     <string name="no_button">НЕТ</string>
-    <string name="basic_info_hint">Добавьте информацию о себе</string>
+    <string name="basic_info_placeholder">Добавьте информацию о себе</string>
+    <string name="illnesses_title">Заболевания</string>
+    <string name="illnesses_placeholder">Укажите свои заболевания</string>
+    <string name="symptoms_placeholder">Укажите свои жалобы</string>
+    <string name="symptoms_title">Жалобы</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>
