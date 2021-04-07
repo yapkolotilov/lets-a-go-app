@@ -64,6 +64,10 @@
     <string name="illnesses_placeholder">Укажите свои заболевания</string>
     <string name="symptoms_placeholder">Укажите свои жалобы</string>
     <string name="symptoms_title">Жалобы</string>
+    <string name="choose_illnesses_title">Выберите заболевания</string>
+    <string name="choose_symptoms_title">Выберите жалобы</string>
+    <string name="choose_illnesses_hint">Введите название заболевания</string>
+    <string name="choose_symptoms_hint">Введите название жалобы</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>

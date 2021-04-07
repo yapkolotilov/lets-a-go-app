@@ -4,7 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginHorizontal="32dp"
-    android:orientation="vertical">
+    android:layout_marginTop="@dimen/margin_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/margin_content">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        app:title="foo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_illness_view"
@@ -29,10 +37,10 @@
 
     <Button
         android:id="@+id/save_button"
-        android:visibility="gone"
         style="@style/LetsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/save_button" />
+        android:text="@string/save_button"
+        android:visibility="gone" />
 
 </LinearLayout>

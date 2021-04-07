@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import me.kolotilov.lets_a_go.R
@@ -41,12 +42,16 @@ abstract class BaseChooseFragment<T> : BaseFragment(R.layout.fragment_choose_ill
 
     abstract override val viewModel: BaseChooseViewModel<T>
 
+    override val toolbar: Toolbar by lazyView(R.id.toolbar)
     private val searchView: SearchView by lazyView(R.id.search_illness_view)
     private val recycler: RecyclerView by lazyView(R.id.recycler)
     private val nextButton: Button by lazyView(R.id.next_button)
     private val saveButton: Button by lazyView(R.id.save_button)
 
     private lateinit var adapter: Recycler.Adapter<T>
+
+    protected abstract val title: String
+    protected abstract val hint: String
 
     protected abstract fun getFactory(): ChooseItemFactory<T>
 
@@ -70,6 +75,8 @@ abstract class BaseChooseFragment<T> : BaseFragment(R.layout.fragment_choose_ill
         }
         adapter = Recycler.Adapter(getFactory(), delegate)
         recycler.adapter = adapter
+        toolbar.title = title
+        searchView.queryHint = hint
     }
 
     override fun bind() {

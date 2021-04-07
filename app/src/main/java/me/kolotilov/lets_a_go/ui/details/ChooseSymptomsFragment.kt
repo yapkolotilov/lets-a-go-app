@@ -1,6 +1,7 @@
 package me.kolotilov.lets_a_go.ui.details
 
 import android.view.View
+import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.Symptom
 import me.kolotilov.lets_a_go.presentation.Constants
 import me.kolotilov.lets_a_go.presentation.details.ChooseSymptomsViewModel
@@ -27,6 +28,8 @@ class ChooseSymptomsFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constru
     }
 
     override val viewModel: ChooseSymptomsViewModel by instance()
+    override val title: String get() = requireContext().getString(R.string.choose_symptoms_title)
+    override val hint: String get() = requireContext().getString(R.string.choose_symptoms_hint)
 
     override fun getFactory(): ChooseItemFactory<Symptom> = ChooseSymptomFactory()
 
