@@ -6,6 +6,8 @@ import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
+import me.kolotilov.lets_a_go.presentation.Screens
+import me.kolotilov.lets_a_go.ui.details.EditDetailsType
 import org.joda.time.DateTime
 import ru.terrakok.cicerone.Router
 
@@ -68,6 +70,21 @@ class EditBasicInfoViewModel(
     private var weight: Int? = null
     private var healthUpdated: Boolean = false
 
+    override fun attach() {
+        repository.getDetails()
+            .load()
+            .doOnSuccess {
+                init(
+                    name = it.name,
+                    birthDate = it.birthDate,
+                    height = it.height,
+                    weight = it.weight
+                )
+            }
+            .emptySubscribe()
+            .autoDispose()
+    }
+
     /**
      * Инициализирует вьюмодель.
      *
@@ -76,7 +93,7 @@ class EditBasicInfoViewModel(
      * @param height Высота (см).
      * @param weight Вес (кг).
      */
-    fun init(name: String?, birthDate: DateTime?, height: Int?, weight: Int?) {
+    private fun init(name: String?, birthDate: DateTime?, height: Int?, weight: Int?) {
         this.name = name
         this.birthDate = birthDate
         this.height = height
@@ -155,6 +172,21 @@ class EditBasicInfoViewModel(
             updateFilterDialogSubject.onNext(Unit)
         else
             performSave(false)
+    }
+
+    fun next() {
+        repository.editDetails(
+            name = name,
+            birthDate = birthDate,
+            height = height,
+            weight = weight,
+            updateFilter = true,
+        ).load()
+            .doOnSuccess {
+                router.navigateTo(Screens.chooseIllnesses(EditDetailsType.ONBOARDING))
+            }
+            .emptySubscribe()
+            .autoDispose()
     }
 
     /**

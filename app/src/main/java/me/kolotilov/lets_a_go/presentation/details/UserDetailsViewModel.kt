@@ -7,7 +7,7 @@ import me.kolotilov.lets_a_go.models.UserDetails
 import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
 import me.kolotilov.lets_a_go.presentation.Screens
-import me.kolotilov.lets_a_go.ui.details.BaseChooseFragment
+import me.kolotilov.lets_a_go.ui.details.EditDetailsType
 import ru.terrakok.cicerone.Router
 
 /**
@@ -41,43 +41,25 @@ class UserDetailsViewModel(
      * Изменение информации о пользователе.
      */
     fun editBasicInfo() {
-        val userDetailsCache = userDetailsCache ?: return
-        router.navigateTo(
-            Screens.basicInfo(
-                name = userDetailsCache.name,
-                birthDate = userDetailsCache.birthDate,
-                height = userDetailsCache.height,
-                weight = userDetailsCache.weight
-            )
-        )
+        router.navigateTo(Screens.basicInfo(EditDetailsType.USER_DETAILS))
     }
 
     /**
      * Изменение информации о болезнях.
      */
     fun editIllnesses() {
-        router.navigateTo(
-            Screens.chooseIllnesses(
-                BaseChooseFragment.Type.USER_DETAILS,
-                userDetailsCache?.illnesses ?: emptyList()
-            )
-        )
+        router.navigateTo(Screens.chooseIllnesses(EditDetailsType.USER_DETAILS))
     }
 
     /**
      * Изменение информации о жалобах.
      */
     fun editSymptoms() {
-        router.navigateTo(
-            Screens.chooseSymptoms(
-                BaseChooseFragment.Type.USER_DETAILS,
-                userDetailsCache?.symptoms ?: emptyList()
-            )
-        )
+        router.navigateTo(Screens.chooseSymptoms(EditDetailsType.USER_DETAILS))
     }
 
     fun editFilter() {
-        router.navigateTo(Screens.editFilter())
+        router.navigateTo(Screens.editFilter(EditDetailsType.USER_DETAILS))
     }
 
     /**

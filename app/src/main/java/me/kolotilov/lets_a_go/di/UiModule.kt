@@ -6,6 +6,7 @@ import me.kolotilov.lets_a_go.presentation.Tags
 import me.kolotilov.lets_a_go.presentation.auth.LoginViewModel
 import me.kolotilov.lets_a_go.presentation.auth.RegisterViewModel
 import me.kolotilov.lets_a_go.presentation.details.*
+import me.kolotilov.lets_a_go.presentation.details.onboarding.OnboardingEndViewModel
 import me.kolotilov.lets_a_go.presentation.details.onboarding.OnboardingTitleViewModel
 import me.kolotilov.lets_a_go.presentation.map.*
 import org.joda.time.format.DateTimeFormat
@@ -40,6 +41,7 @@ fun uiModule() = DI.Module("App") {
     bind<EntryDetailsViewModel>() with provider { EntryDetailsViewModel(instance()) }
     bind<RouteDetailsViewModel>() with provider { RouteDetailsViewModel(instance(), instance(), instance()) }
     bind<EditFilterViewModel>() with provider { EditFilterViewModel(instance(), instance()) }
+    bind<OnboardingEndViewModel>() with provider { OnboardingEndViewModel(instance()) }
 }
 
 private fun birthDateFormatter(): DateTimeFormatter {

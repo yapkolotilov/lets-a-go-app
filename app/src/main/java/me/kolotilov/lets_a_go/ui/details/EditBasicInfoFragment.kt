@@ -4,9 +4,9 @@ import android.app.DatePickerDialog
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
 import com.google.android.material.textfield.TextInputLayout
 import me.kolotilov.lets_a_go.R
-import me.kolotilov.lets_a_go.presentation.Constants
 import me.kolotilov.lets_a_go.presentation.Tags
 import me.kolotilov.lets_a_go.presentation.base.ButtonData
 import me.kolotilov.lets_a_go.presentation.base.showCompat
@@ -18,43 +18,20 @@ import me.kolotilov.lets_a_go.ui.buildArguments
 import me.kolotilov.lets_a_go.ui.doAfterTextChanged
 import me.kolotilov.lets_a_go.ui.setTouchListener
 import me.kolotilov.lets_a_go.ui.text
-import me.kolotilov.lets_a_go.utils.castTo
-import me.kolotilov.lets_a_go.utils.toDateTime
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormatter
 import org.kodein.di.instance
-import java.util.*
 
-class EditBasicInfoFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
-    BaseFragment(R.layout.fragment_basic_info) {
+class EditBasicInfoFragment : BaseFragment(R.layout.fragment_basic_info) {
 
     companion object {
 
-        private const val NAME = "NAME"
-        private const val BIRTH_DATE = "BIRTH_DATE"
-        private const val HEIGHT = "HEIGHT"
-        private const val WEIGHT = "WEIGHT"
+        private const val TYPE = "TYPE"
 
-        /**
-         * Возвращает новый фрагмент.
-         *
-         * @param name Название.
-         * @param birthDate Дата рождения.
-         * @param height Высота (см).
-         * @param weight Вес (кг).
-         */
         @Suppress("DEPRECATION")
-        fun newInstance(
-            name: String?,
-            birthDate: DateTime?,
-            height: Int?,
-            weight: Int?
-        ): EditBasicInfoFragment {
+        fun newInstance(type: EditDetailsType): EditBasicInfoFragment {
             return EditBasicInfoFragment().buildArguments {
-                putString(NAME, name)
-                putSerializable(BIRTH_DATE, birthDate?.toDate())
-                putInt(HEIGHT, height ?: -1)
-                putInt(WEIGHT, weight ?: -1)
+                putInt(TYPE, type.ordinal)
             }
         }
     }
@@ -68,14 +45,14 @@ class EditBasicInfoFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) construc
     private val heightInput: TextInputLayout by lazyView(R.id.height_text_input)
     private val weightInput: TextInputLayout by lazyView(R.id.weight_text_input)
     private val saveButton: Button by lazyView(R.id.save_button)
+    private val nextButton: Button by lazyView(R.id.next_button)
 
     override fun Bundle.readArguments() {
-        viewModel.init(
-            name = getString(NAME, null),
-            birthDate = getSerializable(BIRTH_DATE)?.castTo<Date>()?.toDateTime(),
-            height = getInt(HEIGHT, -1).takeIf { it > 0 },
-            weight = getInt(WEIGHT, -1).takeIf { it > 0 }
-        )
+        val typeArg = getInt(BaseChooseFragment.TYPE, -1)
+        val type = EditDetailsType.values().first { it.ordinal == typeArg }
+        val onboarding = type == EditDetailsType.ONBOARDING
+        nextButton.isVisible = onboarding
+        saveButton.isVisible = !onboarding
     }
 
     override fun bind() {
@@ -84,6 +61,7 @@ class EditBasicInfoFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) construc
         heightInput.setTouchListener { viewModel.openHeightPicker() }
         weightInput.setTouchListener { viewModel.openWeightPicker() }
         saveButton.setOnClickListener { viewModel.save() }
+        nextButton.setOnClickListener { viewModel.next() }
     }
 
     override fun subscribe() {

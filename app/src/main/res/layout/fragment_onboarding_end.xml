@@ -16,6 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:contentDescription="@string/icon"
         android:src="@drawable/ic_registration" />
 
     <TextView
@@ -25,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/margin_content"
-        android:text="@string/enter_details_title" />
+        android:text="@string/enter_details_end" />
 
     <View
         android:layout_width="match_parent"
@@ -33,18 +34,11 @@
         android:layout_weight="2" />
 
     <Button
-        android:id="@+id/fill_button"
+        android:id="@+id/go_button"
         style="@style/LetsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_content"
-        android:text="@string/fill_button" />
-
-    <Button
-        android:id="@+id/skip_button"
-        style="@style/LetsTextButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/skip_button" />
+        android:text="@string/go_button" />
 
 </LinearLayout>

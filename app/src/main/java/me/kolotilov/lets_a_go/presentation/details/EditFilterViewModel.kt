@@ -91,7 +91,8 @@ class EditFilterViewModel(
     }
 
     fun setEnabled(enabled: Boolean) {
-
+        edited = true
+        enabledCache = enabled
     }
 
     fun save() {

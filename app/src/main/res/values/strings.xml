@@ -80,6 +80,9 @@
     <string name="distance_hint">Расстояние</string>
     <string name="duration_hint">Продолжительность</string>
     <string name="grounds_hint">Типы покрытия</string>
+    <string name="enabled_hint">Использовать</string>
+    <string name="go_button">Перейти</string>
+    <string name="enter_details_end">Спасибо! Можете пользоваться приложением.</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>

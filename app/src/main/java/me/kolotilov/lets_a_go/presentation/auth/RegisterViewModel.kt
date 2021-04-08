@@ -9,6 +9,7 @@ import me.kolotilov.lets_a_go.models.ServiceException
 import me.kolotilov.lets_a_go.network.NetworkRepository
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
 import me.kolotilov.lets_a_go.presentation.Screens
+import me.kolotilov.lets_a_go.ui.details.EditDetailsType
 import ru.terrakok.cicerone.Router
 
 /**
@@ -39,7 +40,7 @@ class RegisterViewModel(
             .andThen(networkRepository.login(email, password))
             .load()
             .doOnComplete {
-                router.newRootScreen(Screens.basicInfo())
+                router.newRootScreen(Screens.basicInfo(EditDetailsType.ONBOARDING))
             }
             .doOnError {
                 if (it is ServiceException)

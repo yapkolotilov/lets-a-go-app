@@ -20,24 +20,6 @@ abstract class BaseChooseFragment<T> : BaseFragment(R.layout.fragment_choose_ill
     companion object {
 
         const val TYPE = "TYPE"
-
-        const val ITEMS = "ILLNESSES"
-    }
-
-    /**
-     * Тип.
-     */
-    enum class Type {
-
-        /**
-         * Онбординг.
-         */
-        ONBOARDING,
-
-        /**
-         * Детали.
-         */
-        USER_DETAILS
     }
 
     abstract override val viewModel: BaseChooseViewModel<T>
@@ -59,10 +41,8 @@ abstract class BaseChooseFragment<T> : BaseFragment(R.layout.fragment_choose_ill
 
     override fun Bundle.readArguments() {
         val typeArg = getInt(TYPE, -1)
-        val type = Type.values().first { it.ordinal == typeArg }
-        val selectedItems = (getStringArray(ITEMS) ?: emptyArray()).map { it.toItem() }
-        viewModel.init(selectedItems)
-        val onboarding = type == Type.ONBOARDING
+        val type = EditDetailsType.values().first { it.ordinal == typeArg }
+        val onboarding = type == EditDetailsType.ONBOARDING
         nextButton.isVisible = onboarding
         saveButton.isVisible = !onboarding
     }

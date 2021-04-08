@@ -1,19 +1,24 @@
 package me.kolotilov.lets_a_go.ui.details
 
 import android.animation.LayoutTransition
+import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.slider.RangeSlider
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.Route
+import me.kolotilov.lets_a_go.presentation.Constants
 import me.kolotilov.lets_a_go.presentation.details.EditFilterViewModel
 import me.kolotilov.lets_a_go.ui.base.BaseFragment
 import me.kolotilov.lets_a_go.ui.base.Recycler
+import me.kolotilov.lets_a_go.ui.buildArguments
 import me.kolotilov.lets_a_go.ui.distance
 import me.kolotilov.lets_a_go.ui.dp
 import me.kolotilov.lets_a_go.ui.duration
@@ -23,22 +28,33 @@ import me.kolotilov.lets_a_go.utils.castTo
 import org.joda.time.Duration
 import org.kodein.di.instance
 
-class EditFilterFragment : BaseFragment(R.layout.fragment_edit_filter) {
+class EditFilterFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
+    BaseFragment(R.layout.fragment_edit_filter) {
 
-    private companion object {
+    companion object {
 
-        const val DISTANCE_SCALE = 1000
-        const val MIN_DISTANCE = 0f
-        const val MAX_DISTANCE = 50f
+        private const val TYPE = "TYPE"
 
-        const val DURATION_SCALE = 3_600_000
-        const val MIN_DURATION = 0f
-        const val MAX_DURATION = 10f
+        private const val DISTANCE_SCALE = 1000
+        private const val MIN_DISTANCE = 0f
+        private const val MAX_DISTANCE = 50f
+
+        private const val DURATION_SCALE = 3_600_000
+        private const val MIN_DURATION = 0f
+        private const val MAX_DURATION = 10f
+
+        @Suppress("DEPRECATION")
+        fun newInstance(type: EditDetailsType): EditFilterFragment {
+            return EditFilterFragment().buildArguments {
+                putInt(TYPE, type.ordinal)
+            }
+        }
     }
 
     override val viewModel: EditFilterViewModel by instance()
 
     override val toolbar: Toolbar by lazyView(R.id.toolbar)
+    private val enabledSwitch: SwitchCompat by lazyView(R.id.enabled_switch)
     private val distanceTextView: TextView by lazyView(R.id.distance_text_view)
     private val distanceSlider: RangeSlider by lazyView(R.id.distance_slider)
     private val durationTextView: TextView by lazyView(R.id.duration_text_view)
@@ -47,6 +63,7 @@ class EditFilterFragment : BaseFragment(R.layout.fragment_edit_filter) {
     private val typesRecycler: RecyclerView by lazyView(R.id.types_recycler)
     private val groundsRecycler: RecyclerView by lazyView(R.id.grounds_recycler)
     private val saveButton: Button by lazyView(R.id.save_button)
+    private val nextButton: Button by lazyView(R.id.next_button)
 
     private val typesAdapter: Recycler.Adapter<Route.Type> =
         Recycler.Adapter(TypeFactory(), object : Recycler.Delegate<Route.Type> {
@@ -63,6 +80,14 @@ class EditFilterFragment : BaseFragment(R.layout.fragment_edit_filter) {
                 viewModel.select(item)
             }
         })
+
+    override fun Bundle.readArguments() {
+        val typeArg = getInt(BaseChooseFragment.TYPE, -1)
+        val type = EditDetailsType.values().first { it.ordinal == typeArg }
+        val onboarding = type == EditDetailsType.ONBOARDING
+        nextButton.isVisible = onboarding
+        saveButton.isVisible = !onboarding
+    }
 
     override fun fillViews() {
         rootLayout.castTo<ViewGroup>().layoutTransition = LayoutTransition().apply {
@@ -117,6 +142,7 @@ class EditFilterFragment : BaseFragment(R.layout.fragment_edit_filter) {
             )
         }
         saveButton.setOnClickListener { viewModel.save() }
+        enabledSwitch.setOnCheckedChangeListener { _, isChecked -> viewModel.setEnabled(isChecked) }
     }
 
     override fun subscribe() {
@@ -125,6 +151,7 @@ class EditFilterFragment : BaseFragment(R.layout.fragment_edit_filter) {
                 data.distance.toList().map { (it / DISTANCE_SCALE).toInt().toFloat() }
             durationSlider.values =
                 data.duration.toList().map { (it.millis / DURATION_SCALE).toInt().toFloat() }
+            enabledSwitch.isChecked = data.enabled
         }.autoDispose()
 
         viewModel.distance.subscribe { distance ->

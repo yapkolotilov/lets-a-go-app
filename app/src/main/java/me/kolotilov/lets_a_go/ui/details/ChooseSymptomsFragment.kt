@@ -19,10 +19,9 @@ class ChooseSymptomsFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constru
          * @param type Тип.
          */
         @Suppress("DEPRECATION")
-        fun newInstance(type: Type, symptoms: List<Symptom>): ChooseSymptomsFragment {
+        fun newInstance(type: EditDetailsType): ChooseSymptomsFragment {
             return ChooseSymptomsFragment().buildArguments {
                 putInt(TYPE, type.ordinal)
-                putStringArray(ITEMS, symptoms.map { it.name }.toTypedArray())
             }
         }
     }

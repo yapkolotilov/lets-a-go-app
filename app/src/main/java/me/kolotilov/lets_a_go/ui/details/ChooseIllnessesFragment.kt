@@ -19,10 +19,9 @@ class ChooseIllnessesFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constr
          * @param type Тип.
          */
         @Suppress("DEPRECATION")
-        fun newInstance(type: Type, illnesses: List<Illness>): ChooseIllnessesFragment {
+        fun newInstance(type: EditDetailsType): ChooseIllnessesFragment {
             return ChooseIllnessesFragment().buildArguments {
                 putInt(TYPE, type.ordinal)
-                putStringArray(ITEMS, illnesses.map { it.name }.toTypedArray())
             }
         }
     }

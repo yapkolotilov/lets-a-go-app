@@ -30,17 +30,21 @@ abstract class BaseChooseViewModel<T> : BaseViewModel() {
     private var healthUpdated: Boolean = false
 
     override fun attach() {
-        loadItems()
-            .map { it.sorted() }
-            .load()
+        Single.zip(
+            loadItems()
+                .map { it.sorted() }, loadSelectedItems(),
+            { items, selectedItems ->
+                items to selectedItems
+            }).load()
             .doOnSuccess {
-                itemsCache = it.map { it.toItem() }.toMutableList()
+                itemsCache = it.first.map { it.toItem() }.toMutableList()
+                init(it.second)
                 itemsSubject.onNext(itemsCache)
             }
             .emptySubscribe()
     }
 
-    fun init(selectedItems: List<T>) {
+    private fun init(selectedItems: List<T>) {
         selectedCache = selectedItems.toMutableSet()
         selectedItemsSubject.onNext(selectedCache)
     }
@@ -71,6 +75,8 @@ abstract class BaseChooseViewModel<T> : BaseViewModel() {
     abstract fun performSave(updateFilter: Boolean)
 
     protected abstract fun loadItems(): Single<List<String>>
+
+    protected abstract fun loadSelectedItems(): Single<List<T>>
 
     protected abstract fun String.toItem(): T
 

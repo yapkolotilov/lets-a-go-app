@@ -52,7 +52,7 @@ class LoginViewModel(
         networkRepository.login(email, password)
             .load()
             .doOnComplete {
-                router.newRootScreen(Screens.map())
+                router.newRootScreen(Screens.onboarding())
             }
             .doOnError {
                 if (it is ServiceException)
@@ -66,6 +66,6 @@ class LoginViewModel(
      * Переход на страницу регистрации.
      */
     fun register() {
-        router.navigateTo(Screens.register())
+        router.navigateTo(Screens.onboarding())
     }
 }

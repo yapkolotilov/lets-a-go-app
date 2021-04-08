@@ -3,15 +3,13 @@ package me.kolotilov.lets_a_go.presentation
 import androidx.annotation.AnimRes
 import androidx.fragment.app.Fragment
 import me.kolotilov.lets_a_go.R
-import me.kolotilov.lets_a_go.models.Illness
-import me.kolotilov.lets_a_go.models.Symptom
 import me.kolotilov.lets_a_go.ui.auth.LoginFragment
 import me.kolotilov.lets_a_go.ui.auth.RegisterFragment
 import me.kolotilov.lets_a_go.ui.details.*
+import me.kolotilov.lets_a_go.ui.details.onboarding.OnboardingEndFragment
 import me.kolotilov.lets_a_go.ui.details.onboarding.OnboardingTitleFragment
 import me.kolotilov.lets_a_go.ui.details.user.UserDetailsFragment
 import me.kolotilov.lets_a_go.ui.map.*
-import org.joda.time.DateTime
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
@@ -23,23 +21,14 @@ object Screens {
     /**
      * Экран редактирования базовой информации.
      *
-     * @param name Название.
-     * @param birthDate Дата рождения.
-     * @param height Высота (см).
-     * @param weight Вес (кг).
      */
-    fun basicInfo(
-        name: String? = null,
-        birthDate: DateTime? = null,
-        height: Int? = null,
-        weight: Int? = null
-    ) = LetsScreen { EditBasicInfoFragment.newInstance(name, birthDate, height, weight) }
+    fun basicInfo(type: EditDetailsType) = LetsScreen { EditBasicInfoFragment.newInstance(type) }
 
-    fun chooseIllnesses(type: BaseChooseFragment.Type, illnesses: List<Illness>) =
-        LetsScreen { ChooseIllnessesFragment.newInstance(type, illnesses) }
+    fun chooseIllnesses(type: EditDetailsType) =
+        LetsScreen { ChooseIllnessesFragment.newInstance(type) }
 
-    fun chooseSymptoms(type: BaseChooseFragment.Type, symptoms: List<Symptom>) =
-        LetsScreen { ChooseSymptomsFragment.newInstance(type, symptoms) }
+    fun chooseSymptoms(type: EditDetailsType) =
+        LetsScreen { ChooseSymptomsFragment.newInstance(type) }
 
     fun userDetails() = LetsScreen { UserDetailsFragment() }
 
@@ -55,7 +44,9 @@ object Screens {
 
     fun entryDetails() = LetsScreen { EntryDetailsBottomSheet() }
 
-    fun editFilter() = LetsScreen { EditFilterFragment() }
+    fun editFilter(type: EditDetailsType) = LetsScreen { EditFilterFragment.newInstance(type) }
+
+    fun onboardingEnd() = LetsScreen { OnboardingEndFragment() }
 }
 
 class LetsScreen(
