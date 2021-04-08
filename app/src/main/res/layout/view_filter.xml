@@ -64,7 +64,7 @@
                     android:id="@+id/types_hint_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_content_small"
+                    android:layout_marginTop="@dimen/margin_content"
                     android:text="@string/route_types_hint"
                     android:textColor="@color/grey"
                     app:layout_constraintTop_toBottomOf="@id/filter_grid" />
@@ -81,7 +81,7 @@
                     android:id="@+id/grounds_hint_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_content_small"
+                    android:layout_marginTop="@dimen/margin_content"
                     android:text="@string/ground_type_hint"
                     android:textColor="@color/grey"
                     app:layout_constraintTop_toBottomOf="@id/types_linear_layout" />

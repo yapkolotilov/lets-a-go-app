@@ -9,4 +9,6 @@ object Tags {
      * Форматтер дня рождения.
      */
     const val BIRTH_DATE = "BIRTH_DATE"
+
+    const val DISTANCE = "DISTANCE"
 }

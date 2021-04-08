@@ -12,6 +12,8 @@ class Recycler {
         protected val delegate: Delegate<T> = object : Delegate<T> {}
     ) : RecyclerView.Adapter<ViewHolder<T>>() {
 
+        var enabled: Boolean = true
+
         var items: List<T> = emptyList()
             set(value) {
                 field = value
@@ -31,6 +33,12 @@ class Recycler {
 
         override fun onBindViewHolder(holder: ViewHolder<T>, position: Int) {
             val item = items[position]
+            holder.itemView.setOnClickListener {
+                if (!enabled)
+                    return@setOnClickListener
+                delegate.onClick(item)
+                notifyDataSetChanged()
+            }
             holder.bind(item, selectedItems.contains(item))
         }
 
@@ -43,7 +51,6 @@ class Recycler {
 
     class SelectAdapter<T>(
         factory: Factory<T>,
-        var enabled: Boolean = true,
         delegate: Delegate<T> = object : Delegate<T> {},
     ) : Adapter<T>(factory, delegate) {
 

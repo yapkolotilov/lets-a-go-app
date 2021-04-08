@@ -46,15 +46,15 @@ class RouteDetailsBottomSheet : BaseBottomSheetFragment(R.layout.fragment_route_
                 type = R.layout.route_type,
             ) { view, delegate ->
                 TypeViewHolder(view, delegate)
-            },
-            enabled = false
+            }
         )
+        typeAdapter.enabled = false
         groundAdapter = Recycler.SelectAdapter(
             Recycler.SimpleFactory(R.layout.ground_type) { view, delegate ->
                 GroundViewHolder(view, delegate)
             },
-            enabled = false
         )
+        groundAdapter.enabled = false
         statsAdapter = Grid.ListAdapter(statsGrid, StatsFactory())
 
         typeRecycler.adapter = typeAdapter
@@ -124,16 +124,8 @@ class EntryDetailsViewHolder(itemView: View, delegate: Recycler.Delegate<Pair<En
     private val dateTextView = itemView.findViewById<TextView>(R.id.date_text_view)
     private val distanceTextView = itemView.findViewById<TextView>(R.id.distance_text_view)
     private val decimalFormat = DecimalFormat().apply { maximumFractionDigits = 1 }
-    private lateinit var currentItem: Pair<Entry, Route>
-
-    init {
-        itemView.setOnClickListener {
-            delegate.onClick(currentItem)
-        }
-    }
 
     override fun bind(item: Pair<Entry, Route>, selected: Boolean) {
-        currentItem = item
         dateTextView.text = SimpleDateFormat("dd MMMMM HH:mm:ss").format(item.first.points.first().timestamp.toDate())
         distanceTextView.text = "${decimalFormat.format(item.first.distance() / 1000)} км."
         itemView.setBackgroundColor(if (item.first.finished(item.second)) Color.GREEN else Color.RED)

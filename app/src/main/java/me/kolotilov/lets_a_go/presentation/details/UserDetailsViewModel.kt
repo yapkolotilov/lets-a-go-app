@@ -76,6 +76,10 @@ class UserDetailsViewModel(
         )
     }
 
+    fun editFilter() {
+        router.navigateTo(Screens.editFilter())
+    }
+
     /**
      * Разлогиниться.
      */

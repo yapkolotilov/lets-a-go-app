@@ -17,5 +17,5 @@ data class Filter(
     val typesAllowed: List<Route.Type>?,
     val groundsAllowed: List<Route.Ground>?,
     val enabled: Boolean,
-    val id: Int
+    val id: Int = -1
 )

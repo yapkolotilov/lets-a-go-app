@@ -7,10 +7,7 @@ import me.kolotilov.lets_a_go.models.Illness
 import me.kolotilov.lets_a_go.models.Symptom
 import me.kolotilov.lets_a_go.ui.auth.LoginFragment
 import me.kolotilov.lets_a_go.ui.auth.RegisterFragment
-import me.kolotilov.lets_a_go.ui.details.BaseChooseFragment
-import me.kolotilov.lets_a_go.ui.details.ChooseIllnessesFragment
-import me.kolotilov.lets_a_go.ui.details.ChooseSymptomsFragment
-import me.kolotilov.lets_a_go.ui.details.EditBasicInfoFragment
+import me.kolotilov.lets_a_go.ui.details.*
 import me.kolotilov.lets_a_go.ui.details.onboarding.OnboardingTitleFragment
 import me.kolotilov.lets_a_go.ui.details.user.UserDetailsFragment
 import me.kolotilov.lets_a_go.ui.map.*
@@ -57,6 +54,8 @@ object Screens {
     fun editEntry() = LetsScreen { EditEntryBottomSheet() }
 
     fun entryDetails() = LetsScreen { EntryDetailsBottomSheet() }
+
+    fun editFilter() = LetsScreen { EditFilterFragment() }
 }
 
 class LetsScreen(

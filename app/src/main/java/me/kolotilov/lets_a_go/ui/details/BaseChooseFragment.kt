@@ -133,18 +133,9 @@ abstract class ChooseItemViewHolder<T : Any>(itemView: View, delegate: Recycler.
     private val titleView: TextView = itemView.findViewById(R.id.name_text_view)
     private val checkedImageView: View = itemView.findViewById(R.id.checked_image_view)
 
-    private lateinit var currentItem: T
-
     protected abstract fun getName(item: T): String
 
-    init {
-        itemView.setOnClickListener {
-            delegate.onClick(currentItem)
-        }
-    }
-
     override fun bind(item: T, selected: Boolean) {
-        currentItem = item
         titleView.text = getName(item)
         checkedImageView.isVisible = selected
     }

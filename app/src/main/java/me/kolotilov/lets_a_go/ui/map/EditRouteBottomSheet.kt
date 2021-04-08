@@ -36,18 +36,8 @@ class EditRouteBottomSheet : BaseBottomSheetFragment(R.layout.fragment_edit_rout
     private lateinit var statsAdapter: Grid.ListAdapter
 
     override fun fillViews() {
-        typeAdapter = Recycler.SelectAdapter(
-            Recycler.SimpleFactory(
-                type = R.layout.route_type
-            ) { view, delegate ->
-                TypeViewHolder(view, delegate)
-            }
-        )
-        groundAdapter = Recycler.SelectAdapter(
-            Recycler.SimpleFactory(R.layout.ground_type) { view, delegate ->
-                GroundViewHolder(view, delegate)
-            }
-        )
+        typeAdapter = Recycler.SelectAdapter(TypeFactory())
+        groundAdapter = Recycler.SelectAdapter(GroundFactory())
         statsAdapter = Grid.ListAdapter(statsGrid, StatsFactory())
 
         typeRecycler.adapter = typeAdapter
@@ -97,11 +87,40 @@ class EditRouteBottomSheet : BaseBottomSheetFragment(R.layout.fragment_edit_rout
     }
 }
 
+class TypeFactory : Recycler.Factory<Route.Type> {
+
+    override fun getType(item: Route.Type): Int = R.layout.route_type
+
+    override fun getViewHolder(
+        type: Int,
+        itemView: View,
+        delegate: Recycler.Delegate<Route.Type>
+    ): Recycler.ViewHolder<Route.Type> {
+        return TypeViewHolder(itemView, delegate)
+    }
+}
+
+class GroundFactory : Recycler.Factory<Route.Ground> {
+
+    override fun getType(item: Route.Ground): Int = R.layout.ground_type
+
+    override fun getViewHolder(
+        type: Int,
+        itemView: View,
+        delegate: Recycler.Delegate<Route.Ground>
+    ): Recycler.ViewHolder<Route.Ground> {
+        return GroundViewHolder(itemView, delegate)
+    }
+}
 
 class TypeViewHolder(itemView: View, delegate: Recycler.Delegate<Route.Type>) :
     Recycler.ViewHolder<Route.Type>(itemView, delegate) {
 
     private val iconView: ImageView = itemView as ImageView
+
+    init {
+
+    }
 
     override fun bind(item: Route.Type, selected: Boolean) {
         iconView.setBackgroundResource(if (selected) R.drawable.bg_selected_item else R.drawable.bg_select_item)
@@ -113,12 +132,12 @@ class TypeViewHolder(itemView: View, delegate: Recycler.Delegate<Route.Type>) :
 class GroundViewHolder(itemView: View, delegate: Recycler.Delegate<Route.Ground>) :
     Recycler.ViewHolder<Route.Ground>(itemView, delegate) {
 
-    private val iconView: TextView = itemView as TextView
+    private val textView: TextView = itemView as TextView
 
     override fun bind(item: Route.Ground, selected: Boolean) {
-        iconView.setBackgroundResource(if (selected) R.drawable.bg_selected_item else R.drawable.bg_select_item)
+        textView.setBackgroundResource(if (selected) R.drawable.bg_selected_item else R.drawable.bg_select_item)
         val text = item.name(context)
-        iconView.text = text
+        textView.text = text
     }
 }
 

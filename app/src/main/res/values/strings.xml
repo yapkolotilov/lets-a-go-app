@@ -49,7 +49,7 @@
     <string name="kg">кг.</string>
     <string name="birth_date_hint">Дата рождения</string>
     <string name="register_title">Регистрация</string>
-    <string name="basic_info_title">Информация о себе</string>
+    <string name="basic_info_title">Заполните данные о себе</string>
     <string name="cancel_button">ОТМЕНА</string>
     <string name="height_picker_title">Укажите свой рост (см.)</string>
     <string name="cm_value">%d см.</string>
@@ -76,6 +76,10 @@
     <string name="from_to">От %s до %s</string>
     <string name="duration">Продолжительность</string>
     <string name="route_types_hint">Типы маршрутов</string>
+    <string name="edit_filter_title">Настройте рекомендации</string>
+    <string name="distance_hint">Расстояние</string>
+    <string name="duration_hint">Продолжительность</string>
+    <string name="grounds_hint">Типы покрытия</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>

@@ -106,24 +106,22 @@ fun Number.sp(context: Context): Int {
 }
 
 fun Double.distance(context: Context): String {
-    val formatter = DecimalFormat()
+    val formatter = DecimalFormat().apply { maximumFractionDigits = 1 }
     val name: String
     val value: Double
 
-    if (this > 1000) {
+    if (this >= 1000) {
         value = this / 1000.0
         name = context.getString(R.string.km)
-        formatter.maximumFractionDigits = 1
     } else {
         value = this
         name = context.getString(R.string.m)
-        formatter.maximumFractionDigits = 0
     }
     return "${formatter.format(value)} $name"
 }
 
 fun Duration.duration(context: Context): String {
-    return DateTimeFormat.forPattern("hh:mm").print(DateTime(millis))
+    return DateTimeFormat.forPattern("HH:mm").print(DateTime(millis))
 }
 
 @DrawableRes
