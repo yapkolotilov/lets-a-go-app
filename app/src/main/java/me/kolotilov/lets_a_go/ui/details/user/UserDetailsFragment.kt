@@ -7,6 +7,7 @@ import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.presentation.details.UserDetailsViewModel
 import me.kolotilov.lets_a_go.ui.base.BaseFragment
 import me.kolotilov.lets_a_go.ui.details.BaseDetailsView
+import me.kolotilov.lets_a_go.ui.details.FilterView
 import me.kolotilov.lets_a_go.ui.details.IllnessesView
 import me.kolotilov.lets_a_go.ui.details.SymptomsView
 import me.kolotilov.lets_a_go.utils.smartSetText
@@ -21,6 +22,7 @@ class UserDetailsFragment : BaseFragment(R.layout.fragment_user_details) {
     private val baseDetailsView: BaseDetailsView by lazyView(R.id.base_details_view)
     private val illnessesView: IllnessesView by lazyView(R.id.illnesses_view)
     private val symptomsView: SymptomsView by lazyView(R.id.symptoms_view)
+    private val filterView: FilterView by lazyView(R.id.filter_view)
     private val logOutButton: Button by lazyView(R.id.log_out_button)
 
     override fun bind() {
@@ -41,6 +43,14 @@ class UserDetailsFragment : BaseFragment(R.layout.fragment_user_details) {
             )
             illnessesView.setItems(it.illnesses)
             symptomsView.setItems(it.symptoms)
+            val filter = it.filter
+            filterView.setItems(
+                filter.length,
+                filter.duration,
+                filter.typesAllowed,
+                filter.groundsAllowed,
+                filter.enabled
+            )
         }.autoDispose()
     }
 }

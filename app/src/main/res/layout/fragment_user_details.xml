@@ -56,6 +56,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <me.kolotilov.lets_a_go.ui.details.FilterView
+                android:id="@+id/filter_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

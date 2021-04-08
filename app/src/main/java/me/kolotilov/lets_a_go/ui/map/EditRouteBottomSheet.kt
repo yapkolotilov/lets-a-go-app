@@ -13,6 +13,8 @@ import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.presentation.map.EditRouteViewModel
 import me.kolotilov.lets_a_go.ui.base.*
 import me.kolotilov.lets_a_go.ui.context
+import me.kolotilov.lets_a_go.ui.icon
+import me.kolotilov.lets_a_go.ui.name
 import org.kodein.di.instance
 import java.text.SimpleDateFormat
 import java.util.*
@@ -103,11 +105,7 @@ class TypeViewHolder(itemView: View, delegate: Recycler.Delegate<Route.Type>) :
 
     override fun bind(item: Route.Type, selected: Boolean) {
         iconView.setBackgroundResource(if (selected) R.drawable.bg_selected_item else R.drawable.bg_select_item)
-        val icon = when (item) {
-            Route.Type.WALKING -> R.drawable.ic_type_walking
-            Route.Type.RUNNING -> R.drawable.ic_type_running
-            Route.Type.CYCLING -> R.drawable.ic_type_cycling
-        }
+        val icon = item.icon()
         iconView.setImageResource(icon)
     }
 }
@@ -119,10 +117,7 @@ class GroundViewHolder(itemView: View, delegate: Recycler.Delegate<Route.Ground>
 
     override fun bind(item: Route.Ground, selected: Boolean) {
         iconView.setBackgroundResource(if (selected) R.drawable.bg_selected_item else R.drawable.bg_select_item)
-        val text = when (item) {
-            Route.Ground.ASPHALT -> context.getString(R.string.ground_asphalt)
-            Route.Ground.TRACK -> context.getString(R.string.ground_track)
-        }
+        val text = item.name(context)
         iconView.text = text
     }
 }

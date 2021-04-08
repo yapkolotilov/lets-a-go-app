@@ -5,9 +5,9 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="4dp"
-    android:paddingHorizontal="8dp"
+    android:paddingHorizontal="16dp"
     android:paddingVertical="4dp"
-    tools:background="@drawable/bg_select_item"
-    tools:text="Земля">
-
-</TextView>
+    android:textSize="16sp"
+    android:textColor="@color/white"
+    android:background="@drawable/bg_select_item"
+    tools:text="Земля" />

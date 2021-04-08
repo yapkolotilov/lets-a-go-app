@@ -6,13 +6,19 @@ import android.location.Location
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.MotionEvent
+import androidx.annotation.DrawableRes
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.textfield.TextInputLayout
+import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.Point
+import me.kolotilov.lets_a_go.models.Route
 import org.joda.time.DateTime
+import org.joda.time.Duration
+import org.joda.time.format.DateTimeFormat
+import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 //region Map API
@@ -97,6 +103,43 @@ fun Number.sp(context: Context): Int {
         this.toFloat(),
         context.resources.displayMetrics
     ).roundToInt()
+}
+
+fun Double.distance(context: Context): String {
+    val formatter = DecimalFormat()
+    val name: String
+    val value: Double
+
+    if (this > 1000) {
+        value = this / 1000.0
+        name = context.getString(R.string.km)
+        formatter.maximumFractionDigits = 1
+    } else {
+        value = this
+        name = context.getString(R.string.m)
+        formatter.maximumFractionDigits = 0
+    }
+    return "${formatter.format(value)} $name"
+}
+
+fun Duration.duration(context: Context): String {
+    return DateTimeFormat.forPattern("hh:mm").print(DateTime(millis))
+}
+
+@DrawableRes
+fun Route.Type.icon(): Int {
+    return when (this) {
+        Route.Type.WALKING -> R.drawable.ic_type_walking
+        Route.Type.RUNNING -> R.drawable.ic_type_running
+        Route.Type.CYCLING -> R.drawable.ic_type_cycling
+    }
+}
+
+fun Route.Ground.name(context: Context): String {
+    return when (this) {
+        Route.Ground.ASPHALT -> context.getString(R.string.ground_asphalt)
+        Route.Ground.TRACK -> context.getString(R.string.ground_track)
+    }
 }
 
 //endregion

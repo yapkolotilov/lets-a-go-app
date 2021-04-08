@@ -27,7 +27,7 @@ class BaseDetailsView @JvmOverloads constructor(
         val weight: Int?
     )
 
-    override val cardView: View = findViewById(R.id.root_view)
+    override val cardView: View = findViewById(R.id.card_view)
     override val loadingLayout: View = findViewById(R.id.loading_layout)
     override val loadedLayout: View = findViewById(R.id.loaded_layout)
     override val emptyLayout: View = findViewById(R.id.empty_layout)

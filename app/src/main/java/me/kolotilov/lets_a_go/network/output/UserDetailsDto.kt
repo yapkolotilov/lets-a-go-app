@@ -39,5 +39,5 @@ fun UserDetailsDto.toUserDetails() = UserDetails(
     weight = weight,
     illnesses = illnesses.map { Illness(it) },
     symptoms = symptoms.map { Symptom(it) },
-    filter = filter.toFilter()
+    filter = filter.toFilter(),
 )

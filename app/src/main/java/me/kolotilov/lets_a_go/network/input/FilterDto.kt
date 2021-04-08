@@ -8,27 +8,37 @@ import me.kolotilov.lets_a_go.utils.toDuration
 import java.util.*
 
 data class FilterDto(
+    @SerializedName("min_length")
+    val minLength: Double?,
     @SerializedName("max_length")
     val maxLength: Double?,
+    @SerializedName("min_duration")
+    val minDuration: Date?,
     @SerializedName("max_duration")
     val maxDuration: Date?,
     @SerializedName("types_allowed")
     val typesAllowed: List<Route.Type>?,
     @SerializedName("grounds_allowed")
-    val groundsAllowed: List<Route.Ground>?
+    val groundsAllowed: List<Route.Ground>?,
+    @SerializedName("enabled")
+    val enabled: Boolean
 )
 
 fun FilterDto.toFilter() = Filter(
-    maxLength = maxLength,
-    maxDuration = maxDuration?.toDuration(),
+    length = if (minLength != null && maxLength != null) minLength..maxLength else null,
+    duration = if (minDuration != null && maxDuration != null) minDuration.toDuration()..maxDuration.toDuration() else null,
     typesAllowed = typesAllowed,
     groundsAllowed = groundsAllowed,
+    enabled = enabled,
     id = 0
 )
 
 fun Filter.toFilterDto() = FilterDto(
-    maxLength = maxLength,
-    maxDuration = maxDuration?.toDate(),
+    minLength = length?.start,
+    maxLength = length?.endInclusive,
+    minDuration = duration?.start?.toDate(),
+    maxDuration = duration?.endInclusive?.toDate(),
     typesAllowed = typesAllowed,
-    groundsAllowed = groundsAllowed
+    groundsAllowed = groundsAllowed,
+    enabled = enabled
 )

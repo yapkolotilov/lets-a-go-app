@@ -68,6 +68,14 @@
     <string name="choose_symptoms_title">Выберите жалобы</string>
     <string name="choose_illnesses_hint">Введите название заболевания</string>
     <string name="choose_symptoms_hint">Введите название жалобы</string>
+    <string name="filter_placeholder">Настройте рекомендации под себя</string>
+    <string name="filter_title">Рекомендации</string>
+    <string name="km">км.</string>
+    <string name="m">м.</string>
+    <string name="distance">Расстояние</string>
+    <string name="from_to">От %s до %s</string>
+    <string name="duration">Продолжительность</string>
+    <string name="route_types_hint">Типы маршрутов</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>
