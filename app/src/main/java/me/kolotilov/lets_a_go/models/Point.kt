@@ -15,8 +15,8 @@ import kotlin.math.*
 data class Point(
     val latitude: Double,
     val longitude: Double,
-    val timestamp: DateTime,
-    val id: Int
+    val altitude: Double,
+    val timestamp: DateTime
 ) {
 
     infix fun distance(other: Point): Double {

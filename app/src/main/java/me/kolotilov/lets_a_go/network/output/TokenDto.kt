@@ -1,8 +1,9 @@
 package me.kolotilov.lets_a_go.network.output
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
+
 
 data class TokenDto(
-    @SerializedName("token")
+    @JsonProperty("token")
     val token: String
 )

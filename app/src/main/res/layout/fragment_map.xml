@@ -11,44 +11,58 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <LinearLayout
-        android:id="@+id/top_menu"
+    <FrameLayout
+        android:id="@+id/record_panel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#AAFFFFFF"
+        android:background="@drawable/bg_recording"
         android:orientation="vertical"
         android:padding="16dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible">
+        app:layout_constraintBottom_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/duration_TextView"
+        <GridLayout
+            android:id="@+id/record_grid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:text="00:00:00" />
+            android:layout_marginHorizontal="54dp"
+            android:columnCount="2" />
 
-        <TextView
-            android:id="@+id/length_TextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="10 м." />
+    </FrameLayout>
 
-    </LinearLayout>
-
-    <Button
+    <ImageButton
         android:id="@+id/user_details_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Кабинет"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="@dimen/margin_content"
+        android:layout_marginEnd="@dimen/margin_content"
+        android:background="@drawable/bg_image_view"
+        android:contentDescription="@string/icon"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_user"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <ImageButton
+        android:id="@+id/search_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="@dimen/margin_content"
+        android:layout_marginTop="@dimen/margin_content"
+        android:background="@drawable/bg_image_view"
+        android:contentDescription="@string/icon"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_search"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <me.kolotilov.lets_a_go.ui.map.RecordButton
         android:id="@+id/record_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Записать"
+        android:layout_marginBottom="@dimen/margin_content"
+        android:clickable="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

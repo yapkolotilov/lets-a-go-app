@@ -54,7 +54,14 @@ class Recycler {
         delegate: Delegate<T> = object : Delegate<T> {},
     ) : Adapter<T>(factory, delegate) {
 
-        private var selectedItem: T? = null
+        var selectedItem: T? = null
+            set(value) {
+                if (field == value)
+                    return
+                field = value
+                onItemSelected(selectedItem)
+                notifyDataSetChanged()
+            }
         private var onItemSelected: ((T?) -> Unit) = {}
 
         fun setOnItemSelectedListener(listener: (T?) -> Unit) {

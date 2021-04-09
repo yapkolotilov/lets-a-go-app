@@ -6,7 +6,12 @@ import android.location.Location
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.MotionEvent
+import android.view.View
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
@@ -28,9 +33,7 @@ import kotlin.math.roundToInt
  */
 fun Point.toLatLng() = LatLng(latitude, longitude)
 
-fun LatLng.toPoint() = Point(latitude, longitude, DateTime.now(), -1)
-
-fun Location.toPoint() = Point(latitude, longitude, DateTime(time), -1)
+fun Location.toPoint() = Point(latitude, longitude, altitude, DateTime(time))
 
 fun Location.toLatLng() = LatLng(latitude, longitude)
 
@@ -105,8 +108,22 @@ fun Number.sp(context: Context): Int {
     ).roundToInt()
 }
 
+@ColorInt
+fun Context.getColorCompat(@ColorRes color: Int): Int {
+    return ContextCompat.getColor(this, color)
+}
+
+fun View.getString(@StringRes stringRes: Int): String {
+    return context.getString(stringRes)
+}
+
+//endregion
+
+//region Модели
+
+private val singleDigitFormatter = DecimalFormat().apply { maximumFractionDigits = 1 }
+
 fun Double.distance(context: Context): String {
-    val formatter = DecimalFormat().apply { maximumFractionDigits = 1 }
     val name: String
     val value: Double
 
@@ -117,11 +134,19 @@ fun Double.distance(context: Context): String {
         value = this
         name = context.getString(R.string.m)
     }
-    return "${formatter.format(value)} $name"
+    return "${singleDigitFormatter.format(value)} $name"
 }
 
 fun Duration.duration(context: Context): String {
     return DateTimeFormat.forPattern("HH:mm").print(DateTime(millis))
+}
+
+fun Double.speed(context: Context): String {
+    return context.getString(R.string.speed, singleDigitFormatter.format(this))
+}
+
+fun Int.kilocalories(context: Context): String {
+    return context.getString(R.string.kilocalories, this)
 }
 
 @DrawableRes

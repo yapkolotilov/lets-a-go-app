@@ -1,43 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingHorizontal="32dp">
 
-    <LinearLayout
+    <View
+        android:layout_width="48dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_content"
+        android:background="@color/grey" />
+
+    <TextView
+        android:id="@+id/title_text_view"
+        style="@style/LetsTextTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="@dimen/margin_content"
+        android:gravity="center"
+        android:text="@string/new_route_title" />
 
-        <TextView
-            android:id="@+id/title_text_view"
-            android:layout_width="0dp"
-            android:gravity="center"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:text="@string/new_route_title" />
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/public_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:hint="@string/switch_public_hint" />
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/public_switch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:hint="@string/switch_public_hint" />
-
-    </LinearLayout>
-
-    <EditText
-        android:id="@+id/name_edit_text"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/name_text_input"
+        style="@style/LetsTextInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="@string/route_name_hint" />
+        android:hint="@string/route_name_hint">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
+        style="@style/LetsTextHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -51,6 +59,7 @@
         tools:itemCount="3" />
 
     <TextView
+        style="@style/LetsTextHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -63,14 +72,30 @@
         android:layout_marginTop="8dp"
         tools:itemCount="3" />
 
-    <GridLayout
-        android:id="@+id/stats_grid"
-        android:columnCount="2"
+    <TextView
+        style="@style/LetsTextHint"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/difficulty_hint" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/difficulty_slider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stepSize="1"
+        android:valueFrom="1"
+        android:valueTo="5" />
+
+    <me.kolotilov.lets_a_go.presentation.map.RouteStatsView
+        android:id="@+id/route_stats_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_content" />
 
     <Button
         android:id="@+id/save_button"
+        style="@style/LetsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
@@ -78,8 +103,9 @@
 
     <Button
         android:id="@+id/delete_button"
+        style="@style/LetsTextButtonRed"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Удалить" />
+        android:text="@string/delete_button" />
 
 </LinearLayout>

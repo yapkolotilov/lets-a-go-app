@@ -13,10 +13,7 @@ import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.Entry
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.presentation.map.RouteDetailsViewModel
-import me.kolotilov.lets_a_go.ui.base.BaseBottomSheetFragment
-import me.kolotilov.lets_a_go.ui.base.Grid
-import me.kolotilov.lets_a_go.ui.base.KeyValueModel
-import me.kolotilov.lets_a_go.ui.base.Recycler
+import me.kolotilov.lets_a_go.ui.base.*
 import org.kodein.di.instance
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -41,13 +38,7 @@ class RouteDetailsBottomSheet : BaseBottomSheetFragment(R.layout.fragment_route_
     private lateinit var entriesAdapter: Recycler.Adapter<Pair<Entry, Route>>
 
     override fun fillViews() {
-        typeAdapter = Recycler.SelectAdapter(
-            Recycler.SimpleFactory(
-                type = R.layout.route_type,
-            ) { view, delegate ->
-                TypeViewHolder(view, delegate)
-            }
-        )
+        typeAdapter = Recycler.SelectAdapter(TypeFactory())
         typeAdapter.enabled = false
         groundAdapter = Recycler.SelectAdapter(
             Recycler.SimpleFactory(R.layout.ground_type) { view, delegate ->
@@ -55,7 +46,7 @@ class RouteDetailsBottomSheet : BaseBottomSheetFragment(R.layout.fragment_route_
             },
         )
         groundAdapter.enabled = false
-        statsAdapter = Grid.ListAdapter(statsGrid, StatsFactory())
+        statsAdapter = Grid.ListAdapter(statsGrid, KeyValueFactory())
 
         typeRecycler.adapter = typeAdapter
         typeRecycler.layoutManager =

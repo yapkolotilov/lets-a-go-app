@@ -1,10 +1,11 @@
 package me.kolotilov.lets_a_go.network.input
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
+
 
 data class LoginDto(
-    @SerializedName("username")
+    @JsonProperty("username")
     val username: String,
-    @SerializedName("password")
+    @JsonProperty("password")
     val password: String
 )

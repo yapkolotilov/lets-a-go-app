@@ -1,5 +1,6 @@
 package me.kolotilov.lets_a_go.ui.base
 
+import android.animation.LayoutTransition
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -18,7 +19,8 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import me.kolotilov.lets_a_go.presentation.base.BaseBottomSheetViewModel
+import me.kolotilov.lets_a_go.presentation.BaseViewModel
+import me.kolotilov.lets_a_go.utils.castTo
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.x.closestDI
@@ -30,6 +32,15 @@ abstract class BaseBottomSheetFragment(
 
     private val compositeDisposable = CompositeDisposable()
     private val delegates = mutableListOf<ViewDelegate<*>>()
+
+    protected var animateLayoutChanges: Boolean = false
+        set(value) {
+            field = value
+            if (value)
+                requireView().castTo<ViewGroup>().layoutTransition = LayoutTransition().apply {
+                    enableTransitionType(LayoutTransition.CHANGING)
+                }
+        }
 
     override val di: DI by closestDI()
 
@@ -48,6 +59,8 @@ abstract class BaseBottomSheetFragment(
         bind()
         defaultSubscribe()
         subscribe()
+        if (arguments != null)
+            requireArguments().readArguments()
         viewModel.attach()
     }
 
@@ -55,18 +68,22 @@ abstract class BaseBottomSheetFragment(
         super.onDestroyView()
         compositeDisposable.clear()
         delegates.forEach { it.dispose() }
-        viewModel.detach()
     }
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        viewModel.onDismiss()
+        viewModel.detach()
     }
 
     /**
      * Вьюмодель.
      */
-    protected abstract val viewModel: BaseBottomSheetViewModel
+    protected abstract val viewModel: BaseViewModel
+
+    /**
+     * Читает аргументы.
+     */
+    protected open fun Bundle.readArguments() {}
 
     /**
      * Наполнение вьюшек.

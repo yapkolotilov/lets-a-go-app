@@ -3,7 +3,6 @@ package me.kolotilov.lets_a_go.di
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import com.google.gson.GsonBuilder
 import me.kolotilov.lets_a_go.App
 import me.kolotilov.lets_a_go.network.*
 import me.kolotilov.lets_a_go.presentation.Params
@@ -16,7 +15,7 @@ import org.kodein.di.instance
 import org.kodein.di.singleton
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.create
 import ru.terrakok.cicerone.Router
 import java.io.IOException
@@ -76,11 +75,7 @@ private fun provideRetrofit(client: OkHttpClient): Retrofit {
         .baseUrl("https://lets-a-go.herokuapp.com/")
         .client(client)
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .addConverterFactory(
-            GsonConverterFactory.create(
-                GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssX").create()
-            )
-        )
+        .addConverterFactory(JacksonConverterFactory.create())
         .build()
 }
 

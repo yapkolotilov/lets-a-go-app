@@ -21,6 +21,7 @@ import java.text.DecimalFormat
 fun uiModule() = DI.Module("App") {
     bind<NavigatorHolder>() with provider { instance<App>().getNavigatorHolder() }
     bind<DateTimeFormatter>(Tags.BIRTH_DATE) with provider { birthDateFormatter() }
+    bind<DateTimeFormatter>(Tags.RECORDING_TIME) with provider { recordTimeFormatter() }
     bind<DecimalFormat>(Tags.DISTANCE) with provider { distanceFormatter() }
 
     bind<EmptyViewModel>() with provider { EmptyViewModel() }
@@ -36,12 +37,16 @@ fun uiModule() = DI.Module("App") {
     }
     bind<OnboardingTitleViewModel>() with provider { OnboardingTitleViewModel(instance()) }
     bind<MapViewModel>() with provider { MapViewModel(instance(), instance(), instance()) }
-    bind<EditRouteViewModel>() with provider { EditRouteViewModel(instance(), instance(), instance()) }
+    bind<EditRouteViewModel>() with provider { EditRouteViewModel(instance(), instance()) }
     bind<EditEntryViewModel>() with provider { EditEntryViewModel(instance(), instance(), instance()) }
     bind<EntryDetailsViewModel>() with provider { EntryDetailsViewModel(instance()) }
     bind<RouteDetailsViewModel>() with provider { RouteDetailsViewModel(instance(), instance(), instance()) }
     bind<EditFilterViewModel>() with provider { EditFilterViewModel(instance(), instance()) }
     bind<OnboardingEndViewModel>() with provider { OnboardingEndViewModel(instance()) }
+}
+
+private fun recordTimeFormatter(): DateTimeFormatter {
+    return DateTimeFormat.forPattern("HH:mm:ss")
 }
 
 private fun birthDateFormatter(): DateTimeFormatter {

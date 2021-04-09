@@ -27,7 +27,7 @@ data class UserDetails(
     val weight: Int? = null,
     val illnesses: List<Illness> = emptyList(),
     val symptoms: List<Symptom> = emptyList(),
-    val filter: Filter = Filter(null, null, null, null, false, -1),
+    val filter: Filter = Filter(null, null, null, null, false),
     val routes: List<Route> = emptyList(),
     val entries: List<Entry> = emptyList()
 )

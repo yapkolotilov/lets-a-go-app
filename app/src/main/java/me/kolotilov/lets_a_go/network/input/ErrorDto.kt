@@ -1,6 +1,6 @@
 package me.kolotilov.lets_a_go.network.input
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 import me.kolotilov.lets_a_go.models.ErrorCode
 import me.kolotilov.lets_a_go.models.ServiceException
 
@@ -9,16 +9,16 @@ import me.kolotilov.lets_a_go.models.ServiceException
  */
 data class ErrorDto(
     //@ApiModelProperty("Код ошибки.")
-    @SerializedName("code")
+    @JsonProperty("code")
     val code: ErrorCode,
     //@ApiModelProperty("Статус ошибки.")
-    @SerializedName("status")
+    @JsonProperty("status")
     val status: Int,
     //@ApiModelProperty("Сообщение об ощибке.")
-    @SerializedName("message")
+    @JsonProperty("message")
     val message: String,
     //@ApiModelProperty("Трассировка стека.")
-    @SerializedName("stackTrace")
+    @JsonProperty("stackTrace")
     val stackTrace: String
 )
 

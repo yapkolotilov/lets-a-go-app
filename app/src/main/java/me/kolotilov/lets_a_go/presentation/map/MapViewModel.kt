@@ -3,13 +3,14 @@ package me.kolotilov.lets_a_go.presentation.map
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
-import me.kolotilov.lets_a_go.models.Entry
-import me.kolotilov.lets_a_go.models.Point
-import me.kolotilov.lets_a_go.models.Route
+import io.reactivex.subjects.Subject
+import me.kolotilov.lets_a_go.models.*
 import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
 import me.kolotilov.lets_a_go.presentation.Params
 import me.kolotilov.lets_a_go.presentation.Screens
+import me.kolotilov.lets_a_go.ui.base.setResultListener
+import me.kolotilov.lets_a_go.ui.toEditRouteParams
 import ru.terrakok.cicerone.Router
 
 class MapViewModel(
@@ -24,8 +25,32 @@ class MapViewModel(
     val startEntry: Observable<Unit> get() = startEntrySubject
     private val startEntrySubject = PublishSubject.create<Unit>()
 
+    val errorDialog: Observable<ErrorCode> get() = errorDialogSubject
+    private val errorDialogSubject: Subject<ErrorCode> = BehaviorSubject.create()
+
+    val clearEntry: Observable<Unit> get() = clearEntrySubject
+    private val clearEntrySubject: Subject<Unit> = PublishSubject.create()
+
     override fun attach() {
         loadRoutes()
+    }
+
+    fun openRoutePreview(recordedPoints: MutableList<Point>) {
+        repository.routePreview(recordedPoints)
+            .load()
+            .doOnSuccess {
+                router.setResultListener<Unit>(EditRouteViewModel.TAG) {
+                    loadRoutes()
+                    clearEntrySubject.onNext(Unit)
+                }
+                router.navigateTo(Screens.editRoute(it.toEditRouteParams(recordedPoints)))
+            }
+            .doOnError {
+                if (it is ServiceException)
+                    errorDialogSubject.onNext(it.code)
+            }
+            .emptySubscribe()
+            .autoDispose()
     }
 
     fun openEditEntryBottomSheet(route: Route?, recordedPoints: MutableList<Point>, callback: () -> Unit) {
@@ -36,15 +61,6 @@ class MapViewModel(
             callback()
         }
         router.navigateTo(Screens.editEntry())
-    }
-
-    fun openEditRouteBottomSheet(recordedPoints: MutableList<Point>, callback: () -> Unit) {
-        params.editRoute.points = recordedPoints
-        params.editRoute.callback = {
-            loadRoutes()
-            callback()
-        }
-        router.navigateTo(Screens.editRoute())
     }
 
     fun openRouteDetailsBottomSheet(route: Route) {

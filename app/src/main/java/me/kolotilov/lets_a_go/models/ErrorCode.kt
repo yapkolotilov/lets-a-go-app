@@ -43,5 +43,10 @@ enum class ErrorCode {
     /**
      * Пользователь уже зарегистрирован.
      */
-    USER_ALREADY_EXITS
+    USER_ALREADY_EXITS,
+
+    /**
+     * Слишком короткий маршрут.
+     */
+    ROUTE_TOO_SHORT,
 }

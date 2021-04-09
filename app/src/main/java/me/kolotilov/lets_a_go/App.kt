@@ -2,6 +2,7 @@ package me.kolotilov.lets_a_go
 
 import android.app.Application
 import me.kolotilov.lets_a_go.di.mainModule
+import me.kolotilov.lets_a_go.ui.base.AppRouter
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.bind
@@ -37,6 +38,6 @@ class App : Application(), DIAware {
     }
 
     fun getRouter(): Router {
-        return cicerone.router
+        return AppRouter(cicerone.router)
     }
 }

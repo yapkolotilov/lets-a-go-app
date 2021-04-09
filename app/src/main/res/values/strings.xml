@@ -83,6 +83,17 @@
     <string name="enabled_hint">Использовать</string>
     <string name="go_button">Перейти</string>
     <string name="enter_details_end">Спасибо! Можете пользоваться приложением.</string>
+    <string name="give_permission_title">Пожалуйста, дайте приложению разрешение на геолокацию</string>
+    <string name="give_permission_message">Без него вы не сможете записывать ваши маршруты</string>
+    <string name="route_too_short_title">Вы прошли слишком мало</string>
+    <string name="route_too_short_message">Маршрут должен быть длинней.</string>
+    <string name="speed_hint">Средняя скорость</string>
+    <string name="speed">%s км/ч</string>
+    <string name="kilocalories_burnt_hint">Ккал сожжено</string>
+    <string name="kilocalories">%d ккал</string>
+    <string name="altitude_delta_hint">Перепад высот</string>
+    <string name="delete_button">Удалить</string>
+    <string name="difficulty_hint">Сложность</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>

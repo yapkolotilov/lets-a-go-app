@@ -10,14 +10,12 @@ import android.graphics.Color
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.os.Bundle
-import android.text.format.DateUtils
 import android.view.View
-import android.widget.Button
-import android.widget.TextView
+import android.widget.GridLayout
+import android.widget.ImageButton
 import androidx.annotation.DrawableRes
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -29,17 +27,23 @@ import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.models.distance
+import me.kolotilov.lets_a_go.presentation.Tags
+import me.kolotilov.lets_a_go.presentation.base.ButtonData
+import me.kolotilov.lets_a_go.presentation.base.showDialog
 import me.kolotilov.lets_a_go.presentation.map.MapViewModel
 import me.kolotilov.lets_a_go.ui.base.BaseFragment
+import me.kolotilov.lets_a_go.ui.base.Grid
+import me.kolotilov.lets_a_go.ui.base.KeyValueFactory
+import me.kolotilov.lets_a_go.ui.base.KeyValueModel
+import me.kolotilov.lets_a_go.ui.distance
+import me.kolotilov.lets_a_go.ui.getColorCompat
 import me.kolotilov.lets_a_go.ui.toLatLng
 import me.kolotilov.lets_a_go.ui.toPoint
 import org.joda.time.DateTime
 import org.joda.time.Duration
+import org.joda.time.format.DateTimeFormatter
 import org.kodein.di.instance
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 
 
 class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
@@ -58,6 +62,8 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
 
     private inner class Idle : State() {
 
+        private var moved: Boolean = false
+
         override fun processLocation(location: Location) {
             if (moved)
                 return
@@ -68,15 +74,18 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
         override fun onRecordClick() = startRecording()
 
         private fun startRecording() {
-            state = Routing()
-            recordPanel.isVisible = true
-            recordButton.text = "Остановить"
+            state = routing
+            setRecordPanelVisibility(true)
             recordedPoints.clear()
+            currentPositionMarker.position
+            val currentLocation = currentLocation
+            if (currentLocation == null)
+                return
             val startPoint = Point(
-                latitude = currentPositionMarker.position.latitude,
-                longitude = currentPositionMarker.position.longitude,
-                timestamp = DateTime.now(),
-                id = 0
+                latitude = currentLocation.latitude,
+                longitude = currentLocation.longitude,
+                altitude = currentLocation.altitude,
+                timestamp = DateTime(currentLocation.time),
             )
             recordedPoints.add(startPoint)
 
@@ -87,9 +96,9 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
                         recordedPoints.firstOrNull()?.timestamp ?: DateTime.now(),
                         DateTime.now()
                     )
-                    updateRecordingPanel(duration.millis)
+                    updateRecordingPanel(duration)
                 }
-                .subscribe({}, {})
+                .emptySubscribe()
         }
     }
 
@@ -104,14 +113,11 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
         override fun onRecordClick() = stopRecording()
 
         private fun stopRecording() {
-            state = Idle()
-            recordPanel.isVisible = false
-            recordButton.text = "Записать"
-            updateRecordingPanel(0)
+            state = idle
+            setRecordPanelVisibility(false)
+            updateRecordingPanel(Duration.ZERO)
             timerDisposable?.dispose()
-            viewModel.openEditRouteBottomSheet(recordedPoints) {
-                currentEntryPolyline.remove()
-            }
+            viewModel.openRoutePreview(recordedPoints)
         }
     }
 
@@ -123,62 +129,63 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
         }
 
         override fun onRecordClick() {
-            state = Idle()
-            recordPanel.isVisible = false
-            recordButton.text = "Записать"
-            updateRecordingPanel(0)
+            state = idle
+            setRecordPanelVisibility(false)
+            updateRecordingPanel(Duration.ZERO)
             timerDisposable?.dispose()
             viewModel.openEditEntryBottomSheet(selectedRoute, recordedPoints) {}
         }
     }
 
-    private val recordButton: Button by lazyView(R.id.record_button)
-    private val recordPanel: View by lazyView(R.id.top_menu)
-    private val durationTextView: TextView by lazyView(R.id.duration_TextView)
-    private val distanceTextView: TextView by lazyView(R.id.length_TextView)
-    private val userDetailsButton: Button by lazyView(R.id.user_details_button)
     override val viewModel: MapViewModel by instance()
 
+    private val recordButton: View by lazyView(R.id.record_button)
+    private val recordPanel: View by lazyView(R.id.record_panel)
+    private val recordGrid: GridLayout by lazyView(R.id.record_grid)
+    private val searchButton: ImageButton by lazyView(R.id.search_button)
+    private val userDetailsButton: ImageButton by lazyView(R.id.user_details_button)
+    private lateinit var recordAdapter: Grid.ListAdapter
+
     private var timerDisposable: Disposable? = null
-    private val dateFormatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+    private val dateFormatter: DateTimeFormatter by instance(Tags.RECORDING_TIME)
 
     private val recordedPoints = mutableListOf<Point>()
     private var routeMarkers = emptyList<Marker>()
-    private var state: State = Idle()
+    private val idle: State = Idle()
+    private val routing: State = Routing()
+    private val entrying: State = Entrying()
+    private var state: State = idle
     private lateinit var map: GoogleMap
-    private var moved: Boolean = false
     private var selectedRoute: Route? = null
     private val currentPositionMarker by lazy {
         map.addMarker(
-            MarkerOptions().title("Локация").position(LatLng(0.0, 0.0)).icon(
-                bitmapDescriptorFromVector(requireContext(), R.drawable.ic_navigation)
-            )
+            MarkerOptions()
+                .position(LatLng(0.0, 0.0))
+                .icon(bitmapDescriptorFromVector(requireContext(), R.drawable.ic_navigation))
         )
     }
     private val currentEntryPolyline by lazy {
-        map.addPolyline(PolylineOptions().addAll(emptyList()))
+        map.addPolyline(
+            PolylineOptions()
+                .color(requireContext().getColorCompat(R.color.red))
+                .width(15f)
+                .addAll(emptyList())
+        )
     }
-    private var currentRoutePolyline: Polyline? = null
+    private val currentRoutePolyline: Polyline by lazy {
+        map.addPolyline(
+            PolylineOptions()
+                .color(Color.BLUE)
+                .width(15f)
+                .addAll(emptyList())
+        )
+    }
     private lateinit var client: LocationManager
+    private var currentLocation: Location? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val mapFragment = childFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync {
-            map = it
-            onMapLoaded()
-        }
-    }
-
-    override fun fillViews() {
-        recordButton.setOnClickListener {
-            onRecordClick()
-        }
-    }
-
-    private fun onRecordClick() {
-        state.onRecordClick()
+    override fun onDestroy() {
+        super.onDestroy()
+        client.removeUpdates(this)
     }
 
     override fun onRequestPermissionsResult(
@@ -189,38 +196,52 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
         if (requestCode == LOCATION_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 requestLocationUpdates()
+            } else {
+                showDialog(
+                    title = getString(R.string.give_permission_title),
+                    message = getString(R.string.give_permission_message),
+                    positiveButton = ButtonData(getString(R.string.ok_button))
+                )
             }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        client.removeUpdates(this)
-    }
-
     override fun onLocationChanged(location: Location) {
+        currentLocation = location
+        recordButton.isClickable = true
         currentPositionMarker.position = location.toLatLng()
         state.processLocation(location)
+    }
+
+    override fun fillViews() {
+        recordAdapter = Grid.ListAdapter(recordGrid, KeyValueFactory())
+        animateLayoutChanges = true
+        recordButton.setOnClickListener {
+            state.onRecordClick()
+        }
+        val mapFragment = childFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync {
+            map = it
+            onMapLoaded()
+        }
     }
 
     override fun bind() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
             requestLocationUpdates()
         } else {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_REQUEST_CODE)
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_REQUEST_CODE
+            )
         }
         userDetailsButton.setOnClickListener { viewModel.openUserDetails() }
     }
 
-    @SuppressLint("MissingPermission")
-    private fun requestLocationUpdates() {
-        client = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        client.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 5f, this)
-    }
-
     override fun subscribe() {
         viewModel.routes.subscribe { routes ->
-            currentRoutePolyline?.remove()
+            currentRoutePolyline.points = emptyList()
             routeMarkers.forEach {
                 it.remove()
             }
@@ -235,8 +256,26 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
 
         viewModel.startEntry.subscribe {
             state.onRecordClick()
-            state = Entrying()
+            state = entrying
         }.autoDispose()
+
+        viewModel.errorDialog.subscribe {
+            showDialog(
+                title = getString(R.string.route_too_short_title),
+                message = getString(R.string.route_too_short_message),
+                positiveButton = ButtonData(getString(R.string.ok_button))
+            )
+        }.autoDispose()
+
+        viewModel.clearEntry.subscribe {
+            currentEntryPolyline.points = emptyList()
+        }.autoDispose()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun requestLocationUpdates() {
+        client = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        client.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 1f, this)
     }
 
     private fun onMarkerClick(marker: Marker) {
@@ -256,30 +295,31 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
 
     private fun drawRoute(route: Route) {
         routeMarkers.forEach { it.remove() }
-        currentRoutePolyline?.remove()
-        currentRoutePolyline = map.addPolyline(
-            PolylineOptions().color(Color.BLUE).addAll(route.points.map { it.toLatLng() })
+        currentRoutePolyline.points = route.points.map { it.toLatLng() }
+    }
+
+    private fun updateRecordingPanel(duration: Duration) {
+        recordAdapter.items = listOf(
+            KeyValueModel(getString(R.string.duration_hint), dateFormatter.print(duration.millis)),
+            KeyValueModel(
+                getString(R.string.distance_hint),
+                recordedPoints.distance().distance(requireContext())
+            )
         )
     }
 
-    private fun updateRecordingPanel(duration: Long) {
-        durationTextView.text = dateFormatter.format(duration - 3 * DateUtils.HOUR_IN_MILLIS)
-        distanceTextView.text = "${recordedPoints.distance().roundToInt()} м."
-    }
-
     private fun onMapLoaded() {
-        val sydney = LatLng(-34.0, 151.0)
-        map.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         map.setOnMarkerClickListener {
             onMarkerClick(it)
             true
         }
     }
 
+    @Suppress("SameParameterValue")
     private fun bitmapDescriptorFromVector(
         context: Context,
         @DrawableRes vectorDrawableResourceId: Int
-    ): BitmapDescriptor? {
+    ): BitmapDescriptor {
         val vectorDrawable = ContextCompat.getDrawable(context, vectorDrawableResourceId)
         val bitmap = Bitmap.createBitmap(
             vectorDrawable!!.intrinsicWidth,
@@ -291,5 +331,18 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
         vectorDrawable.draw(canvas)
 
         return BitmapDescriptorFactory.fromBitmap(bitmap)
+    }
+
+    private fun setRecordPanelVisibility(visibility: Boolean) {
+        val parent = ConstraintLayout.LayoutParams.PARENT_ID
+        recordPanel.layoutParams = ConstraintLayout.LayoutParams(recordPanel.layoutParams).apply {
+            if (visibility) {
+                topToBottom = -1
+                topToTop = parent
+            } else {
+                bottomToTop = parent
+                topToTop = -1
+            }
+        }
     }
 }

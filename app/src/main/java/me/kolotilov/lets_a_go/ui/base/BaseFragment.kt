@@ -1,5 +1,6 @@
 package me.kolotilov.lets_a_go.ui.base
 
+import android.animation.LayoutTransition
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -38,6 +39,14 @@ abstract class BaseFragment(
 
     override val di: DI by closestDI()
     protected open val toolbar: Toolbar? = null
+    protected var animateLayoutChanges: Boolean = false
+        set(value) {
+            field = value
+            if (value)
+                requireView().castTo<ViewGroup>().layoutTransition = LayoutTransition().apply {
+                    enableTransitionType(LayoutTransition.CHANGING)
+                }
+        }
 
     final override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,9 +64,9 @@ abstract class BaseFragment(
         bind()
         defaultSubscribe()
         subscribe()
-        viewModel.attach()
         if (arguments != null)
             requireArguments().readArguments()
+        viewModel.attach()
     }
 
     @CallSuper

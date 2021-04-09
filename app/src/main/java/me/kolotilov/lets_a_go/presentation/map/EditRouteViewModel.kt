@@ -4,24 +4,32 @@ import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.models.Route
-import me.kolotilov.lets_a_go.models.distance
-import me.kolotilov.lets_a_go.models.duration
+import me.kolotilov.lets_a_go.models.RoutePreview
 import me.kolotilov.lets_a_go.network.Repository
-import me.kolotilov.lets_a_go.presentation.Params
+import me.kolotilov.lets_a_go.presentation.BaseViewModel
 import me.kolotilov.lets_a_go.presentation.Screens
-import me.kolotilov.lets_a_go.presentation.base.BaseBottomSheetViewModel
+import me.kolotilov.lets_a_go.ui.base.sendResult
 import org.joda.time.Duration
 import ru.terrakok.cicerone.Router
 
 class EditRouteViewModel(
-    private val params: Params,
     private val repository: Repository,
     private val router: Router
-) : BaseBottomSheetViewModel() {
+) : BaseViewModel() {
+
+    companion object {
+
+        const val TAG = "EditRoute"
+    }
 
     class Data(
+        val distance: Double,
         val duration: Duration,
-        val distance: Double
+        val speed: Double,
+        val kiloCaloriesBurnt: Int?,
+        val altitudeDelta: Double,
+        val type: Route.Type,
+        val difficulty: Int
     )
 
     val data: Observable<Data> get() = dataSubject
@@ -31,29 +39,21 @@ class EditRouteViewModel(
     private var type: Route.Type? = null
     private var ground: Route.Ground? = null
     private var public: Boolean = false
-    private var points = emptyList<Point>()
+    private var difficulty: Int? = null
+
+    private var preview: RoutePreview? = null
+    private var points: List<Point>? = null
     private var id: Int? = null
 
     override fun attach() {
-        points = params.editRoute.points
-        id = params.editRoute.id
-        if (points.isNotEmpty()) {
-            dataSubject.onNext(
-                Data(
-                    points.duration(),
-                    points.distance()
-                )
-            )
+        val preview = preview
+        if (preview != null) {
+            dataSubject.onNext(preview.toData())
         } else if (id != null) {
             repository.getRoute(id!!)
                 .load()
                 .doOnSuccess {
-                    dataSubject.onNext(
-                        Data(
-                            it.points.duration(),
-                            it.points.distance()
-                        )
-                    )
+                    // TODO
                 }
                 .emptySubscribe()
                 .autoDispose()
@@ -62,7 +62,12 @@ class EditRouteViewModel(
 
     override fun detach() {
         super.detach()
-        params.editRoute.clear()
+        router.sendResult(TAG, Unit)
+    }
+
+    fun init(preview: RoutePreview?, points: List<Point>?) {
+        this.preview = preview
+        this.points = points
     }
 
     fun setName(name: String) {
@@ -81,15 +86,20 @@ class EditRouteViewModel(
         this.public = public
     }
 
+    fun setDifficulty(difficulty: Int) {
+        this.difficulty = difficulty
+    }
+
     fun save() {
         fun parseResult(route: Route) {
-            params.routeDetails.id = route.id
+//            params.routeDetails.id = route.id
             router.exit()
             router.navigateTo(Screens.routeDetails())
         }
 
+        // TODO
         if (id == null) {
-            repository.createRoute(name, type, ground, points)
+            repository.createRoute(name, type, ground, points ?: emptyList())
                 .load()
                 .doOnSuccess {
                     parseResult(it)
@@ -97,22 +107,22 @@ class EditRouteViewModel(
                 .emptySubscribe()
                 .autoDispose()
         } else {
-            val route = Route(
-                name = name,
-                difficulty = null,
-                type = type,
-                ground = ground,
-                points = points,
-                entries = emptyList(),
-                id = id ?: 0
-            )
-            repository.editRoute(id ?: 0, route)
-                .load()
-                .doOnSuccess {
-                    parseResult(it)
-                }
-                .emptySubscribe()
-                .autoDispose()
+//            val route = Route(
+//                name = name,
+//                difficulty = null,
+//                type = type,
+//                ground = ground,
+//                points = points,
+//                entries = emptyList(),
+//                id = id ?: 0
+//            )
+//            repository.editRoute(id ?: 0, route)
+//                .load()
+//                .doOnSuccess {
+//                    parseResult(it)
+//                }
+//                .emptySubscribe()
+//                .autoDispose()
         }
     }
 
@@ -129,7 +139,13 @@ class EditRouteViewModel(
                 .autoDispose()
     }
 
-    override fun onDismiss() {
-        params.editRoute.callback()
-    }
+    private fun RoutePreview.toData() = Data(
+        distance = distance,
+        duration = duration,
+        speed = speed,
+        kiloCaloriesBurnt = kiloCaloriesBurnt,
+        altitudeDelta = altitudeDelta,
+        type = type,
+        difficulty = difficulty
+    )
 }

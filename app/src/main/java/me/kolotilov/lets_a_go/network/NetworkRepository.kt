@@ -6,6 +6,7 @@ import me.kolotilov.lets_a_go.models.*
 import me.kolotilov.lets_a_go.network.input.*
 import me.kolotilov.lets_a_go.network.output.toEntry
 import me.kolotilov.lets_a_go.network.output.toRoute
+import me.kolotilov.lets_a_go.network.output.toRoutePreview
 import me.kolotilov.lets_a_go.network.output.toUserDetails
 import okhttp3.ResponseBody
 import org.joda.time.DateTime
@@ -51,6 +52,8 @@ interface NetworkRepository {
     fun createEntry(route: Route, entry: Entry): Single<Route>
 
     fun searchRoutes(query: String?, filter: Filter?): Single<List<Route>>
+
+    fun routePreview(points: List<Point>): Single<RoutePreview>
 }
 
 class NetworkRepositoryImpl(
@@ -158,6 +161,11 @@ class NetworkRepositoryImpl(
 
     override fun searchRoutes(query: String?, filter: Filter?): Single<List<Route>> {
         return api.searchRoutes(query, filter?.toFilterDto()).map { routes -> routes.map { it.toRoute() } }
+    }
+
+    override fun routePreview(points: List<Point>): Single<RoutePreview> {
+        return api.routePreview(CreateRoutePreviewDto(points.map { it.toCreatePointDto() }))
+            .map { it.toRoutePreview() }
     }
 
     private fun parseError(throwable: Throwable): Throwable {

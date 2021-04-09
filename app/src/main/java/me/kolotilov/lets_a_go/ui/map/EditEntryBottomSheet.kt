@@ -6,6 +6,7 @@ import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.presentation.map.EditEntryViewModel
 import me.kolotilov.lets_a_go.ui.base.BaseBottomSheetFragment
 import me.kolotilov.lets_a_go.ui.base.Grid
+import me.kolotilov.lets_a_go.ui.base.KeyValueFactory
 import me.kolotilov.lets_a_go.ui.base.KeyValueModel
 import org.kodein.di.instance
 import java.text.SimpleDateFormat
@@ -19,7 +20,7 @@ class EditEntryBottomSheet : BaseBottomSheetFragment(R.layout.fragment_edit_entr
     private lateinit var statsAdapter: Grid.ListAdapter
 
     override fun fillViews() {
-        statsAdapter = Grid.ListAdapter(statsGrid, StatsFactory())
+        statsAdapter = Grid.ListAdapter(statsGrid, KeyValueFactory())
     }
 
     override fun bind() {

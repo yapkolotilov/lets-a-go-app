@@ -17,13 +17,13 @@ import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.presentation.Constants
 import me.kolotilov.lets_a_go.presentation.details.EditFilterViewModel
 import me.kolotilov.lets_a_go.ui.base.BaseFragment
+import me.kolotilov.lets_a_go.ui.base.GroundFactory
 import me.kolotilov.lets_a_go.ui.base.Recycler
+import me.kolotilov.lets_a_go.ui.base.TypeFactory
 import me.kolotilov.lets_a_go.ui.buildArguments
 import me.kolotilov.lets_a_go.ui.distance
 import me.kolotilov.lets_a_go.ui.dp
 import me.kolotilov.lets_a_go.ui.duration
-import me.kolotilov.lets_a_go.ui.map.GroundFactory
-import me.kolotilov.lets_a_go.ui.map.TypeFactory
 import me.kolotilov.lets_a_go.utils.castTo
 import org.joda.time.Duration
 import org.kodein.di.instance
@@ -152,6 +152,7 @@ class EditFilterFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor
             durationSlider.values =
                 data.duration.toList().map { (it.millis / DURATION_SCALE).toInt().toFloat() }
             enabledSwitch.isChecked = data.enabled
+            animateLayoutChanges = true
         }.autoDispose()
 
         viewModel.distance.subscribe { distance ->

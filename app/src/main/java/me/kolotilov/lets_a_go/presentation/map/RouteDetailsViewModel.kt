@@ -59,7 +59,7 @@ class RouteDetailsViewModel(
 
     fun edit() {
         params.editRoute.id = params.routeDetails.id
-        router.navigateTo(Screens.editRoute())
+//        router.navigateTo(Screens.editRoute()) // TODO
     }
 
     private fun parseRoute(route: Route) {

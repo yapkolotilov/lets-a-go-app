@@ -3,6 +3,7 @@ package me.kolotilov.lets_a_go.presentation
 import androidx.annotation.AnimRes
 import androidx.fragment.app.Fragment
 import me.kolotilov.lets_a_go.R
+import me.kolotilov.lets_a_go.ui.EditRouteParams
 import me.kolotilov.lets_a_go.ui.auth.LoginFragment
 import me.kolotilov.lets_a_go.ui.auth.RegisterFragment
 import me.kolotilov.lets_a_go.ui.details.*
@@ -36,7 +37,7 @@ object Screens {
 
     fun map() = LetsScreen { MapFragment() }
 
-    fun editRoute() = LetsScreen { EditRouteBottomSheet() }
+    fun editRoute(params: EditRouteParams) = LetsScreen { EditRouteBottomSheet.newInstance(params) }
 
     fun routeDetails() = LetsScreen { RouteDetailsBottomSheet() }
 

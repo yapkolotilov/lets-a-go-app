@@ -1,31 +1,26 @@
 package me.kolotilov.lets_a_go.network.output
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.utils.toDateTime
 import java.util.*
 
 data class PointDto(
-    @SerializedName("latitude")
+    @JsonProperty("latitude")
     val latitude: Double,
-    @SerializedName("longitude")
+    @JsonProperty("longitude")
     val longitude: Double,
-    @SerializedName("timestamp")
+    @JsonProperty("altitude")
+    val altitude: Double,
+    @JsonProperty("timestamp")
     val timestamp: Date,
-    @SerializedName("id")
+    @JsonProperty("id")
     val id: Int
-)
-
-fun Point.toPointDto() = PointDto(
-    latitude = latitude,
-    longitude = longitude,
-    timestamp = timestamp.toDate(),
-    id = id
 )
 
 fun PointDto.toPoint() = Point(
     latitude = latitude,
     longitude = longitude,
+    altitude = altitude,
     timestamp = timestamp.toDateTime(),
-    id = id
 )
