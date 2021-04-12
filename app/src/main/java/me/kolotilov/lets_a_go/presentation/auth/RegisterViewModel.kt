@@ -2,10 +2,7 @@ package me.kolotilov.lets_a_go.presentation.auth
 
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
-import me.kolotilov.lets_a_go.models.ErrorCode
-import me.kolotilov.lets_a_go.models.ServiceException
 import me.kolotilov.lets_a_go.network.NetworkRepository
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
 import me.kolotilov.lets_a_go.presentation.Screens
@@ -26,9 +23,6 @@ class RegisterViewModel(
     val validation: Observable<Boolean> get() = validationSubject
     private val validationSubject: Subject<Boolean> = BehaviorSubject.create()
 
-    val error: Observable<ErrorCode> get() = errorSubject
-    private val errorSubject: Subject<ErrorCode> = PublishSubject.create()
-
     /**
      * Регистрация.
      *
@@ -41,10 +35,6 @@ class RegisterViewModel(
             .load()
             .doOnComplete {
                 router.newRootScreen(Screens.basicInfo(EditDetailsType.ONBOARDING))
-            }
-            .doOnError {
-                if (it is ServiceException)
-                    errorSubject.onNext(it.code)
             }
             .emptySubscribe()
             .autoDispose()

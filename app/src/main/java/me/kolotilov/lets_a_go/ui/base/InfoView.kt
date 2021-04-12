@@ -6,6 +6,9 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.LayoutRes
 import androidx.core.view.isVisible
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.android.closestDI
 
 /**
  * Базовая информация.
@@ -15,7 +18,7 @@ abstract class InfoView<D : Any>(
     attrs: AttributeSet?,
     @LayoutRes
     layoutRes: Int
-) : FrameLayout(context, attrs) {
+) : FrameLayout(context, attrs), DIAware {
 
     private enum class State {
 
@@ -30,6 +33,8 @@ abstract class InfoView<D : Any>(
     protected abstract val loadingLayout: View
     protected abstract val loadedLayout: View
     protected abstract val emptyLayout: View
+
+    override val di: DI by closestDI()
 
     init {
         inflate(context, layoutRes, this)

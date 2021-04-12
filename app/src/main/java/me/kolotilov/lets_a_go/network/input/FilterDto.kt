@@ -1,6 +1,6 @@
 package me.kolotilov.lets_a_go.network.input
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.gson.annotations.SerializedName
 import me.kolotilov.lets_a_go.models.Filter
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.utils.toDate
@@ -8,19 +8,19 @@ import me.kolotilov.lets_a_go.utils.toDuration
 import java.util.*
 
 data class FilterDto(
-    @JsonProperty("min_length")
+    @SerializedName("min_length")
     val minLength: Double?,
-    @JsonProperty("max_length")
+    @SerializedName("max_length")
     val maxLength: Double?,
-    @JsonProperty("min_duration")
+    @SerializedName("min_duration")
     val minDuration: Date?,
-    @JsonProperty("max_duration")
+    @SerializedName("max_duration")
     val maxDuration: Date?,
-    @JsonProperty("types_allowed")
+    @SerializedName("types_allowed")
     val typesAllowed: List<Route.Type>?,
-    @JsonProperty("grounds_allowed")
+    @SerializedName("grounds_allowed")
     val groundsAllowed: List<Route.Ground>?,
-    @JsonProperty("enabled")
+    @SerializedName("enabled")
     val enabled: Boolean
 )
 

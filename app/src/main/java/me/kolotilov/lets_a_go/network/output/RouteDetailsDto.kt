@@ -1,31 +1,56 @@
-package me.kolotilov.lets_a_go.network.output
+ package me.kolotilov.lets_a_go.network.output
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import android.util.Log
+import com.google.gson.annotations.SerializedName
 import me.kolotilov.lets_a_go.models.Route
+import me.kolotilov.lets_a_go.models.RouteDetails
+import me.kolotilov.lets_a_go.utils.toDuration
+import java.util.*
 
 class RouteDetailsDto(
-    @JsonProperty("name")
+    @SerializedName("name")
     val name: String?,
-    @JsonProperty("difficulty")
+    @SerializedName("distance")
+    val distance: Double,
+    @SerializedName("duration")
+    val duration: Date,
+    @SerializedName("altitude_delta")
+    val altitudeDelta: Double,
+    @SerializedName("speed")
+    val speed: Double,
+    @SerializedName("kilocalories_burnt")
+    val kilocaloriesBurnt: Int?,
+    @SerializedName("difficulty")
     val difficulty: Int?,
-    @JsonProperty("points")
-    val points: List<PointDto>,
-    @JsonProperty("type")
+    @SerializedName("type")
     val type: Route.Type?,
-    @JsonProperty("ground")
+    @SerializedName("ground")
     val ground: Route.Ground?,
-    @JsonProperty("entries")
-    val entries: List<EntryDto>,
-    @JsonProperty("id")
-    val id: Int
+    @SerializedName("entries")
+    val entries: List<RouteEntryDto>,
+    @SerializedName("mine")
+    val mine: Boolean,
+    @SerializedName("total_distance")
+    val totalDistance: Double,
+    @SerializedName("total_calories_burnt")
+    val totalCaloriesBurnt: Int?,
+    @SerializedName("id")
+    val id: Int,
 )
 
-fun RouteDetailsDto.toRoute() = Route(
+fun RouteDetailsDto.toRouteDetails() = RouteDetails(
     name = name,
-    difficulty = difficulty,
-    points = points.map { it.toPoint() },
+    distance = distance,
+    duration = duration.toDuration(),
+    altitudeDelta = altitudeDelta,
+    speed = speed,
+    kilocaloriesBurnt = kilocaloriesBurnt,
+    difficulty = difficulty?.takeIf { it > 0 },
     type = type,
     ground = ground,
-    entries = entries.map { it.toEntry() },
-    id = id
+    entries = entries.map { it.toRouteEntry() }.also { Log.d("BRUH", "entries.size = ${entries.size}") },
+    mine = mine,
+    totalDistance = totalDistance,
+    totalCaloriesBurnt = totalCaloriesBurnt,
+    id = id.also { Log.d("BRUH", "id = $id") }
 )

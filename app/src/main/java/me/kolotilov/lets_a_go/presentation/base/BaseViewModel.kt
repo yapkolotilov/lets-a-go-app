@@ -11,6 +11,8 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
+import me.kolotilov.lets_a_go.models.ErrorCode
+import me.kolotilov.lets_a_go.models.ServiceException
 import me.kolotilov.lets_a_go.utils.emitNext
 
 /**
@@ -20,6 +22,9 @@ abstract class BaseViewModel {
 
     val popup: Observable<String> get() = popupSubject
     private val popupSubject: Subject<String> = PublishSubject.create()
+
+    val errorDialog: Observable<ErrorCode> get() = errorDialogSubject
+    private val errorDialogSubject: Subject<ErrorCode> = PublishSubject.create()
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -61,7 +66,11 @@ abstract class BaseViewModel {
     protected fun Completable.load(): Completable {
         return schedule()
             .doOnSubscribe { compositeDisposable.add(it) }
-            .doOnError { Log.e("NETWORK", it.stackTraceToString()) }
+            .doOnError {
+                Log.e("NETWORK", it.stackTraceToString())
+                if (it is ServiceException)
+                    errorDialogSubject.onNext(it.code)
+            }
     }
 
     /**
@@ -78,7 +87,11 @@ abstract class BaseViewModel {
     protected fun <T> Single<T>.load(): Single<T> {
         return schedule()
             .doOnSubscribe { compositeDisposable.add(it) }
-            .doOnError { Log.e("NETWORK", it.stackTraceToString()) }
+            .doOnError {
+                Log.e("NETWORK", it.stackTraceToString())
+                if (it is ServiceException)
+                    errorDialogSubject.onNext(it.code)
+            }
     }
 
     /**
@@ -95,7 +108,11 @@ abstract class BaseViewModel {
     protected fun <T> Observable<T>.load(): Observable<T> {
         return schedule()
             .doOnSubscribe { compositeDisposable.add(it) }
-            .doOnError { Log.e("NETWORK", it.stackTraceToString()) }
+            .doOnError {
+                Log.e("NETWORK", it.stackTraceToString())
+                if (it is ServiceException)
+                    errorDialogSubject.onNext(it.code)
+            }
     }
 
     /**

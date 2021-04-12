@@ -3,9 +3,9 @@ package me.kolotilov.lets_a_go.di
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.google.gson.GsonBuilder
 import me.kolotilov.lets_a_go.App
 import me.kolotilov.lets_a_go.network.*
-import me.kolotilov.lets_a_go.presentation.Params
 import me.kolotilov.lets_a_go.presentation.details.UserDetailsContainer
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -15,7 +15,7 @@ import org.kodein.di.instance
 import org.kodein.di.singleton
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.jackson.JacksonConverterFactory
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import ru.terrakok.cicerone.Router
 import java.io.IOException
@@ -44,7 +44,6 @@ fun presentationModule() = DI.Module("Presentation") {
     }
     bind<Repository>() with singleton { RepositoryImpl(instance(), instance()) }
     bind<UserDetailsContainer>() with singleton { UserDetailsContainer() }
-    bind<Params>() with singleton { Params() }
 }
 
 private fun provideOkHttpClient(sharedPreferences: SharedPreferences): OkHttpClient {
@@ -58,7 +57,7 @@ private fun provideOkHttpClient(sharedPreferences: SharedPreferences): OkHttpCli
                         addHeader("Authorization", "Bearer $token")
                 }
                 .build()
-            Log.d("REQUEST", "$request : ${bodyToString(request)} : ${request.headers()}")
+            Log.d("REQUEST", "$request : ${bodyToString(request)}")
             val response = chain.proceed(request)
             Log.d("RESPONSE", response.toString())
             response
@@ -75,7 +74,13 @@ private fun provideRetrofit(client: OkHttpClient): Retrofit {
         .baseUrl("https://lets-a-go.herokuapp.com/")
         .client(client)
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .addConverterFactory(JacksonConverterFactory.create())
+        .addConverterFactory(
+            GsonConverterFactory.create(
+                GsonBuilder()
+                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ssX")
+                    .create()
+            )
+        )
         .build()
 }
 

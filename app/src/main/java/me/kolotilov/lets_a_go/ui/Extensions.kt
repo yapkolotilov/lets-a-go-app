@@ -2,6 +2,7 @@ package me.kolotilov.lets_a_go.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.location.Location
 import android.os.Bundle
 import android.util.TypedValue
@@ -113,6 +114,10 @@ fun Context.getColorCompat(@ColorRes color: Int): Int {
     return ContextCompat.getColor(this, color)
 }
 
+fun Context.getDrawableCompat(@DrawableRes drawable: Int): Drawable {
+    return ContextCompat.getDrawable(this, drawable)!!
+}
+
 fun View.getString(@StringRes stringRes: Int): String {
     return context.getString(stringRes)
 }
@@ -137,8 +142,8 @@ fun Double.distance(context: Context): String {
     return "${singleDigitFormatter.format(value)} $name"
 }
 
-fun Duration.duration(context: Context): String {
-    return DateTimeFormat.forPattern("HH:mm").print(DateTime(millis))
+fun Duration.duration(): String {
+    return DateTimeFormat.forPattern("HH:mm:ss").print(DateTime(millis))
 }
 
 fun Double.speed(context: Context): String {
@@ -147,6 +152,10 @@ fun Double.speed(context: Context): String {
 
 fun Int.kilocalories(context: Context): String {
     return context.getString(R.string.kilocalories, this)
+}
+
+fun Boolean.yesOrNo(context: Context): String {
+    return if (this) context.getString(R.string.yes) else context.getString(R.string.no)
 }
 
 @DrawableRes
@@ -163,6 +172,15 @@ fun Route.Ground.name(context: Context): String {
         Route.Ground.ASPHALT -> context.getString(R.string.ground_asphalt)
         Route.Ground.TRACK -> context.getString(R.string.ground_track)
     }
+}
+
+fun Route.Type.name(context: Context): String {
+    val stringRes = when (this) {
+        Route.Type.WALKING -> R.string.type_walking
+        Route.Type.RUNNING -> R.string.type_running
+        Route.Type.CYCLING -> R.string.type_cycling
+    }
+    return context.getString(stringRes)
 }
 
 //endregion

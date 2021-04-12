@@ -1,6 +1,7 @@
 package me.kolotilov.lets_a_go.ui.base
 
 import android.animation.LayoutTransition
+import android.app.Dialog
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -8,11 +9,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.CallSuper
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.core.app.ActivityCompat
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -33,6 +37,9 @@ abstract class BaseBottomSheetFragment(
     private val compositeDisposable = CompositeDisposable()
     private val delegates = mutableListOf<ViewDelegate<*>>()
 
+    protected open val peekHeight: Int? = null
+    private var behavior: BottomSheetBehavior<FrameLayout>? = null
+
     protected var animateLayoutChanges: Boolean = false
         set(value) {
             field = value
@@ -43,6 +50,24 @@ abstract class BaseBottomSheetFragment(
         }
 
     override val di: DI by closestDI()
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.setOnShowListener {
+            val d = dialog as BottomSheetDialog
+
+            behavior = d.behavior
+            val behavior = behavior!!
+            behavior.skipCollapsed = true
+
+            val peekHeight = peekHeight
+            if (peekHeight != null) {
+                behavior.peekHeight = peekHeight
+                behavior.isHideable = false
+            }
+        }
+        return dialog
+    }
 
     final override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,6 +98,10 @@ abstract class BaseBottomSheetFragment(
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         viewModel.detach()
+    }
+
+    protected fun expand() {
+        behavior?.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     /**

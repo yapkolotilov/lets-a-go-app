@@ -119,7 +119,7 @@ class EditFilterFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor
             valueFrom = MIN_DURATION
             valueTo = MAX_DURATION
             stepSize = 0.5f
-            setLabelFormatter { Duration((it * DURATION_SCALE).toLong()).duration(requireContext()) }
+            setLabelFormatter { Duration((it * DURATION_SCALE).toLong()).duration() }
             addOnSliderTouchListener(getOnSliderTouchListener())
         }
     }
@@ -166,8 +166,8 @@ class EditFilterFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor
         viewModel.duration.subscribe { duration ->
             durationTextView.text = getString(
                 R.string.from_to,
-                duration.first.duration(requireContext()),
-                duration.second.duration(requireContext())
+                duration.first.duration(),
+                duration.second.duration()
             )
         }.autoDispose()
 

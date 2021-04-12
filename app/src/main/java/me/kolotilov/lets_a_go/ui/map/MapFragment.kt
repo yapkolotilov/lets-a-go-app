@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Color
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -24,8 +23,9 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import me.kolotilov.lets_a_go.R
+import me.kolotilov.lets_a_go.models.ErrorCode
 import me.kolotilov.lets_a_go.models.Point
-import me.kolotilov.lets_a_go.models.Route
+import me.kolotilov.lets_a_go.models.RoutePoint
 import me.kolotilov.lets_a_go.models.distance
 import me.kolotilov.lets_a_go.presentation.Tags
 import me.kolotilov.lets_a_go.presentation.base.ButtonData
@@ -44,6 +44,9 @@ import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormatter
 import org.kodein.di.instance
 import java.util.concurrent.TimeUnit
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
@@ -55,7 +58,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
 
     private abstract inner class State {
 
-        abstract fun processLocation(location: Location)
+        abstract fun processLocation(location: Point, cached: Boolean = false)
 
         abstract fun onRecordClick()
     }
@@ -64,31 +67,33 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
 
         private var moved: Boolean = false
 
-        override fun processLocation(location: Location) {
+        override fun processLocation(location: Point, cached: Boolean) {
             if (moved)
                 return
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(location.toLatLng(), 15F))
-            moved = true
+            if (!cached)
+                moved = true
         }
 
         override fun onRecordClick() = startRecording()
 
         private fun startRecording() {
+            recordButton
             state = routing
             setRecordPanelVisibility(true)
+            routeMarkers.forEach { it.remove() }
             recordedPoints.clear()
             currentPositionMarker.position
-            val currentLocation = currentLocation
-            if (currentLocation == null)
-                return
+            val currentLocation = currentLocation ?: return
             val startPoint = Point(
                 latitude = currentLocation.latitude,
                 longitude = currentLocation.longitude,
                 altitude = currentLocation.altitude,
-                timestamp = DateTime(currentLocation.time),
+                timestamp = DateTime(DateTime.now()),
             )
             recordedPoints.add(startPoint)
 
+            timerDisposable?.dispose()
             timerDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
@@ -104,8 +109,8 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
 
     private inner class Routing : State() {
 
-        override fun processLocation(location: Location) {
-            val point = location.toPoint()
+        override fun processLocation(location: Point, cached: Boolean) {
+            val point = location
             recordedPoints.add(point)
             currentEntryPolyline.points = recordedPoints.map { LatLng(it.latitude, it.longitude) }
         }
@@ -123,8 +128,8 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
 
     private inner class Entrying : State() {
 
-        override fun processLocation(location: Location) {
-            val point = location.toPoint()
+        override fun processLocation(location: Point, cached: Boolean) {
+            val point = location
             recordedPoints.add(point)
         }
 
@@ -133,7 +138,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
             setRecordPanelVisibility(false)
             updateRecordingPanel(Duration.ZERO)
             timerDisposable?.dispose()
-            viewModel.openEditEntryBottomSheet(selectedRoute, recordedPoints) {}
+            viewModel.openEntryPreview(selectedRoute?.id ?: 0, recordedPoints)
         }
     }
 
@@ -156,7 +161,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
     private val entrying: State = Entrying()
     private var state: State = idle
     private lateinit var map: GoogleMap
-    private var selectedRoute: Route? = null
+    private var selectedRoute: RoutePoint? = null
     private val currentPositionMarker by lazy {
         map.addMarker(
             MarkerOptions()
@@ -175,16 +180,16 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
     private val currentRoutePolyline: Polyline by lazy {
         map.addPolyline(
             PolylineOptions()
-                .color(Color.BLUE)
+                .color(requireContext().getColorCompat(R.color.blue_primary))
                 .width(15f)
                 .addAll(emptyList())
         )
     }
     private lateinit var client: LocationManager
-    private var currentLocation: Location? = null
+    private var currentLocation: Point? = null
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         client.removeUpdates(this)
     }
 
@@ -207,10 +212,16 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
     }
 
     override fun onLocationChanged(location: Location) {
+        onLocationChangedImpl(location.toPoint())
+    }
+
+    private fun onLocationChangedImpl(location: Point, cached: Boolean = false) {
+        state.processLocation(location, cached)
+        updateMarker(location)
         currentLocation = location
         recordButton.isClickable = true
         currentPositionMarker.position = location.toLatLng()
-        state.processLocation(location)
+        viewModel.setLastLocation(location)
     }
 
     override fun fillViews() {
@@ -240,16 +251,19 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
     }
 
     override fun subscribe() {
-        viewModel.routes.subscribe { routes ->
-            currentRoutePolyline.points = emptyList()
+        fun clearMarkers() {
             routeMarkers.forEach {
                 it.remove()
             }
+        }
+
+        viewModel.routes.subscribe { routes ->
+            currentRoutePolyline.points = emptyList()
+            clearMarkers()
             routeMarkers = routes.map { route ->
-                val point = route.points.first()
+                val point = route.startPoint
                 map.addMarker(
                     MarkerOptions().position(LatLng(point.latitude, point.longitude))
-                        .title(route.name)
                 ).also { it.tag = route }
             }
         }.autoDispose()
@@ -260,15 +274,39 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
         }.autoDispose()
 
         viewModel.errorDialog.subscribe {
-            showDialog(
-                title = getString(R.string.route_too_short_title),
-                message = getString(R.string.route_too_short_message),
-                positiveButton = ButtonData(getString(R.string.ok_button))
-            )
+            when (it) {
+                ErrorCode.ENTRY_TOO_SHORT -> {
+                    showDialog(
+                        title = getString(R.string.route_too_short_title),
+                        message = getString(R.string.route_too_short_message),
+                        positiveButton = ButtonData(getString(R.string.ok_button))
+                    )
+                }
+                ErrorCode.SPEED_TOO_FAST -> {
+                    showDialog(
+                        title = getString(R.string.speed_too_fast_title),
+                        message = getString(R.string.speed_too_fast_message),
+                        positiveButton = ButtonData(getString(R.string.ok_button))
+                    )
+                }
+                else -> Unit
+            }
+            currentRoutePolyline.points = emptyList()
+            currentEntryPolyline.points = emptyList()
+            viewModel.loadRoutes()
         }.autoDispose()
 
         viewModel.clearEntry.subscribe {
             currentEntryPolyline.points = emptyList()
+        }.autoDispose()
+
+        viewModel.drawRoute.subscribe {
+            clearMarkers()
+            currentRoutePolyline.points = it.map { it.toLatLng() }
+        }.autoDispose()
+
+        viewModel.lastLocation.subscribe {
+            onLocationChangedImpl(it, true)
         }.autoDispose()
     }
 
@@ -279,23 +317,27 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
     }
 
     private fun onMarkerClick(marker: Marker) {
-        val route = marker.tag as? Route ?: return
+        val route = marker.tag as? RoutePoint ?: return
         selectedRoute = route
         drawRoute(route)
         map.animateCamera(
-            CameraUpdateFactory.newLatLngZoom(route.points.first().toLatLng(), 15F),
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    route.startPoint.latitude,
+                    route.startPoint.longitude
+                ), 15F
+            ),
             object : GoogleMap.CancelableCallback {
                 override fun onFinish() {
-                    viewModel.openRouteDetailsBottomSheet(route)
+                    viewModel.openRouteDetailsBottomSheet(route.id)
                 }
 
                 override fun onCancel() = Unit
             })
     }
 
-    private fun drawRoute(route: Route) {
-        routeMarkers.forEach { it.remove() }
-        currentRoutePolyline.points = route.points.map { it.toLatLng() }
+    private fun drawRoute(route: RoutePoint) {
+        viewModel.drawRoute(route.id)
     }
 
     private fun updateRecordingPanel(duration: Duration) {
@@ -309,6 +351,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
     }
 
     private fun onMapLoaded() {
+        viewModel.requestLastLocation()
         map.setOnMarkerClickListener {
             onMarkerClick(it)
             true
@@ -344,5 +387,30 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
                 topToTop = -1
             }
         }
+    }
+
+    private var isMarkerRotating = false
+
+    private fun updateMarker(newLocation: Point) {
+        val bearing = bearingBetweenLocations(currentLocation ?: return, newLocation).toFloat()
+        currentPositionMarker.rotation = bearing
+    }
+
+    // https://stackoverflow.com/questions/20704834/rotate-marker-as-per-user-direction-on-google-maps-v2-android
+    private fun bearingBetweenLocations(latLng1: Point, latLng2: Point): Double {
+        if (latLng1.distance(latLng2) < 0.1f)
+            return 0.0
+        val PI = 3.14159
+        val lat1 = latLng1.latitude * PI / 180
+        val long1 = latLng1.longitude * PI / 180
+        val lat2 = latLng2.latitude * PI / 180
+        val long2 = latLng2.longitude * PI / 180
+        val dLon = long2 - long1
+        val y = sin(dLon) * cos(lat2)
+        val x = cos(lat1) * sin(lat2) - (sin(lat1) * cos(lat2) * cos(dLon))
+        var brng = atan2(y, x)
+        brng = Math.toDegrees(brng)
+        brng = (brng + 360) % 360
+        return brng
     }
 }

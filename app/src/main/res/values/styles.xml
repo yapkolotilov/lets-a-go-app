@@ -42,4 +42,12 @@
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/black</item>
     </style>
+
+    <style name="LetsBottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/LetsBottomSheet</item>
+    </style>
+
+    <style name="LetsBottomSheet" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
 </resources>

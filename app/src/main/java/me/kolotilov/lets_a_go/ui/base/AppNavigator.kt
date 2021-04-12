@@ -19,6 +19,8 @@ open class AppNavigator(
     containerId: Int
 ) : SupportAppNavigator(activity, containerId) {
 
+    private val currentFragment: Fragment? get() = fragmentManager.fragments.lastOrNull()
+
     override fun setupFragmentTransaction(
         command: Command,
         currentFragment: Fragment?,
@@ -53,8 +55,14 @@ open class AppNavigator(
             super.fragmentForward(command)
     }
 
+    override fun fragmentReplace(command: Replace) {
+        if (currentFragment != null)
+            fragmentBack()
+        fragmentForward(Forward(command.screen))
+    }
+
     override fun fragmentBack() {
-        val lastFragment = fragmentManager.fragments.lastOrNull()
+        val lastFragment = currentFragment
         if (lastFragment is BottomSheetDialogFragment)
             lastFragment.dismiss()
         else

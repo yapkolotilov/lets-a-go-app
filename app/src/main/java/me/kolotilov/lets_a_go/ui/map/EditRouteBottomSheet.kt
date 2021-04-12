@@ -3,6 +3,7 @@ package me.kolotilov.lets_a_go.ui.map
 import android.os.Bundle
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +13,7 @@ import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.presentation.Constants
 import me.kolotilov.lets_a_go.presentation.map.EditRouteViewModel
-import me.kolotilov.lets_a_go.presentation.map.RouteStatsView
+import me.kolotilov.lets_a_go.presentation.map.EntryStatsView
 import me.kolotilov.lets_a_go.ui.*
 import me.kolotilov.lets_a_go.ui.base.BaseBottomSheetFragment
 import me.kolotilov.lets_a_go.ui.base.GroundFactory
@@ -28,23 +29,27 @@ class EditRouteBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) construct
     companion object {
 
         private const val PREVIEW = "PREVIEW"
+        private const val ID = "ID"
 
         @Suppress("DEPRECATION")
-        fun newInstance(params: EditRouteParams): EditRouteBottomSheet {
+        fun newInstance(params: EditRouteParams?, id: Int?): EditRouteBottomSheet {
             return EditRouteBottomSheet().buildArguments {
                 putSerializable(PREVIEW, params)
+                putInt(ID, id ?: -1)
             }
         }
     }
 
     override val viewModel by instance<EditRouteViewModel>()
+    override val peekHeight: Int get() = 72.dp(requireContext())
 
+    private val titleTextView: TextView by lazyView(R.id.title_text_view)
     private val publicSwitch: SwitchCompat by lazyView(R.id.public_switch)
     private val nameEditText: TextInputLayout by lazyView(R.id.name_text_input)
     private val typeRecycler: RecyclerView by lazyView(R.id.type_recycler)
     private val groundRecycler: RecyclerView by lazyView(R.id.ground_recycler)
     private val difficultySlider: Slider by lazyView(R.id.difficulty_slider)
-    private val statsView: RouteStatsView by lazyView(R.id.route_stats_view)
+    private val statsView: EntryStatsView by lazyView(R.id.route_stats_view)
     private val saveButton: Button by lazyView(R.id.save_button)
     private val deleteButton: Button by lazyView(R.id.delete_button)
     private lateinit var typeAdapter: Recycler.SelectAdapter<Route.Type>
@@ -52,9 +57,11 @@ class EditRouteBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) construct
 
     override fun Bundle.readArguments() {
         val preview = getSerializable(PREVIEW)?.castTo<EditRouteParams>()
+        val id = getInt(ID).takeIf { it > 0 }
         viewModel.init(
             preview = preview?.toRoutePreview(),
-            points = preview?.points?.map { it.toPoint() }
+            points = preview?.points?.map { it.toPoint() },
+            id = id
         )
     }
 
@@ -109,11 +116,18 @@ class EditRouteBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) construct
                 duration = it.duration,
                 speed = it.speed,
                 kiloCaloriesBurnt = it.kiloCaloriesBurnt,
-                altitudeDelta = it.altitudeDelta
+                altitudeDelta = it.altitudeDelta,
+                date = null
             )
             typeAdapter.selectedItem = it.type
-            it.difficulty
-            difficultySlider.value = it.difficulty.toFloat()
+            if (it.difficulty != null)
+                difficultySlider.value = it.difficulty.toFloat()
+            expand()
+        }.autoDispose()
+
+        viewModel.isNew.subscribe {
+            titleTextView.text =
+                if (it) getString(R.string.new_route_title) else getString(R.string.route_title)
         }.autoDispose()
     }
 

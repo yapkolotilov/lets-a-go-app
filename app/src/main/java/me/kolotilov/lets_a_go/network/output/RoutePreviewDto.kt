@@ -1,25 +1,25 @@
 package me.kolotilov.lets_a_go.network.output
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.gson.annotations.SerializedName
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.models.RoutePreview
 import org.joda.time.Duration
 import java.util.*
 
 data class RoutePreviewDto(
-    @JsonProperty("distance")
+    @SerializedName("distance")
     val distance: Double,
-    @JsonProperty("duration")
+    @SerializedName("duration")
     val duration: Date,
-    @JsonProperty("speed")
+    @SerializedName("speed")
     val speed: Double,
-    @JsonProperty("caloriesBurnt")
+    @SerializedName("caloriesBurnt")
     val kiloCaloriesBurnt: Int?,
-    @JsonProperty("altitudeDelta")
+    @SerializedName("altitudeDelta")
     val altitudeDelta: Double,
-    @JsonProperty("type")
+    @SerializedName("type")
     val type: Route.Type,
-    @JsonProperty("difficulty")
+    @SerializedName("difficulty")
     val difficulty: Int
 )
 

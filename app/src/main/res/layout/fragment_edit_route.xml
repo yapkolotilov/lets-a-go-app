@@ -4,11 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingHorizontal="32dp">
+    android:paddingHorizontal="32dp"
+    android:paddingBottom="@dimen/margin_content">
 
     <View
-        android:layout_width="48dp"
-        android:layout_height="4dp"
+        android:layout_width="@dimen/top_bottom_sheet_width"
+        android:layout_height="@dimen/top_bottom_sheet_height"
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/margin_content"
         android:background="@color/grey" />
@@ -48,35 +49,35 @@
         style="@style/LetsTextHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/margin_content"
         android:text="@string/route_type_title" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/type_recycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/margin_content_small"
         tools:itemCount="3" />
 
     <TextView
         style="@style/LetsTextHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/margin_content"
         android:text="@string/ground_type_hint" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ground_recycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/margin_content_small"
         tools:itemCount="3" />
 
     <TextView
         style="@style/LetsTextHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/margin_content"
         android:text="@string/difficulty_hint" />
 
     <com.google.android.material.slider.Slider
@@ -87,7 +88,7 @@
         android:valueFrom="1"
         android:valueTo="5" />
 
-    <me.kolotilov.lets_a_go.presentation.map.RouteStatsView
+    <me.kolotilov.lets_a_go.presentation.map.EntryStatsView
         android:id="@+id/route_stats_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -1,23 +1,23 @@
 package me.kolotilov.lets_a_go.network.input
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.gson.annotations.SerializedName
 import java.util.*
 
 data class EditDetailsDto(
-    @JsonProperty("name")
+    @SerializedName("name")
     val name: String?,
-    @JsonProperty("birthDate")
+    @SerializedName("birthDate")
     val birthDate: Date?,
-    @JsonProperty("height")
+    @SerializedName("height")
     val height: Int?,
-    @JsonProperty("weight")
+    @SerializedName("weight")
     val weight: Int?,
-    @JsonProperty("illnesses")
+    @SerializedName("illnesses")
     val illnesses: List<String>?,
-    @JsonProperty("symptoms")
+    @SerializedName("symptoms")
     val symptoms: List<String>?,
-    @JsonProperty("filter")
+    @SerializedName("filter")
     val filter: FilterDto?,
-    @JsonProperty("update_filter")
+    @SerializedName("update_filter")
     val updateFilter: Boolean
 )

@@ -3,6 +3,8 @@ package me.kolotilov.lets_a_go.presentation
 import androidx.annotation.AnimRes
 import androidx.fragment.app.Fragment
 import me.kolotilov.lets_a_go.R
+import me.kolotilov.lets_a_go.models.EntryPreview
+import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.ui.EditRouteParams
 import me.kolotilov.lets_a_go.ui.auth.LoginFragment
 import me.kolotilov.lets_a_go.ui.auth.RegisterFragment
@@ -15,7 +17,11 @@ import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
 
-    fun login() = LetsScreen { LoginFragment() }
+    fun login(animate: Boolean = false): LetsScreen {
+        return LetsScreen(animation = if (animate) ScreenAnimation.SLIDE_LEFT else null) {
+            LoginFragment()
+        }
+    }
 
     fun register() = LetsScreen(animation = ScreenAnimation.SLIDE_LEFT) { RegisterFragment() }
 
@@ -25,25 +31,34 @@ object Screens {
      */
     fun basicInfo(type: EditDetailsType) = LetsScreen { EditBasicInfoFragment.newInstance(type) }
 
-    fun chooseIllnesses(type: EditDetailsType) =
-        LetsScreen { ChooseIllnessesFragment.newInstance(type) }
+    fun chooseIllnesses(type: EditDetailsType): LetsScreen {
+        return LetsScreen { ChooseIllnessesFragment.newInstance(type) }
+    }
 
-    fun chooseSymptoms(type: EditDetailsType) =
-        LetsScreen { ChooseSymptomsFragment.newInstance(type) }
+    fun chooseSymptoms(type: EditDetailsType): LetsScreen {
+        return LetsScreen { ChooseSymptomsFragment.newInstance(type) }
+    }
 
     fun userDetails() = LetsScreen { UserDetailsFragment() }
 
     fun onboarding() = LetsScreen { OnboardingTitleFragment() }
 
-    fun map() = LetsScreen { MapFragment() }
+    fun map(animate: Boolean = true): LetsScreen {
+        return LetsScreen(animation = if (animate) ScreenAnimation.SLIDE_RIGHT else null) {
+            MapFragment()
+        }
+    }
 
-    fun editRoute(params: EditRouteParams) = LetsScreen { EditRouteBottomSheet.newInstance(params) }
+    fun editRoute(params: EditRouteParams? = null, id: Int? = null): LetsScreen {
+        return LetsScreen { EditRouteBottomSheet.newInstance(params, id) }
+    }
 
-    fun routeDetails() = LetsScreen { RouteDetailsBottomSheet() }
+    fun routeDetails(id: Int) = LetsScreen { RouteDetailsBottomSheet.newInstance(id) }
 
-    fun editEntry() = LetsScreen { EditEntryBottomSheet() }
+    fun editEntry(entryPreview: EntryPreview, points: List<Point>) =
+        LetsScreen { EntryPreviewBottomSheet.newInstance(entryPreview, points) }
 
-    fun entryDetails() = LetsScreen { EntryDetailsBottomSheet() }
+    fun entryDetails(id: Int) = LetsScreen { EntryDetailsBottomSheet.newInstance(id) }
 
     fun editFilter(type: EditDetailsType) = LetsScreen { EditFilterFragment.newInstance(type) }
 

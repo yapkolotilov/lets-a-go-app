@@ -2,13 +2,13 @@ package me.kolotilov.lets_a_go.presentation.map
 
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
-import me.kolotilov.lets_a_go.presentation.Params
+import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.base.BaseBottomSheetViewModel
 import org.joda.time.DateTime
 import org.joda.time.Duration
 
 class EntryDetailsViewModel(
-    private val params: Params
+    private val repository: Repository
 ) : BaseBottomSheetViewModel() {
 
     data class Data(
@@ -16,26 +16,39 @@ class EntryDetailsViewModel(
         val date: DateTime,
         val duration: Duration,
         val distance: Double,
-        val calories: Double
+        val speed: Double,
+        val altitudeDelta: Double,
+        val kiloCaloriesBurnt: Int?,
+        val routeId: Int?
     )
 
     val data: Observable<Data> get() = dataSubject
     private val dataSubject = BehaviorSubject.create<Data>()
 
+    private var id: Int = 0
+
     override fun attach() {
-        dataSubject.onNext(
-            Data(
-                finished = params.entryDetails.route?.let { params.entryDetails.entry.finished(it) } ?: false,
-                date = params.entryDetails.entry.startDate(),
-                duration = params.entryDetails.entry.duration(),
-                distance = params.entryDetails.entry.distance(),
-                calories = 100.0 // TODO
-            )
-        )
+        repository.getEntry(id)
+            .load()
+            .doOnSuccess {
+                dataSubject.onNext(
+                    Data(
+                        finished = it.finished,
+                        date = it.date,
+                        duration = it.duration,
+                        distance = it.distance,
+                        speed = it.speed,
+                        altitudeDelta = it.altitudeDelta,
+                        kiloCaloriesBurnt = it.kiloCaloriesBurnt,
+                        routeId = it.routeId
+                    )
+                )
+            }
+            .emptySubscribe()
+            .autoDispose()
     }
 
-    override fun detach() {
-        super.detach()
-        params.entryDetails.clear()
+    fun init(id: Int) {
+        this.id = id
     }
 }

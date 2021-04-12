@@ -1,10 +1,10 @@
 package me.kolotilov.lets_a_go.network.input
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.gson.annotations.SerializedName
 import me.kolotilov.lets_a_go.models.Entry
 
 data class CreateEntryDto(
-    @JsonProperty("points")
+    @SerializedName("points")
     val points: List<CreatePointDto>
 )
 

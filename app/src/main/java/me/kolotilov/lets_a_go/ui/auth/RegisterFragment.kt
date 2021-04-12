@@ -47,7 +47,7 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
             registerButton.isEnabled = it
         }.autoDispose()
 
-        viewModel.error.subscribe {
+        viewModel.errorDialog.subscribe {
             val okButton = ButtonData(getString(R.string.ok_button))
             when (it) {
                 ErrorCode.INVALID_PASSWORD -> showDialog(

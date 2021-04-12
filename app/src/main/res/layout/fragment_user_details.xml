@@ -61,6 +61,36 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <TextView
+                android:id="@+id/routes_hint_text_view"
+                style="@style/LetsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/padding_content"
+                android:text="@string/routes_hint" />
+
+            <me.kolotilov.lets_a_go.ui.details.RoutesView
+                android:id="@+id/routes_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/padding_content"
+                android:layout_marginTop="@dimen/margin_content_small" />
+
+            <TextView
+                android:id="@+id/entries_hint_text_view"
+                style="@style/LetsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/padding_content"
+                android:text="@string/entries_hint" />
+
+            <me.kolotilov.lets_a_go.ui.base.EntriesView
+                android:id="@+id/entries_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/padding_content"
+                android:layout_marginTop="@dimen/margin_content_small" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -72,7 +102,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/padding_content"
-                android:layout_marginTop="@dimen/margin_content"
+                android:layout_marginTop="@dimen/margin_content_small"
                 android:text="@string/log_out_button"
                 app:layout_constraintBottom_toBottomOf="parent" />
 

@@ -1,9 +1,9 @@
 package me.kolotilov.lets_a_go.network.input
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.gson.annotations.SerializedName
 
 
 data class ChangePasswordDto(
-    @JsonProperty("password")
+    @SerializedName("password")
     val password: String
 )

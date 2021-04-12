@@ -1,17 +1,19 @@
 package me.kolotilov.lets_a_go.network.input
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.gson.annotations.SerializedName
 import me.kolotilov.lets_a_go.models.Route
 
 data class CreateRouteDto(
-    @JsonProperty("name")
+    @SerializedName("name")
     val name: String?,
-    @JsonProperty("difficulty")
-    val difficulty: Int?,
-    @JsonProperty("type")
+    @SerializedName("difficulty")
+    val difficulty: Int,
+    @SerializedName("type")
     val type: Route.Type?,
-    @JsonProperty("ground")
+    @SerializedName("ground")
     val ground: Route.Ground?,
-    @JsonProperty("points")
+    @SerializedName("public")
+    val isPublic: Boolean,
+    @SerializedName("points")
     val points: List<CreatePointDto>
 )

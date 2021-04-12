@@ -61,8 +61,8 @@ class FilterView @JvmOverloads constructor(
                 data.duration?.let {
                     context.getString(
                         R.string.from_to,
-                        it.start.duration(context),
-                        it.endInclusive.duration(context)
+                        it.start.duration(),
+                        it.endInclusive.duration()
                     )
                 }
             )

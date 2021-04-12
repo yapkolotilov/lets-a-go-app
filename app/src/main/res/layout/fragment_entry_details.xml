@@ -5,18 +5,39 @@
     android:orientation="vertical"
     android:paddingHorizontal="32dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="Поход" />
+    <View
+        android:layout_width="@dimen/top_bottom_sheet_width"
+        android:layout_height="@dimen/top_bottom_sheet_height"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_content"
+        android:background="@color/grey" />
 
-    <GridLayout
-        android:id="@+id/stats_grid"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:columnCount="2" />
+        android:layout_marginTop="@dimen/margin_content">
+
+        <TextView
+            style="@style/LetsTextTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/entry_title" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/finished_text_view"
+        style="@style/LetsText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_content"
+        android:text="@string/entry_title" />
+
+    <me.kolotilov.lets_a_go.presentation.map.EntryStatsView
+        android:id="@+id/entry_stats_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_content" />
 
 </LinearLayout>

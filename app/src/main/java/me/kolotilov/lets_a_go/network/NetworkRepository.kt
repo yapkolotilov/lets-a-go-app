@@ -4,10 +4,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import me.kolotilov.lets_a_go.models.*
 import me.kolotilov.lets_a_go.network.input.*
-import me.kolotilov.lets_a_go.network.output.toEntry
-import me.kolotilov.lets_a_go.network.output.toRoute
-import me.kolotilov.lets_a_go.network.output.toRoutePreview
-import me.kolotilov.lets_a_go.network.output.toUserDetails
+import me.kolotilov.lets_a_go.network.output.*
 import okhttp3.ResponseBody
 import org.joda.time.DateTime
 import retrofit2.Converter
@@ -20,7 +17,7 @@ interface NetworkRepository {
 
     fun login(email: String, password: String): Completable
 
-    fun getDetails(): Single<UserDetails>
+    fun getDetails(location: Point? = null): Single<UserDetails>
 
     fun editDetails(
         name: String? = null,
@@ -37,23 +34,40 @@ interface NetworkRepository {
 
     fun getIllnessesAndSymptoms(): Single<IllnessesAndSymptoms>
 
-    fun createRoute(name: String?, type: Route.Type?, ground: Route.Ground?, points: List<Point>): Single<Route>
+    fun createRoute(
+        name: String?,
+        type: Route.Type?,
+        difficulty: Int,
+        ground: Route.Ground?,
+        isPublic: Boolean,
+        points: List<Point>
+    ): Single<RouteDetails>
 
-    fun getRoute(id: Int): Single<Route>
+    fun getRoute(id: Int): Single<RouteDetails>
 
-    fun editRoute(id: Int, route: Route): Single<Route>
+    fun editRoute(
+        id: Int,
+        name: String?,
+        difficulty: Int?,
+        type: Route.Type?,
+        ground: Route.Ground?
+    ): Single<RouteDetails>
 
     fun deleteRoute(id: Int): Completable
 
-    fun getAllRoutes(filter: Boolean): Single<List<Route>>
+    fun getAllRoutes(filter: Boolean): Single<List<RoutePoint>>
 
-    fun getEntries(): Single<List<Entry>>
+    fun createEntry(routeId: Int, points: List<Point>): Single<RouteDetails>
 
-    fun createEntry(route: Route, entry: Entry): Single<Route>
-
-    fun searchRoutes(query: String?, filter: Filter?): Single<List<Route>>
+    fun searchRoutes(query: String?, filter: Filter?): Single<List<RouteDetails>>
 
     fun routePreview(points: List<Point>): Single<RoutePreview>
+
+    fun entryPreview(routeId: Int, points: List<Point>): Single<EntryPreview>
+
+    fun getEntry(id: Int): Single<EntryDetails>
+
+    fun getRouteOnMap(id: Int): Single<RouteLine>
 }
 
 class NetworkRepositoryImpl(
@@ -76,8 +90,8 @@ class NetworkRepositoryImpl(
             .parseError()
     }
 
-    override fun getDetails(): Single<UserDetails> {
-        return api.getDetails()
+    override fun getDetails(location: Point?): Single<UserDetails> {
+        return api.getDetails(location?.toCreatePointDto())
             .map { it.toUserDetails() }
             .parseError()
     }
@@ -123,49 +137,98 @@ class NetworkRepositoryImpl(
     override fun createRoute(
         name: String?,
         type: Route.Type?,
+        difficulty: Int,
         ground: Route.Ground?,
+        isPublic: Boolean,
         points: List<Point>
-    ): Single<Route> {
+    ): Single<RouteDetails> {
         val createRoute = CreateRouteDto(
             name = name,
-            difficulty = null,
+            difficulty = difficulty,
             type = type,
             ground = ground,
+            isPublic = isPublic,
             points = points.map { it.toCreatePointDto() }
         )
-        return api.createRoute(createRoute).map { it.toRoute() }
+        return api
+            .createRoute(createRoute)
+            .map { it.toRouteDetails() }
+            .parseError()
     }
 
-    override fun getRoute(id: Int): Single<Route> {
-        return api.getRoute(id).map { it.toRoute() }
+    override fun getRoute(id: Int): Single<RouteDetails> {
+        return api
+            .getRoute(id).map { it.toRouteDetails() }
+            .parseError()
     }
 
-    override fun editRoute(id: Int, route: Route): Single<Route> {
-        return api.editRoute(id, route.toEditRouteDto()).map { it.toRoute() }
+    override fun editRoute(
+        id: Int,
+        name: String?,
+        difficulty: Int?,
+        type: Route.Type?,
+        ground: Route.Ground?
+    ): Single<RouteDetails> {
+        return api.editRoute(
+            id, EditRouteDto(
+                name = name,
+                difficulty = difficulty,
+                type = type,
+                ground = ground
+            )
+        ).map { it.toRouteDetails() }
+            .parseError()
     }
 
     override fun deleteRoute(id: Int): Completable {
         return api.deleteRoute(id)
+            .parseError()
     }
 
-    override fun getAllRoutes(filter: Boolean): Single<List<Route>> {
-        return api.getRoutes(filter).map { routes -> routes.map { it.toRoute() } }
+    override fun getAllRoutes(filter: Boolean): Single<List<RoutePoint>> {
+        return api.getRoutes(filter)
+            .map { routes -> routes.map { it.toRoutePoint() } }
+            .parseError()
     }
 
-    override fun getEntries(): Single<List<Entry>> {
-        return api.getEntries().map { entries -> entries.map { it.toEntry() } }
+    override fun createEntry(routeId: Int, points: List<Point>): Single<RouteDetails> {
+        return api.createEntry(routeId, CreateEntryDto(points.map { it.toCreatePointDto() }))
+            .map { it.toRouteDetails() }
+            .parseError()
     }
 
-    override fun createEntry(route: Route, entry: Entry): Single<Route> {
-        return api.createEntry(route.id, entry.toCreateEntryDto()).map { it.toRoute()} }
-
-    override fun searchRoutes(query: String?, filter: Filter?): Single<List<Route>> {
-        return api.searchRoutes(query, filter?.toFilterDto()).map { routes -> routes.map { it.toRoute() } }
+    override fun searchRoutes(query: String?, filter: Filter?): Single<List<RouteDetails>> {
+        return api.searchRoutes(query, filter?.toFilterDto())
+            .map { routes -> routes.map { it.toRouteDetails() } }
+            .parseError()
     }
 
     override fun routePreview(points: List<Point>): Single<RoutePreview> {
         return api.routePreview(CreateRoutePreviewDto(points.map { it.toCreatePointDto() }))
             .map { it.toRoutePreview() }
+            .parseError()
+    }
+
+    override fun entryPreview(routeId: Int, points: List<Point>): Single<EntryPreview> {
+        return api.entryPreview(
+            CreateEntryPreviewDto(
+                routeId,
+                points.map { it.toCreatePointDto() })
+        )
+            .map { it.toEntryPreview() }
+            .parseError()
+    }
+
+    override fun getEntry(id: Int): Single<EntryDetails> {
+        return api.getEntry(id)
+            .map { it.toEntryDetails() }
+            .parseError()
+    }
+
+    override fun getRouteOnMap(id: Int): Single<RouteLine> {
+        return api.getRouteOnMap(id)
+            .map { it.toRouteLine() }
+            .parseError()
     }
 
     private fun parseError(throwable: Throwable): Throwable {

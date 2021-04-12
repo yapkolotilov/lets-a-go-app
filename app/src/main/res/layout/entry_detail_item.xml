@@ -3,21 +3,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/entry_not_passed_item"
     android:orientation="horizontal"
+    android:paddingHorizontal="@dimen/margin_content"
+    android:layout_marginVertical="@dimen/margin_content_extra_small"
     android:paddingVertical="16dp">
 
     <TextView
         android:id="@+id/date_text_view"
+        style="@style/LetsText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        tools:text="20 марта 20:00:00" />
+        tools:text="20 марта 20:00" />
 
     <TextView
-        android:id="@+id/distance_text_view"
+        android:id="@+id/duration_text_view"
+        style="@style/LetsText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        tools:text="10 км" />
+        tools:text="01:00" />
 
 </LinearLayout>

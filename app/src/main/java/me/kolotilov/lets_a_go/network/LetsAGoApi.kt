@@ -18,10 +18,10 @@ interface LetsAGoApi {
     @POST("/$AUTH/login")
     fun login(@Body loginDto: LoginDto): Single<TokenDto>
 
-    @GET("/$DETAILS")
-    fun getDetails(): Single<UserDetailsDto>
-
     @POST("/$DETAILS")
+    fun getDetails(@Body location: CreatePointDto?): Single<UserDetailsDto>
+
+    @POST("/$DETAILS/edit")
     fun editDetails(@Body editDetailsDto: EditDetailsDto): Single<UserDetailsDto>
 
     @POST("/$DETAILS/change_password")
@@ -33,14 +33,11 @@ interface LetsAGoApi {
     @GET("/$DETAILS/symptoms")
     fun getSymptoms(): Single<List<String>>
 
-    @GET("/$MAP/entries")
-    fun getEntries(): Single<List<EntryDto>>
-
     @DELETE("/$MAP/entries/{id}")
     fun deleteEntry(@Path("id") id: Int): Completable
 
     @GET("/$MAP/routes")
-    fun getRoutes(@Query("filter") filter: Boolean): Single<List<RouteDetailsDto>>
+    fun getRoutes(@Query("filter") filter: Boolean): Single<List<RoutePointDto>>
 
     @POST("/$MAP/routes")
     fun createRoute(@Body route: CreateRouteDto): Single<RouteDetailsDto>
@@ -54,6 +51,9 @@ interface LetsAGoApi {
     @DELETE("/$MAP/routes/{id}")
     fun deleteRoute(@Path("id") id: Int): Completable
 
+    @POST("$MAP/entries/preview")
+    fun entryPreview(@Body entry: CreateEntryPreviewDto): Single<EntryPreviewDto>
+
     @POST("/$MAP/routes/{id}/entries")
     fun createEntry(@Path("id") id: Int, @Body createEntryDto: CreateEntryDto): Single<RouteDetailsDto>
 
@@ -62,4 +62,10 @@ interface LetsAGoApi {
 
     @POST("/$MAP/routes/preview")
     fun routePreview(@Body points: CreateRoutePreviewDto): Single<RoutePreviewDto>
+
+    @GET("/$MAP/entries/{id}")
+    fun getEntry(@Path("id") id: Int): Single<EntryDetailsDto>
+
+    @GET("/$MAP/routes/{id}/map")
+    fun getRouteOnMap(@Path("id") id: Int): Single<RouteLineDto>
 }

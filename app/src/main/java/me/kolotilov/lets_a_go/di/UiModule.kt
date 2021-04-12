@@ -22,6 +22,7 @@ fun uiModule() = DI.Module("App") {
     bind<NavigatorHolder>() with provider { instance<App>().getNavigatorHolder() }
     bind<DateTimeFormatter>(Tags.BIRTH_DATE) with provider { birthDateFormatter() }
     bind<DateTimeFormatter>(Tags.RECORDING_TIME) with provider { recordTimeFormatter() }
+    bind<DateTimeFormatter>(Tags.ENTRY_DATE) with provider { entryDateFormatter() }
     bind<DecimalFormat>(Tags.DISTANCE) with provider { distanceFormatter() }
 
     bind<EmptyViewModel>() with provider { EmptyViewModel() }
@@ -36,11 +37,11 @@ fun uiModule() = DI.Module("App") {
         ChooseSymptomsViewModel(instance(), instance())
     }
     bind<OnboardingTitleViewModel>() with provider { OnboardingTitleViewModel(instance()) }
-    bind<MapViewModel>() with provider { MapViewModel(instance(), instance(), instance()) }
+    bind<MapViewModel>() with provider { MapViewModel(instance(), instance()) }
     bind<EditRouteViewModel>() with provider { EditRouteViewModel(instance(), instance()) }
-    bind<EditEntryViewModel>() with provider { EditEntryViewModel(instance(), instance(), instance()) }
+    bind<EntryPreviewViewModel>() with provider { EntryPreviewViewModel(instance(), instance()) }
     bind<EntryDetailsViewModel>() with provider { EntryDetailsViewModel(instance()) }
-    bind<RouteDetailsViewModel>() with provider { RouteDetailsViewModel(instance(), instance(), instance()) }
+    bind<RouteDetailsViewModel>() with provider { RouteDetailsViewModel(instance(), instance()) }
     bind<EditFilterViewModel>() with provider { EditFilterViewModel(instance(), instance()) }
     bind<OnboardingEndViewModel>() with provider { OnboardingEndViewModel(instance()) }
 }
@@ -51,6 +52,10 @@ private fun recordTimeFormatter(): DateTimeFormatter {
 
 private fun birthDateFormatter(): DateTimeFormatter {
     return DateTimeFormat.forPattern("d MMMM yyyy")
+}
+
+private fun entryDateFormatter(): DateTimeFormatter {
+    return DateTimeFormat.forPattern("dd MMMM HH:mm")
 }
 
 private fun distanceFormatter(): DecimalFormat {

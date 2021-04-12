@@ -1,33 +1,42 @@
 package me.kolotilov.lets_a_go.network.output
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.gson.annotations.SerializedName
 import me.kolotilov.lets_a_go.models.Illness
 import me.kolotilov.lets_a_go.models.Symptom
 import me.kolotilov.lets_a_go.models.UserDetails
+import me.kolotilov.lets_a_go.models.toRouteItem
 import me.kolotilov.lets_a_go.network.input.FilterDto
 import me.kolotilov.lets_a_go.network.input.toFilter
 import me.kolotilov.lets_a_go.utils.toDateTime
 import java.util.*
 
 data class UserDetailsDto(
-    @JsonProperty("username")
+    @SerializedName("username")
     val username: String,
-    @JsonProperty("name")
+    @SerializedName("name")
     val name: String?,
-    @JsonProperty("age")
+    @SerializedName("age")
     val age: Int?,
-    @JsonProperty("birthDate")
+    @SerializedName("birthDate")
     val birthDate: Date?,
-    @JsonProperty("height")
+    @SerializedName("height")
     val height: Int?,
-    @JsonProperty("weight")
+    @SerializedName("weight")
     val weight: Int?,
-    @JsonProperty("illnesses")
+    @SerializedName("illnesses")
     val illnesses: List<String>,
-    @JsonProperty("symptoms")
+    @SerializedName("symptoms")
     val symptoms: List<String>,
-    @JsonProperty("filter")
-    val filter: FilterDto
+    @SerializedName("filter")
+    val filter: FilterDto,
+    @SerializedName("total_distance")
+    val totalDistance: Double,
+    @SerializedName("total_calories_burnt")
+    val totalKilocaloriesBurnt: Int?,
+    @SerializedName("routes")
+    val routes: List<RouteItemDto>,
+    @SerializedName("entries")
+    val entries: List<RouteEntryDto>
 )
 
 fun UserDetailsDto.toUserDetails() = UserDetails(
@@ -40,4 +49,8 @@ fun UserDetailsDto.toUserDetails() = UserDetails(
     illnesses = illnesses.map { Illness(it) },
     symptoms = symptoms.map { Symptom(it) },
     filter = filter.toFilter(),
+    totalDistance = totalDistance,
+    totalKilocaloriesBurnt = totalKilocaloriesBurnt,
+    routes = routes.map { it.toRouteItem() },
+    entries = entries.map { it.toRouteEntry() }
 )

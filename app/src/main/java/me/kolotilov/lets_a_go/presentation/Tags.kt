@@ -12,5 +12,7 @@ enum class Tags {
 
     DISTANCE,
 
-    RECORDING_TIME
+    RECORDING_TIME,
+
+    ENTRY_DATE
 }

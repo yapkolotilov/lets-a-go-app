@@ -3,8 +3,6 @@ package me.kolotilov.lets_a_go.presentation.auth
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
-import me.kolotilov.lets_a_go.models.ErrorCode
-import me.kolotilov.lets_a_go.models.ServiceException
 import me.kolotilov.lets_a_go.network.NetworkRepository
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
 import me.kolotilov.lets_a_go.presentation.Constants
@@ -24,12 +22,6 @@ class LoginViewModel(
      */
     val loginEnabled: Observable<Boolean> get() = loginEnabledSubject
     private val loginEnabledSubject: Subject<Boolean> = BehaviorSubject.create()
-
-    /**
-     * Присылает коды ошибок входа.
-     */
-    val errorDialog: Observable<ErrorCode> get() = errorDialogSubject
-    private val errorDialogSubject: Subject<ErrorCode> = BehaviorSubject.create()
 
     /**
      * Запрос обновлений логина.
@@ -53,10 +45,6 @@ class LoginViewModel(
             .load()
             .doOnComplete {
                 router.newRootScreen(Screens.onboarding())
-            }
-            .doOnError {
-                if (it is ServiceException)
-                    errorDialogSubject.onNext(it.code)
             }
             .emptySubscribe()
             .autoDispose()

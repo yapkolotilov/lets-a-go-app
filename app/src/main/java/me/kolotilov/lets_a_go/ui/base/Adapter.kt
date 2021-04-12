@@ -4,6 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import me.kolotilov.lets_a_go.ui.context
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.android.di
 
 class Recycler {
 
@@ -82,7 +86,9 @@ class Recycler {
     }
 
     abstract class ViewHolder<T>(itemView: View, protected val delegate: Delegate<T>) :
-        RecyclerView.ViewHolder(itemView) {
+        RecyclerView.ViewHolder(itemView), DIAware {
+
+        override val di: DI by di { context }
 
         open fun bind(item: T, selected: Boolean) {}
     }

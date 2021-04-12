@@ -1,34 +1,51 @@
 package me.kolotilov.lets_a_go.ui.map
 
-import android.widget.GridLayout
+import android.os.Bundle
+import android.widget.TextView
 import me.kolotilov.lets_a_go.R
+import me.kolotilov.lets_a_go.presentation.Constants
 import me.kolotilov.lets_a_go.presentation.map.EntryDetailsViewModel
+import me.kolotilov.lets_a_go.presentation.map.EntryStatsView
 import me.kolotilov.lets_a_go.ui.base.BaseBottomSheetFragment
-import me.kolotilov.lets_a_go.ui.base.Grid
-import me.kolotilov.lets_a_go.ui.base.KeyValueFactory
-import me.kolotilov.lets_a_go.ui.base.KeyValueModel
+import me.kolotilov.lets_a_go.ui.buildArguments
 import org.kodein.di.instance
-import java.text.SimpleDateFormat
 
-class EntryDetailsBottomSheet : BaseBottomSheetFragment(R.layout.fragment_entry_details) {
+class EntryDetailsBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
+    BaseBottomSheetFragment(R.layout.fragment_entry_details) {
 
-    override val viewModel by instance<EntryDetailsViewModel>()
-    private val statsGrid by lazyView<GridLayout>(R.id.stats_grid)
-    private lateinit var statsAdapter: Grid.ListAdapter
+    companion object {
 
-    override fun fillViews() {
-        statsAdapter = Grid.ListAdapter(statsGrid, KeyValueFactory())
+        private const val ID = "ID"
+
+        @Suppress("DEPRECATION")
+        fun newInstance(id: Int): EntryDetailsBottomSheet {
+            return EntryDetailsBottomSheet().buildArguments {
+                putInt(ID, id)
+            }
+        }
+    }
+
+    override val viewModel: EntryDetailsViewModel by instance()
+    private val finishedTextView: TextView by lazyView(R.id.finished_text_view)
+    private val statsView: EntryStatsView by lazyView(R.id.entry_stats_view)
+
+    override fun Bundle.readArguments() {
+        val id = getInt(ID)
+        viewModel.init(id)
     }
 
     override fun subscribe() {
         viewModel.data.subscribe {
-            statsAdapter.items = listOf(
-                KeyValueModel("Пройден", if (it.finished) "Да" else "Нет"),
-                KeyValueModel("Дата", SimpleDateFormat("dd MMMMM HH:mm:ss").format(it.date.millis)),
-                KeyValueModel("Время", SimpleDateFormat("HH:mm:ss").format(it.duration.millis)),
-                KeyValueModel("Расстояние", "${it.distance / 1000} км."),
-                KeyValueModel("Калории", "${it.calories} ккл")
+            statsView.setData(
+                distance = it.distance,
+                duration = it.duration,
+                speed = it.speed,
+                kiloCaloriesBurnt = it.kiloCaloriesBurnt,
+                altitudeDelta = it.altitudeDelta,
+                date = it.date
             )
+            finishedTextView.text =
+                if (it.finished) getString(R.string.route_passed) else getString(R.string.route_not_passed)
         }.autoDispose()
     }
 }

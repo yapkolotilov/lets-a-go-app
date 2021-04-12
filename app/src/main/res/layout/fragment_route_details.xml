@@ -4,64 +4,77 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/margin_content">
+
+    <View
+        android:layout_width="@dimen/top_bottom_sheet_width"
+        android:layout_height="@dimen/top_bottom_sheet_height"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_content"
+        android:background="@color/grey" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="@dimen/margin_content"
+        android:orientation="horizontal"
+        tools:ignore="UseCompoundDrawables">
 
         <TextView
             android:id="@+id/title_text_view"
-            android:layout_width="0dp"
+            style="@style/LetsTextTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
             android:gravity="center"
-            android:text="Маршрут" />
+            android:text="@string/route_title" />
 
         <ImageView
             android:id="@+id/edit_image_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
+            android:layout_marginStart="@dimen/margin_content_small"
+            android:layout_gravity="end|center_vertical"
+            android:contentDescription="@string/icon"
             android:src="@drawable/ic_edit" />
 
     </LinearLayout>
 
     <TextView
-        android:id="@+id/name_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:gravity="center"
-        android:hint="@string/route_name_hint" />
-
-    <TextView
         android:id="@+id/type_hint_text_view"
+        style="@style/LetsTextHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="@dimen/margin_content"
         android:text="@string/route_type_title" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/type_recycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="@dimen/margin_content_small"
         tools:itemCount="3" />
 
     <TextView
+        android:id="@+id/ground_hint_text_view"
+        style="@style/LetsTextHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="@dimen/margin_content"
         android:text="@string/ground_type_hint" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ground_recycler"
+        style="@style/LetsTextHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="@dimen/margin_content_small"
         tools:itemCount="3" />
 
     <GridLayout
@@ -71,24 +84,52 @@
         android:columnCount="2" />
 
     <TextView
-        android:id="@+id/entries_title_text_view"
+        android:id="@+id/difficulty_hint_text_view"
+        style="@style/LetsTextHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Походы" />
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="@dimen/margin_content"
+        android:text="@string/difficulty_hint" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/entries_recycler"
+    <com.google.android.material.slider.Slider
+        android:id="@+id/difficulty_slider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:itemCount="3" />
+        android:layout_marginHorizontal="32dp"
+        android:enabled="false"
+        android:valueFrom="1"
+        android:valueTo="5" />
+
+    <me.kolotilov.lets_a_go.presentation.map.EntryStatsView
+        android:id="@+id/route_stats_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_content" />
+
+    <TextView
+        android:id="@+id/entries_title_text_view"
+        style="@style/LetsTextHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="@dimen/margin_content"
+        android:text="@string/entries_hint" />
+
+    <me.kolotilov.lets_a_go.ui.base.EntriesView
+        android:id="@+id/entries_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="@dimen/margin_content_small" />
 
     <Button
         android:id="@+id/go_button"
+        style="@style/LetsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Начать прогулку" />
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="@dimen/margin_content"
+        android:text="@string/start_entry_button" />
 
 </LinearLayout>

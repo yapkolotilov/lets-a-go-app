@@ -1,15 +1,15 @@
 package me.kolotilov.lets_a_go.network.input
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.gson.annotations.SerializedName
 import me.kolotilov.lets_a_go.models.Point
 import java.util.*
 
 data class CreatePointDto(
-    @JsonProperty("latitude")
+    @SerializedName("latitude")
     val latitude: Double,
-    @JsonProperty("longitude")
+    @SerializedName("longitude")
     val longitude: Double,
-    @JsonProperty("timestamp")
+    @SerializedName("timestamp")
     val timestamp: Date
 )
 

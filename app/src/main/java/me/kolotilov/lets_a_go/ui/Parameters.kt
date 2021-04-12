@@ -1,11 +1,13 @@
 package me.kolotilov.lets_a_go.ui
 
+import me.kolotilov.lets_a_go.models.EntryPreview
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.models.RoutePreview
 import me.kolotilov.lets_a_go.utils.toDate
 import me.kolotilov.lets_a_go.utils.toDateTime
 import me.kolotilov.lets_a_go.utils.toDuration
+import org.joda.time.Duration
 import java.io.Serializable
 import java.util.*
 
@@ -61,4 +63,35 @@ fun PointParam.toPoint() = Point(
     longitude = longitude,
     altitude = altitude,
     timestamp = timestamp.toDateTime()
+)
+
+
+data class EntryPreviewParams(
+    val distance: Double,
+    val duration: Duration,
+    val speed: Double,
+    val kiloCaloriesBurnt: Int?,
+    val altitudeDelta: Double,
+    val passed: Boolean,
+    val routeId: Int
+) : Serializable
+
+fun EntryPreview.toEntryPreviewParams() = EntryPreviewParams(
+    distance = distance,
+    duration = duration,
+    speed = speed,
+    kiloCaloriesBurnt = kiloCaloriesBurnt,
+    altitudeDelta = altitudeDelta,
+    passed = passed,
+    routeId = routeId
+)
+
+fun EntryPreviewParams.toEntryPreview() = EntryPreview(
+    distance = distance,
+    duration = duration,
+    speed = speed,
+    kiloCaloriesBurnt = kiloCaloriesBurnt,
+    altitudeDelta = altitudeDelta,
+    passed = passed,
+    routeId = routeId
 )
