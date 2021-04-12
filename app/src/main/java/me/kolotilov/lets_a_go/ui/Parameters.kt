@@ -49,7 +49,7 @@ data class PointParam(
     val longitude: Double,
     val altitude: Double,
     val timestamp: Date
-)
+) : Serializable
 
 fun Point.toPointParam() = PointParam(
     latitude = latitude,

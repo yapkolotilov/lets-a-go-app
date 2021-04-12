@@ -21,7 +21,7 @@ class ChooseSymptomsFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constru
         @Suppress("DEPRECATION")
         fun newInstance(type: EditDetailsType): ChooseSymptomsFragment {
             return ChooseSymptomsFragment().buildArguments {
-                putInt(TYPE, type.ordinal)
+                putSerializable(TYPE, type)
             }
         }
     }

@@ -2,6 +2,7 @@ package me.kolotilov.lets_a_go.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.location.Location
 import android.os.Bundle
@@ -207,5 +208,11 @@ fun Route.Type.name(context: Context): String {
     }
     return context.getString(stringRes)
 }
+
+//endregion
+
+//region IPC
+
+fun Intent.requireExtras() = extras!!
 
 //endregion

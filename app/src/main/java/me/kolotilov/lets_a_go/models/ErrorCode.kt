@@ -3,7 +3,7 @@ package me.kolotilov.lets_a_go.models
 /**
  * Ошибка.
  */
-class ServiceException(
+data class ServiceException(
     /**
      * Код ошибки.
      */

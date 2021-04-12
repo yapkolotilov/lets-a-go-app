@@ -31,7 +31,7 @@ class EditBasicInfoFragment : BaseFragment(R.layout.fragment_basic_info) {
         @Suppress("DEPRECATION")
         fun newInstance(type: EditDetailsType): EditBasicInfoFragment {
             return EditBasicInfoFragment().buildArguments {
-                putInt(TYPE, type.ordinal)
+                putSerializable(TYPE, type)
             }
         }
     }
@@ -48,8 +48,7 @@ class EditBasicInfoFragment : BaseFragment(R.layout.fragment_basic_info) {
     private val nextButton: Button by lazyView(R.id.next_button)
 
     override fun Bundle.readArguments() {
-        val typeArg = getInt(BaseChooseFragment.TYPE, -1)
-        val type = EditDetailsType.values().first { it.ordinal == typeArg }
+        val type = getSerializable(TYPE) as EditDetailsType
         val onboarding = type == EditDetailsType.ONBOARDING
         nextButton.isVisible = onboarding
         saveButton.isVisible = !onboarding

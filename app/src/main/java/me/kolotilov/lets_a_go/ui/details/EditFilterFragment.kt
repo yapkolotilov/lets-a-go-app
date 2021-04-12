@@ -44,7 +44,7 @@ class EditFilterFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor
         @Suppress("DEPRECATION")
         fun newInstance(type: EditDetailsType): EditFilterFragment {
             return EditFilterFragment().buildArguments {
-                putInt(TYPE, type.ordinal)
+                putSerializable(TYPE, type)
             }
         }
     }
@@ -80,8 +80,7 @@ class EditFilterFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor
         })
 
     override fun Bundle.readArguments() {
-        val typeArg = getInt(BaseChooseFragment.TYPE, -1)
-        val type = EditDetailsType.values().first { it.ordinal == typeArg }
+        val type = getSerializable(BaseChooseFragment.TYPE) as EditDetailsType
         val onboarding = type == EditDetailsType.ONBOARDING
         nextButton.isVisible = onboarding
         saveButton.isVisible = !onboarding

@@ -119,6 +119,10 @@
     <string name="search_routes_title">Поиск маршрута</string>
     <string name="search_routes_hint">Введите название маршрута</string>
     <string name="search_button">Искать</string>
+    <string name="routing_title">Записывается маршрут</string>
+    <string name="entrying_title">Записывается поход</string>
+    <string name="notification_text">Не выключайте интернет и геолокацию.</string>
+    <string name="notification_text_content">Продолжительность: %s\nРасстояние:        %s</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>

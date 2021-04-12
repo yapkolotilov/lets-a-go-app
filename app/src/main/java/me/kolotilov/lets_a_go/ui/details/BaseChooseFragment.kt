@@ -40,8 +40,7 @@ abstract class BaseChooseFragment<T> : BaseFragment(R.layout.fragment_choose_ill
     protected abstract fun String.toItem(): T
 
     override fun Bundle.readArguments() {
-        val typeArg = getInt(TYPE, -1)
-        val type = EditDetailsType.values().first { it.ordinal == typeArg }
+        val type = getSerializable(TYPE) as EditDetailsType
         val onboarding = type == EditDetailsType.ONBOARDING
         nextButton.isVisible = onboarding
         saveButton.isVisible = !onboarding

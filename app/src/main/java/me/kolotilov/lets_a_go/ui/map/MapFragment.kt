@@ -2,7 +2,10 @@ package me.kolotilov.lets_a_go.ui.map
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -38,6 +41,7 @@ import me.kolotilov.lets_a_go.ui.base.BaseFragment
 import me.kolotilov.lets_a_go.ui.base.Grid
 import me.kolotilov.lets_a_go.ui.base.KeyValueFactory
 import me.kolotilov.lets_a_go.ui.base.KeyValueModel
+import me.kolotilov.lets_a_go.utils.castTo
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormatter
@@ -183,7 +187,7 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
     private val currentEntryPolyline by lazy {
         map.addPolyline(
             PolylineOptions()
-                .color(requireContext().getColorCompat(R.color.red))
+                .color(requireContext().getColorCompat(R.color.blue_primary))
                 .width(15f)
                 .addAll(emptyList())
         )
@@ -199,6 +203,13 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
     private lateinit var client: LocationManager
     private var currentLocation: Point? = null
 
+    private val recoverReceiver = object : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            recover(intent)
+        }
+    }
+
     override fun Bundle.readArguments() {
         val routeId = getInt(ROUTE_ID, -1).takeIf { it != -1 }
         val entryId = getInt(ENTRY_ID, -1).takeIf { it != -1 }
@@ -208,6 +219,19 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
     override fun onDestroyView() {
         super.onDestroyView()
         client.removeUpdates(this)
+        requireContext().unregisterReceiver(recoverReceiver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (state !is Idle) {
+            val startServiceIntent = Intent(requireContext(), MapService::class.java).apply {
+                putExtra(Recording.Extra.TYPE, if (state is Routing) Recording.Type.ROUTING else Recording.Type.ENTRYING)
+                putExtra(Recording.Extra.TIME, DateTime.now().millis - (recordedPoints.firstOrNull()?.timestamp?.millis ?: 0))
+                putExtra(Recording.Extra.POINTS, recordedPoints.map { it.toPointParam() }.toTypedArray())
+            }
+            requireContext().startService(startServiceIntent)
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -216,7 +240,7 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
         grantResults: IntArray
     ) {
         if (requestCode == LOCATION_REQUEST_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
                 requestLocationUpdates()
             } else {
                 showDialog(
@@ -226,6 +250,11 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
                 )
             }
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireContext().registerReceiver(recoverReceiver, IntentFilter(Recording.Action.RECOVER))
     }
 
     override fun onLocationChanged(location: Location) {
@@ -329,10 +358,37 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
         }.autoDispose()
     }
 
+    fun onActivityStop() {
+        if (state is Idle)
+            return
+        val startServiceIntent = Intent(requireContext(), MapService::class.java).apply {
+            action = Recording.Action.START_RECORDING
+            putExtra(Recording.Extra.TYPE, if (state is Routing) Recording.Type.ROUTING else Recording.Type.ENTRYING)
+            putExtra(Recording.Extra.TIME, DateTime.now().millis - (recordedPoints.firstOrNull()?.timestamp?.millis ?: 0L).toLong())
+            putExtra(Recording.Extra.POINTS, recordedPoints.map { it.toPointParam() }.toTypedArray())
+        }
+        requireContext().startService(startServiceIntent)
+    }
+
+    fun recover(intent: Intent) {
+        val extras = intent.requireExtras()
+        val typeArg = extras.getSerializable(Recording.Extra.TYPE) as Recording.Type
+        val timeArg = extras.getLong(Recording.Extra.TIME, 0L)
+        val pointsArg = extras.getSerializable(Recording.Extra.POINTS)!!.castTo<Array<PointParam>>()
+
+        recordedPoints.clear()
+        recordedPoints.addAll(pointsArg.map { it.toPoint() })
+        state = when (typeArg) {
+            Recording.Type.ROUTING -> routing
+            Recording.Type.ENTRYING -> entrying
+        }
+
+    }
+
     @SuppressLint("MissingPermission")
     private fun requestLocationUpdates() {
         client = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        client.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 1f, this)
+        client.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, this)
     }
 
     private fun onMarkerClick(marker: Marker) {
