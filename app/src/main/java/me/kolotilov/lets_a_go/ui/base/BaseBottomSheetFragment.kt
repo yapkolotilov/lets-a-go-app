@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.CallSuper
@@ -50,6 +51,11 @@ abstract class BaseBottomSheetFragment(
         }
 
     override val di: DI by closestDI()
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)

@@ -73,13 +73,13 @@
                 android:id="@+id/routes_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/padding_content"
-                android:layout_marginTop="@dimen/margin_content_small" />
+                android:layout_marginHorizontal="@dimen/padding_content" />
 
             <TextView
                 android:id="@+id/entries_hint_text_view"
                 style="@style/LetsText"
                 android:layout_width="match_parent"
+                android:layout_marginTop="@dimen/margin_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/padding_content"
                 android:text="@string/entries_hint" />
@@ -88,8 +88,7 @@
                 android:id="@+id/entries_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/padding_content"
-                android:layout_marginTop="@dimen/margin_content_small" />
+                android:layout_marginHorizontal="@dimen/padding_content" />
 
             <View
                 android:layout_width="match_parent"

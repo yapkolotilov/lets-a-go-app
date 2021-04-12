@@ -9,6 +9,7 @@ import android.graphics.Canvas
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Bundle
 import android.view.View
 import android.widget.GridLayout
 import android.widget.ImageButton
@@ -27,18 +28,16 @@ import me.kolotilov.lets_a_go.models.ErrorCode
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.models.RoutePoint
 import me.kolotilov.lets_a_go.models.distance
+import me.kolotilov.lets_a_go.presentation.Constants
 import me.kolotilov.lets_a_go.presentation.Tags
 import me.kolotilov.lets_a_go.presentation.base.ButtonData
 import me.kolotilov.lets_a_go.presentation.base.showDialog
 import me.kolotilov.lets_a_go.presentation.map.MapViewModel
+import me.kolotilov.lets_a_go.ui.*
 import me.kolotilov.lets_a_go.ui.base.BaseFragment
 import me.kolotilov.lets_a_go.ui.base.Grid
 import me.kolotilov.lets_a_go.ui.base.KeyValueFactory
 import me.kolotilov.lets_a_go.ui.base.KeyValueModel
-import me.kolotilov.lets_a_go.ui.distance
-import me.kolotilov.lets_a_go.ui.getColorCompat
-import me.kolotilov.lets_a_go.ui.toLatLng
-import me.kolotilov.lets_a_go.ui.toPoint
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormatter
@@ -49,11 +48,23 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
+class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
+    BaseFragment(R.layout.fragment_map), LocationListener {
 
-    private companion object {
+    companion object {
 
-        const val LOCATION_REQUEST_CODE = 1
+        private const val LOCATION_REQUEST_CODE = 1
+
+        private const val ROUTE_ID = "ROUTE_ID"
+        private const val ENTRY_ID = "ENTRY_ID"
+
+        @Suppress("DEPRECATION")
+        fun newInstance(routeId: Int?, entryId: Int?): MapFragment {
+            return MapFragment().buildArguments {
+                putInt(ROUTE_ID, routeId ?: -1)
+                putInt(ENTRY_ID, entryId ?: -1)
+            }
+        }
     }
 
     private abstract inner class State {
@@ -188,6 +199,12 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
     private lateinit var client: LocationManager
     private var currentLocation: Point? = null
 
+    override fun Bundle.readArguments() {
+        val routeId = getInt(ROUTE_ID, -1).takeIf { it != -1 }
+        val entryId = getInt(ENTRY_ID, -1).takeIf { it != -1 }
+        viewModel.init(routeId, entryId)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         client.removeUpdates(this)
@@ -248,6 +265,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
             )
         }
         userDetailsButton.setOnClickListener { viewModel.openUserDetails() }
+        searchButton.setOnClickListener { viewModel.openSearchRoutes() }
     }
 
     override fun subscribe() {
@@ -264,6 +282,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
                 val point = route.startPoint
                 map.addMarker(
                     MarkerOptions().position(LatLng(point.latitude, point.longitude))
+                        .icon(bitmapDescriptorFromVector(requireContext(), route.type.mapIcon()))
                 ).also { it.tag = route }
             }
         }.autoDispose()
@@ -319,7 +338,6 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
     private fun onMarkerClick(marker: Marker) {
         val route = marker.tag as? RoutePoint ?: return
         selectedRoute = route
-        drawRoute(route)
         map.animateCamera(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(
@@ -334,10 +352,6 @@ class MapFragment : BaseFragment(R.layout.fragment_map), LocationListener {
 
                 override fun onCancel() = Unit
             })
-    }
-
-    private fun drawRoute(route: RoutePoint) {
-        viewModel.drawRoute(route.id)
     }
 
     private fun updateRecordingPanel(duration: Duration) {

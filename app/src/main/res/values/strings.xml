@@ -80,7 +80,7 @@
     <string name="distance_hint">Расстояние</string>
     <string name="duration_hint">Продолжительность</string>
     <string name="grounds_hint">Типы покрытия</string>
-    <string name="enabled_hint">Использовать</string>
+    <string name="enabled_hint"></string>
     <string name="go_button">Перейти</string>
     <string name="enter_details_end">Спасибо! Можете пользоваться приложением.</string>
     <string name="give_permission_title">Пожалуйста, дайте приложению разрешение на геолокацию</string>
@@ -116,6 +116,9 @@
     <string name="distance_to_route">%s от вас</string>
     <string name="collapse_button">Скрыть</string>
     <string name="routes_hint">Маршруты</string>
+    <string name="search_routes_title">Поиск маршрута</string>
+    <string name="search_routes_hint">Введите название маршрута</string>
+    <string name="search_button">Искать</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>

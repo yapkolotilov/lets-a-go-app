@@ -10,4 +10,5 @@
     <dimen name="padding_content">32dp</dimen>
     <dimen name="top_bottom_sheet_width">48dp</dimen>
     <dimen name="top_bottom_sheet_height">4dp</dimen>
+    <dimen name="marker_size">32dp</dimen>
 </resources>

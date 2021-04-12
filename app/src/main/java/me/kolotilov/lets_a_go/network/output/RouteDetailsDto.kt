@@ -1,6 +1,5 @@
  package me.kolotilov.lets_a_go.network.output
 
-import android.util.Log
 import com.google.gson.annotations.SerializedName
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.models.RouteDetails
@@ -48,9 +47,9 @@ fun RouteDetailsDto.toRouteDetails() = RouteDetails(
     difficulty = difficulty?.takeIf { it > 0 },
     type = type,
     ground = ground,
-    entries = entries.map { it.toRouteEntry() }.also { Log.d("BRUH", "entries.size = ${entries.size}") },
+    entries = entries.map { it.toRouteEntry() },
     mine = mine,
     totalDistance = totalDistance,
     totalCaloriesBurnt = totalCaloriesBurnt,
-    id = id.also { Log.d("BRUH", "id = $id") }
+    id = id
 )

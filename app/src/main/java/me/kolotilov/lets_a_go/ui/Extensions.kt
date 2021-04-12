@@ -12,6 +12,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -70,6 +71,20 @@ fun TextInputLayout.setTouchListener(listener: () -> Unit) {
         } else
             true
     }
+}
+
+fun SearchView.doAfterTextChanged(callback: (String) -> Unit) {
+    setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+        override fun onQueryTextChange(newText: String?): Boolean {
+            callback(newText ?: "")
+            return true
+        }
+
+        override fun onQueryTextSubmit(query: String?): Boolean {
+            return false
+        }
+    })
 }
 
 /**
@@ -164,6 +179,16 @@ fun Route.Type.icon(): Int {
         Route.Type.WALKING -> R.drawable.ic_type_walking
         Route.Type.RUNNING -> R.drawable.ic_type_running
         Route.Type.CYCLING -> R.drawable.ic_type_cycling
+    }
+}
+
+@DrawableRes
+fun Route.Type?.mapIcon(): Int {
+    return when (this) {
+        Route.Type.WALKING -> R.drawable.ic_walking_marker
+        Route.Type.RUNNING -> R.drawable.ic_running_marker
+        Route.Type.CYCLING -> R.drawable.ic_cycling_marker
+        null               -> R.drawable.ic_route_marker
     }
 }
 

@@ -6,6 +6,7 @@ import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.EntryPreview
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.ui.EditRouteParams
+import me.kolotilov.lets_a_go.ui.SearchRoutesFragment
 import me.kolotilov.lets_a_go.ui.auth.LoginFragment
 import me.kolotilov.lets_a_go.ui.auth.RegisterFragment
 import me.kolotilov.lets_a_go.ui.details.*
@@ -43,9 +44,9 @@ object Screens {
 
     fun onboarding() = LetsScreen { OnboardingTitleFragment() }
 
-    fun map(animate: Boolean = true): LetsScreen {
-        return LetsScreen(animation = if (animate) ScreenAnimation.SLIDE_RIGHT else null) {
-            MapFragment()
+    fun map(routeId: Int?, entryId: Int?, animation: ScreenAnimation? = null): LetsScreen {
+        return LetsScreen(animation) {
+            MapFragment.newInstance(routeId, entryId)
         }
     }
 
@@ -63,6 +64,8 @@ object Screens {
     fun editFilter(type: EditDetailsType) = LetsScreen { EditFilterFragment.newInstance(type) }
 
     fun onboardingEnd() = LetsScreen { OnboardingEndFragment() }
+
+    fun searchRoutes() = LetsScreen(animation = ScreenAnimation.SLIDE_LEFT) { SearchRoutesFragment() }
 }
 
 class LetsScreen(

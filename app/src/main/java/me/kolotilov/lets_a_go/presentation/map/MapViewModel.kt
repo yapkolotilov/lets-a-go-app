@@ -1,6 +1,7 @@
 package me.kolotilov.lets_a_go.presentation.map
 
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
@@ -13,6 +14,7 @@ import me.kolotilov.lets_a_go.presentation.Screens
 import me.kolotilov.lets_a_go.ui.base.setResultListener
 import me.kolotilov.lets_a_go.ui.toEditRouteParams
 import ru.terrakok.cicerone.Router
+import java.util.concurrent.TimeUnit
 
 class MapViewModel(
     private val repository: Repository,
@@ -77,18 +79,27 @@ class MapViewModel(
             .autoDispose()
     }
 
-    fun openRouteDetailsBottomSheet(routeId: Int) {
+    fun openRouteDetailsBottomSheet(routeId: Int, callback: () -> Unit = {}) {
+        repository.getRouteOnMap(routeId)
+            .load()
+            .doOnSuccess {
+                drawRouteSubject.onNext(it.points)
+                callback()
+            }
+            .emptySubscribe()
+            .autoDispose()
         router.navigateTo(Screens.routeDetails(routeId))
     }
 
-    fun drawRoute(id: Int) {
-        repository.getRouteOnMap(id)
+    private fun openEntryDetailsBottomSheet(entryId: Int, routeId: Int?) {
+        repository.getRouteOnMap(routeId ?: -1)
             .load()
             .doOnSuccess {
                 drawRouteSubject.onNext(it.points)
             }
             .emptySubscribe()
             .autoDispose()
+        router.navigateTo(Screens.entryDetails(entryId))
     }
 
     fun loadRoutes() {
@@ -103,5 +114,25 @@ class MapViewModel(
 
     fun openUserDetails() {
         router.navigateTo(Screens.userDetails())
+    }
+
+    fun openSearchRoutes() {
+        router.navigateTo(Screens.searchRoutes())
+    }
+
+    fun init(routeId: Int?, entryId: Int?) {
+        Single.just(Unit)
+            .delay(500, TimeUnit.MILLISECONDS)
+            .schedule()
+            .doOnSuccess {
+                if (routeId != null) {
+                    openRouteDetailsBottomSheet(routeId) {
+                        if (entryId != null)
+                            openEntryDetailsBottomSheet(entryId, routeId)
+                    }
+                }
+            }
+            .emptySubscribe()
+            .autoDispose()
     }
 }

@@ -19,7 +19,7 @@ interface LetsAGoApi {
     fun login(@Body loginDto: LoginDto): Single<TokenDto>
 
     @POST("/$DETAILS")
-    fun getDetails(@Body location: CreatePointDto?): Single<UserDetailsDto>
+    fun getDetails(@Body location: DetailsDto): Single<UserDetailsDto>
 
     @POST("/$DETAILS/edit")
     fun editDetails(@Body editDetailsDto: EditDetailsDto): Single<UserDetailsDto>
@@ -58,7 +58,7 @@ interface LetsAGoApi {
     fun createEntry(@Path("id") id: Int, @Body createEntryDto: CreateEntryDto): Single<RouteDetailsDto>
 
     @POST("/$MAP/routes/search")
-    fun searchRoutes(@Query("name") name: String?, filter: FilterDto?): Single<List<RouteDetailsDto>>
+    fun searchRoutes(@Body query: SearchRoutesDto): Single<List<RouteItemDto>>
 
     @POST("/$MAP/routes/preview")
     fun routePreview(@Body points: CreateRoutePreviewDto): Single<RoutePreviewDto>

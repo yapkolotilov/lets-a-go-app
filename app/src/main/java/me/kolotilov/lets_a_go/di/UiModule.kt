@@ -2,6 +2,7 @@ package me.kolotilov.lets_a_go.di
 
 import me.kolotilov.lets_a_go.App
 import me.kolotilov.lets_a_go.presentation.EmptyViewModel
+import me.kolotilov.lets_a_go.presentation.SearchRoutesViewModel
 import me.kolotilov.lets_a_go.presentation.Tags
 import me.kolotilov.lets_a_go.presentation.auth.LoginViewModel
 import me.kolotilov.lets_a_go.presentation.auth.RegisterViewModel
@@ -44,6 +45,7 @@ fun uiModule() = DI.Module("App") {
     bind<RouteDetailsViewModel>() with provider { RouteDetailsViewModel(instance(), instance()) }
     bind<EditFilterViewModel>() with provider { EditFilterViewModel(instance(), instance()) }
     bind<OnboardingEndViewModel>() with provider { OnboardingEndViewModel(instance()) }
+    bind<SearchRoutesViewModel>() with provider { SearchRoutesViewModel(instance(), instance()) }
 }
 
 private fun recordTimeFormatter(): DateTimeFormatter {

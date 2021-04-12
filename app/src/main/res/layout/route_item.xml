@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/name_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/margin_content"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Название" />
+
+    <TextView
+        android:id="@+id/distance_and_duration_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_content_extra_small"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/name_text_view"
+        tools:text="5 км, 01:00:00" />
+
+    <TextView
+        android:id="@+id/type_and_ground_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_content_extra_small"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/distance_and_duration_text_view"
+        tools:text="Пеший, Асфальт" />
+
+    <TextView
+        android:id="@+id/distance_to_route_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="В 2 км. от вас" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/margin_content"
+        android:background="@color/grey"
+        app:layout_constraintTop_toBottomOf="@id/type_and_ground_text_view" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

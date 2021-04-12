@@ -34,6 +34,8 @@ class UserDetailsFragment : BaseFragment(R.layout.fragment_user_details) {
         illnessesView.setOnClickListener { viewModel.editIllnesses() }
         symptomsView.setOnClickListener { viewModel.editSymptoms() }
         filterView.setOnClickListener { viewModel.editFilter() }
+        routesView.setOnRouteClickListener { viewModel.openRoute(it.id) }
+        entriesView.setOnEntryClickListener { viewModel.openEntry(it.id, it.routeId) }
     }
 
     override fun subscribe() {

@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity(), DIAware {
         setContentView(R.layout.activity_main)
 
         val rootScreen =
-            if (repository.token.isNotEmpty()) Screens.map(false) else Screens.login()
+            if (repository.token.isNotEmpty()) Screens.map(null, null, null) else Screens.login()
         router.newRootScreen(rootScreen)
     }
 

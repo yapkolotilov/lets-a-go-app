@@ -50,4 +50,9 @@
     <style name="LetsBottomSheet" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@android:color/transparent</item>
     </style>
+
+    <style name="LetsFilterSwitch">
+        <item name="switchMinWidth">72dp</item>
+        <item name="android:thumb">@drawable/filter_thumb</item>
+    </style>
 </resources>

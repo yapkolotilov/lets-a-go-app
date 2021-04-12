@@ -14,6 +14,6 @@ class OnboardingTitleViewModel(
     }
 
     fun skip() {
-        router.navigateTo(Screens.map())
+        router.navigateTo(Screens.map(null, null))
     }
 }

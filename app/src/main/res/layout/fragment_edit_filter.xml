@@ -28,10 +28,10 @@
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/enabled_switch"
+                style="@style/LetsFilterSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:hint="@string/enabled_hint"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 

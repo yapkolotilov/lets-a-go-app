@@ -59,7 +59,7 @@ interface NetworkRepository {
 
     fun createEntry(routeId: Int, points: List<Point>): Single<RouteDetails>
 
-    fun searchRoutes(query: String?, filter: Filter?): Single<List<RouteDetails>>
+    fun searchRoutes(name: String?, filter: Filter?, location: Point?): Single<List<RouteItem>>
 
     fun routePreview(points: List<Point>): Single<RoutePreview>
 
@@ -91,7 +91,7 @@ class NetworkRepositoryImpl(
     }
 
     override fun getDetails(location: Point?): Single<UserDetails> {
-        return api.getDetails(location?.toCreatePointDto())
+        return api.getDetails(DetailsDto(location?.toCreatePointDto()))
             .map { it.toUserDetails() }
             .parseError()
     }
@@ -197,9 +197,14 @@ class NetworkRepositoryImpl(
             .parseError()
     }
 
-    override fun searchRoutes(query: String?, filter: Filter?): Single<List<RouteDetails>> {
-        return api.searchRoutes(query, filter?.toFilterDto())
-            .map { routes -> routes.map { it.toRouteDetails() } }
+    override fun searchRoutes(name: String?, filter: Filter?, location: Point?): Single<List<RouteItem>> {
+        val queryDto = SearchRoutesDto(
+            name = name,
+            filter = filter?.toFilterDto(),
+            userLocation = location?.toCreatePointDto()
+        )
+        return api.searchRoutes(queryDto)
+            .map { routes -> routes.map { it.toRouteItem() } }
             .parseError()
     }
 

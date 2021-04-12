@@ -8,6 +8,7 @@ import me.kolotilov.lets_a_go.presentation.map.EntryDetailsViewModel
 import me.kolotilov.lets_a_go.presentation.map.EntryStatsView
 import me.kolotilov.lets_a_go.ui.base.BaseBottomSheetFragment
 import me.kolotilov.lets_a_go.ui.buildArguments
+import me.kolotilov.lets_a_go.ui.dp
 import org.kodein.di.instance
 
 class EntryDetailsBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
@@ -28,6 +29,7 @@ class EntryDetailsBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constr
     override val viewModel: EntryDetailsViewModel by instance()
     private val finishedTextView: TextView by lazyView(R.id.finished_text_view)
     private val statsView: EntryStatsView by lazyView(R.id.entry_stats_view)
+    override val peekHeight: Int get() = 64.dp(requireContext())
 
     override fun Bundle.readArguments() {
         val id = getInt(ID)
@@ -46,6 +48,7 @@ class EntryDetailsBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constr
             )
             finishedTextView.text =
                 if (it.finished) getString(R.string.route_passed) else getString(R.string.route_not_passed)
+            expand()
         }.autoDispose()
     }
 }

@@ -1,7 +1,6 @@
 package me.kolotilov.lets_a_go.ui.map
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -106,7 +105,6 @@ class RouteDetailsBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constr
                 groundRecycler.isVisible = false
             }
 
-            Log.d("BRUH", "difficulty = ${data.difficulty}")
             if (data.difficulty == null)
                 difficultySlider.isVisible = false
             else
@@ -131,6 +129,7 @@ class RouteDetailsBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constr
                     entries = data.entries
                 )
             }
+            expand()
         }.autoDispose()
     }
 }

@@ -99,4 +99,14 @@ class UserDetailsViewModel(
         repository.token = ""
         router.newRootScreen(Screens.login())
     }
+
+    fun openRoute(routeId: Int) {
+        router.exit()
+        router.replaceScreen(Screens.map(routeId, null, null))
+    }
+
+    fun openEntry(entryId: Int, routeId: Int?) {
+        router.exit()
+        router.replaceScreen(Screens.map(routeId, entryId, null))
+    }
 }

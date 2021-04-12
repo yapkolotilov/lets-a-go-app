@@ -1,10 +1,12 @@
-package me.kolotilov.lets_a_go.ui.details
+package me.kolotilov.lets_a_go.ui
 
 import android.animation.LayoutTransition
-import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
@@ -13,25 +15,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.slider.RangeSlider
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.Route
-import me.kolotilov.lets_a_go.presentation.Constants
-import me.kolotilov.lets_a_go.presentation.details.EditFilterViewModel
-import me.kolotilov.lets_a_go.ui.base.BaseFragment
-import me.kolotilov.lets_a_go.ui.base.GroundFactory
-import me.kolotilov.lets_a_go.ui.base.Recycler
-import me.kolotilov.lets_a_go.ui.base.TypeFactory
-import me.kolotilov.lets_a_go.ui.buildArguments
-import me.kolotilov.lets_a_go.ui.distance
-import me.kolotilov.lets_a_go.ui.dp
-import me.kolotilov.lets_a_go.ui.duration
+import me.kolotilov.lets_a_go.models.RouteItem
+import me.kolotilov.lets_a_go.presentation.SearchRoutesViewModel
+import me.kolotilov.lets_a_go.ui.base.*
 import org.joda.time.Duration
 import org.kodein.di.instance
 
-class EditFilterFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
-    BaseFragment(R.layout.fragment_edit_filter) {
+class SearchRoutesFragment : BaseFragment(R.layout.fragment_search_routes) {
 
     companion object {
-
-        private const val TYPE = "TYPE"
 
         private const val DISTANCE_SCALE = 1000
         private const val MIN_DISTANCE = 0f
@@ -40,28 +32,23 @@ class EditFilterFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor
         private const val DURATION_SCALE = 3_600_000
         private const val MIN_DURATION = 0f
         private const val MAX_DURATION = 10f
-
-        @Suppress("DEPRECATION")
-        fun newInstance(type: EditDetailsType): EditFilterFragment {
-            return EditFilterFragment().buildArguments {
-                putInt(TYPE, type.ordinal)
-            }
-        }
     }
 
-    override val viewModel: EditFilterViewModel by instance()
-
+    override val viewModel: SearchRoutesViewModel by instance()
     override val toolbar: Toolbar by lazyView(R.id.toolbar)
+
+    private val searchView: SearchView by lazyView(R.id.search_view)
+    private val editFilterButton: View by lazyView(R.id.edit_filter_button)
+    private val editFilterLayout: ViewGroup by lazyView(R.id.edit_filter_layout)
     private val enabledSwitch: SwitchCompat by lazyView(R.id.enabled_switch)
     private val distanceTextView: TextView by lazyView(R.id.distance_text_view)
     private val distanceSlider: RangeSlider by lazyView(R.id.distance_slider)
     private val durationTextView: TextView by lazyView(R.id.duration_text_view)
     private val durationSlider: RangeSlider by lazyView(R.id.duration_slider)
-    private val rootLayout: LinearLayout by lazyView(R.id.root_layout)
     private val typesRecycler: RecyclerView by lazyView(R.id.types_recycler)
+    private val searchButton: Button by lazyView(R.id.search_filter_button)
     private val groundsRecycler: RecyclerView by lazyView(R.id.grounds_recycler)
-    private val saveButton: Button by lazyView(R.id.save_button)
-    private val nextButton: Button by lazyView(R.id.next_button)
+    private val itemsRecycler: RecyclerView by lazyView(R.id.recycler)
 
     private val typesAdapter: Recycler.Adapter<Route.Type> =
         Recycler.Adapter(TypeFactory(), object : Recycler.Delegate<Route.Type> {
@@ -79,37 +66,42 @@ class EditFilterFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor
             }
         })
 
-    override fun Bundle.readArguments() {
-        val typeArg = getInt(BaseChooseFragment.TYPE, -1)
-        val type = EditDetailsType.values().first { it.ordinal == typeArg }
-        val onboarding = type == EditDetailsType.ONBOARDING
-        nextButton.isVisible = onboarding
-        saveButton.isVisible = !onboarding
-    }
+    private val itemsAdapter: Recycler.Adapter<RouteItem> =
+        Recycler.Adapter(RouteFactory(), object : Recycler.Delegate<RouteItem> {
+
+            override fun onClick(item: RouteItem) {
+                viewModel.openRoute(item.id)
+            }
+        })
 
     override fun fillViews() {
-        rootLayout.layoutTransition = LayoutTransition().apply {
+        animateLayoutChanges = true
+        editFilterLayout.layoutTransition = LayoutTransition().apply {
             enableTransitionType(LayoutTransition.CHANGING)
         }
-
+        editFilterButton.setOnClickListener {
+            editFilterLayout.isVisible = !editFilterLayout.isVisible
+        }
         typesRecycler.apply {
             adapter = typesAdapter
+            typesAdapter.items = Route.Type.values().toList()
             layoutManager = LinearLayoutManager(requireContext()).apply {
                 orientation = LinearLayoutManager.HORIZONTAL
             }
         }
-
         groundsRecycler.apply {
             adapter = groundsAdapter
+            groundsAdapter.items = Route.Ground.values().toList()
             layoutManager = LinearLayoutManager(requireContext()).apply {
                 orientation = LinearLayoutManager.HORIZONTAL
             }
         }
-
+        itemsRecycler.adapter = itemsAdapter
         distanceSlider.apply {
             valueFrom = MIN_DISTANCE
             valueTo = MAX_DISTANCE
             stepSize = 1f
+            values = listOf(valueFrom, valueTo)
             setLabelFormatter { (it * DISTANCE_SCALE).toDouble().distance(requireContext()) }
             addOnSliderTouchListener(getOnSliderTouchListener())
         }
@@ -117,6 +109,7 @@ class EditFilterFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor
             valueFrom = MIN_DURATION
             valueTo = MAX_DURATION
             stepSize = 0.5f
+            values = listOf(valueFrom, valueTo)
             setLabelFormatter { Duration((it * DURATION_SCALE).toLong()).duration() }
             addOnSliderTouchListener(getOnSliderTouchListener())
         }
@@ -139,18 +132,22 @@ class EditFilterFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor
                 Duration((durationSlider.values[1] * DURATION_SCALE).toLong())
             )
         }
-        saveButton.setOnClickListener { viewModel.save() }
         enabledSwitch.setOnCheckedChangeListener { _, isChecked -> viewModel.setEnabled(isChecked) }
+
+        searchView.doAfterTextChanged { viewModel.search(it) }
+        searchButton.setOnClickListener {
+            editFilterLayout.isVisible = false
+            viewModel.search()
+        }
     }
 
     override fun subscribe() {
-        viewModel.data.subscribe { data ->
-            distanceSlider.values =
-                data.distance.toList().map { (it / DISTANCE_SCALE).toInt().toFloat() }
-            durationSlider.values =
-                data.duration.toList().map { (it.millis / DURATION_SCALE).toInt().toFloat() }
-            enabledSwitch.isChecked = data.enabled
-            animateLayoutChanges = true
+        viewModel.types.subscribe { types ->
+            typesAdapter.selectedItems = types
+        }.autoDispose()
+
+        viewModel.grounds.subscribe { grounds ->
+            groundsAdapter.selectedItems = grounds
         }.autoDispose()
 
         viewModel.distance.subscribe { distance ->
@@ -169,14 +166,8 @@ class EditFilterFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor
             )
         }.autoDispose()
 
-        viewModel.types.subscribe { types ->
-            typesAdapter.items = types.first
-            typesAdapter.selectedItems = types.second
-        }.autoDispose()
-
-        viewModel.grounds.subscribe { grounds ->
-            groundsAdapter.items = grounds.first
-            groundsAdapter.selectedItems = grounds.second
+        viewModel.items.subscribe {
+            itemsAdapter.items = it
         }.autoDispose()
     }
 
