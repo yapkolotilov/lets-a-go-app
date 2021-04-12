@@ -403,17 +403,13 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
         }
     }
 
-    private var isMarkerRotating = false
-
     private fun updateMarker(newLocation: Point) {
-        val bearing = bearingBetweenLocations(currentLocation ?: return, newLocation).toFloat()
+        val bearing = bearingBetweenLocations(currentLocation ?: newLocation, newLocation).toFloat()
         currentPositionMarker.rotation = bearing
     }
 
     // https://stackoverflow.com/questions/20704834/rotate-marker-as-per-user-direction-on-google-maps-v2-android
     private fun bearingBetweenLocations(latLng1: Point, latLng2: Point): Double {
-        if (latLng1.distance(latLng2) < 0.1f)
-            return 0.0
         val PI = 3.14159
         val lat1 = latLng1.latitude * PI / 180
         val long1 = latLng1.longitude * PI / 180
