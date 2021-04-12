@@ -13,6 +13,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.GridLayout
 import android.widget.ImageButton
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.maps.android.clustering.ClusterManager
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -96,7 +98,9 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
             recordButton
             state = routing
             setRecordPanelVisibility(true)
-            routeMarkers.forEach { it.remove() }
+            clusterManager.clearItems()
+            clusterManager.cluster()
+//            routeMarkers.forEach { it.remove() }
             recordedPoints.clear()
             currentPositionMarker.position
             val currentLocation = currentLocation ?: return
@@ -170,7 +174,8 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
     private val dateFormatter: DateTimeFormatter by instance(Tags.RECORDING_TIME)
 
     private val recordedPoints = mutableListOf<Point>()
-    private var routeMarkers = emptyList<Marker>()
+
+    //    private var routeMarkers = emptyList<Marker>()
     private val idle: State = Idle()
     private val routing: State = Routing()
     private val entrying: State = Entrying()
@@ -202,6 +207,7 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
     }
     private lateinit var client: LocationManager
     private var currentLocation: Point? = null
+    private lateinit var clusterManager: ClusterManager<RouteMarker>
 
     private val recoverReceiver = object : BroadcastReceiver() {
 
@@ -226,9 +232,18 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
         super.onDestroy()
         if (state !is Idle) {
             val startServiceIntent = Intent(requireContext(), MapService::class.java).apply {
-                putExtra(Recording.Extra.TYPE, if (state is Routing) Recording.Type.ROUTING else Recording.Type.ENTRYING)
-                putExtra(Recording.Extra.TIME, DateTime.now().millis - (recordedPoints.firstOrNull()?.timestamp?.millis ?: 0))
-                putExtra(Recording.Extra.POINTS, recordedPoints.map { it.toPointParam() }.toTypedArray())
+                putExtra(
+                    Recording.Extra.TYPE,
+                    if (state is Routing) Recording.Type.ROUTING else Recording.Type.ENTRYING
+                )
+                putExtra(
+                    Recording.Extra.TIME,
+                    DateTime.now().millis - (recordedPoints.firstOrNull()?.timestamp?.millis ?: 0)
+                )
+                putExtra(
+                    Recording.Extra.POINTS,
+                    recordedPoints.map { it.toPointParam() }.toTypedArray()
+                )
             }
             requireContext().startService(startServiceIntent)
         }
@@ -299,21 +314,26 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
 
     override fun subscribe() {
         fun clearMarkers() {
-            routeMarkers.forEach {
-                it.remove()
-            }
+            clusterManager.clearItems()
+            clusterManager.cluster()
+//            routeMarkers.forEach {
+//                it.remove()
+//            }
         }
 
         viewModel.routes.subscribe { routes ->
             currentRoutePolyline.points = emptyList()
             clearMarkers()
-            routeMarkers = routes.map { route ->
+//            routeMarkers = routes.map { route ->
+            val markers = routes.map { route ->
                 val point = route.startPoint
-                map.addMarker(
-                    MarkerOptions().position(LatLng(point.latitude, point.longitude))
-                        .icon(bitmapDescriptorFromVector(requireContext(), route.type.mapIcon()))
-                ).also { it.tag = route }
+                RouteMarker(route)
+//                map.addMarker(
+//                    MarkerOptions().position(LatLng(point.latitude, point.longitude))
+//                        .icon(bitmapDescriptorFromVector(requireContext(), route.type.mapIcon()))
+//                ).also { it.tag = route }
             }
+            clusterManager.addItems(markers)
         }.autoDispose()
 
         viewModel.startEntry.subscribe {
@@ -363,9 +383,19 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
             return
         val startServiceIntent = Intent(requireContext(), MapService::class.java).apply {
             action = Recording.Action.START_RECORDING
-            putExtra(Recording.Extra.TYPE, if (state is Routing) Recording.Type.ROUTING else Recording.Type.ENTRYING)
-            putExtra(Recording.Extra.TIME, DateTime.now().millis - (recordedPoints.firstOrNull()?.timestamp?.millis ?: 0L).toLong())
-            putExtra(Recording.Extra.POINTS, recordedPoints.map { it.toPointParam() }.toTypedArray())
+            putExtra(
+                Recording.Extra.TYPE,
+                if (state is Routing) Recording.Type.ROUTING else Recording.Type.ENTRYING
+            )
+            putExtra(
+                Recording.Extra.TIME,
+                DateTime.now().millis - (recordedPoints.firstOrNull()?.timestamp?.millis
+                    ?: 0L).toLong()
+            )
+            putExtra(
+                Recording.Extra.POINTS,
+                recordedPoints.map { it.toPointParam() }.toTypedArray()
+            )
         }
         requireContext().startService(startServiceIntent)
     }
@@ -393,6 +423,10 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
 
     private fun onMarkerClick(marker: Marker) {
         val route = marker.tag as? RoutePoint ?: return
+        onRoutePointClick(route)
+    }
+
+    private fun onRoutePointClick(route: RoutePoint) {
         selectedRoute = route
         map.animateCamera(
             CameraUpdateFactory.newLatLngZoom(
@@ -421,11 +455,37 @@ class MapFragment @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
     }
 
     private fun onMapLoaded() {
+        clusterManager = ClusterManager(requireContext(), map)
+        map.setOnCameraIdleListener {
+            Log.d("BRUH", "onCameraIdle()")
+            clusterManager.onCameraIdle()
+
+            clusterManager.cluster()
+        }
+        clusterManager.renderer = RouteRenderer(requireContext(), map, clusterManager)
+
         viewModel.requestLastLocation()
-        map.setOnMarkerClickListener {
-            onMarkerClick(it)
+        clusterManager.setOnClusterItemClickListener {
+            onRoutePointClick(it.route)
             true
         }
+        clusterManager.setOnClusterClickListener { cluster ->
+            val builder = LatLngBounds.builder()
+            for (item in cluster.items) {
+                builder.include(item.position)
+            }
+            val padding = 80.dp(requireContext())
+            map.setPadding(padding, padding, padding, padding)
+            val bounds = builder.build()
+            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50))
+            map.setPadding(0, 0, 0, 0)
+
+            true
+        }
+//        map.setOnMarkerClickListener {
+//            onMarkerClick(it)
+//            true
+//        }
     }
 
     @Suppress("SameParameterValue")

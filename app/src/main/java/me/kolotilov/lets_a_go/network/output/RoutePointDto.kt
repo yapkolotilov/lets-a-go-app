@@ -15,6 +15,6 @@ data class RoutePointDto(
 
 fun RoutePointDto.toRoutePoint() = RoutePoint(
     type = type,
-    startPoint = startPoint,
+    startPoint = startPoint.toPoint(),
     id = id
 )
