@@ -34,10 +34,17 @@ import java.util.concurrent.TimeUnit
 
 class MapService : Service(), LocationListener {
 
-    private companion object {
+    companion object {
 
         private const val ID = 1337
         private const val CHANNEL_ID = "LETS_A_GO"
+
+        fun start(context: Context, time: Long, type: Recording.Type) {
+            val intent = Intent(context, MapService::class.java).apply {
+                putExtra(Recording.Extra.TYPE, type)
+                putExtra(Recording.Extra.TIME, time)
+            }
+        }
     }
 
     private lateinit var notification: Notification
@@ -140,7 +147,7 @@ class MapService : Service(), LocationListener {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun startMyOwnForeground(): NotificationCompat.Builder {
-        val channelName = "Lets'a go!"
+        val channelName = getString(R.string.channel_name)
         val chan = NotificationChannel(
             CHANNEL_ID,
             channelName,

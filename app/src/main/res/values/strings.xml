@@ -126,6 +126,7 @@
     <string name="route_hint">Маршрут</string>
     <string name="too_far_from_route_title">Вы слишком далеко от маршрута</string>
     <string name="too_far_from_route_message">Подойдите поближе к стартовой точке, чтобы начать</string>
+    <string name="channel_name">Lets\'a go!</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>

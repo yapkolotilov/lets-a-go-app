@@ -152,7 +152,6 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private val dialogHelper = DialogHelper()
     private var userRotation: Float = 0f
 
-
     override fun onDestroyView() {
         locationMarker.remove()
         routePolyline.remove()
@@ -160,6 +159,10 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         routesClusterManager.cluster()
         locationService.stopListen()
         super.onDestroyView()
+    }
+
+    fun onActivityStop() {
+
     }
 
     override fun fillViews() {
