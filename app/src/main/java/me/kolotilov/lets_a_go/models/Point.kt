@@ -35,6 +35,10 @@ fun List<Point>.duration(): Duration {
     return Duration(firstOrNull()?.timestamp ?: DateTime.now(), lastOrNull()?.timestamp ?:DateTime.now())
 }
 
+fun List<Point>.durationTillNow(): Duration {
+    return Duration(firstOrNull()?.timestamp ?: DateTime.now(), DateTime.now())
+}
+
 fun List<Point>.speed(): Double {
     return distance() / duration().standardHours
 }

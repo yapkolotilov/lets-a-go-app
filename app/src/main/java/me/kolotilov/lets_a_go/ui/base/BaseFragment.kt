@@ -34,17 +34,24 @@ abstract class BaseFragment(
     @LayoutRes layoutRes: Int
 ) : Fragment(layoutRes), DIAware {
 
-    private val compositeDisposable = CompositeDisposable()
-    private val delegates = mutableListOf<ViewDelegate<*>>()
+    private val viewDisposable = CompositeDisposable()
+    private val fragmentDisposable = CompositeDisposable()
+    private val delegates = mutableListOf<Delegate>()
 
     override val di: DI by closestDI()
     protected open val toolbar: Toolbar? = null
     protected var animateLayoutChanges: Boolean = false
         set(value) {
+            if (field == value)
+                return
             field = value
             if (value)
-                requireView().castTo<ViewGroup>().layoutTransition = LayoutTransition().apply {
+                view?.castTo<ViewGroup>()?.layoutTransition = LayoutTransition().apply {
                     enableTransitionType(LayoutTransition.CHANGING)
+                    enableTransitionType(LayoutTransition.APPEARING)
+//                    enableTransitionType(LayoutTransition.DISAPPEARING)
+//                    enableTransitionType(LayoutTransition.CHANGE_APPEARING)
+//                    enableTransitionType(LayoutTransition.CHANGE_DISAPPEARING)
                 }
         }
 
@@ -72,9 +79,15 @@ abstract class BaseFragment(
     @CallSuper
     override fun onDestroyView() {
         super.onDestroyView()
-        compositeDisposable.clear()
-        delegates.forEach { it.dispose() }
+        viewDisposable.clear()
+        delegates.forEach { it.clear() }
         viewModel.detach()
+    }
+
+    @CallSuper
+    override fun onDestroy() {
+        super.onDestroy()
+        fragmentDisposable.clear()
     }
 
     /**
@@ -131,6 +144,17 @@ abstract class BaseFragment(
     //region Расширения
 
     /**
+     * Ленивое свойство.
+     *
+     * @param factory Инициализатор.
+     */
+    protected fun <T> lazyProperty(factory: () -> T) : PropertyDelegate<T> {
+        val delegate = PropertyDelegate(factory)
+        delegates.add(delegate)
+        return delegate
+    }
+
+    /**
      * Ищет View по ID.
      *
      * @param id ID.
@@ -142,10 +166,17 @@ abstract class BaseFragment(
     }
 
     /**
-     * Автоматически останавливает подписку.
+     * Автоматически останавливает подписку при уничтожении вьюшки.
      */
     protected fun Disposable.autoDispose() {
-        compositeDisposable.add(this)
+        viewDisposable.add(this)
+    }
+
+    /**
+     * Автоматически останавливает подписку при уничтожении фрагмента.
+     */
+    protected fun Disposable.disposeOnDestroy() {
+        fragmentDisposable.add(this)
     }
 
     protected fun <T> Observable<T>.emptySubscribe(): Disposable {

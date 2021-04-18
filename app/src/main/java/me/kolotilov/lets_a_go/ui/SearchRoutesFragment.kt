@@ -75,7 +75,6 @@ class SearchRoutesFragment : BaseFragment(R.layout.fragment_search_routes) {
         })
 
     override fun fillViews() {
-        animateLayoutChanges = true
         editFilterLayout.layoutTransition = LayoutTransition().apply {
             enableTransitionType(LayoutTransition.CHANGING)
         }
@@ -167,6 +166,9 @@ class SearchRoutesFragment : BaseFragment(R.layout.fragment_search_routes) {
         }.autoDispose()
 
         viewModel.items.subscribe {
+            requireView().postDelayed({
+                animateLayoutChanges = true
+            }, 500)
             itemsAdapter.items = it
         }.autoDispose()
     }

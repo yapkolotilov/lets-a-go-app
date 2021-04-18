@@ -50,10 +50,10 @@ class RoutesView @JvmOverloads constructor(
 
     fun setItems(routes: List<RouteItem>) {
         val count = routes.size
-        switchExpand(true)
         showAllButton.isVisible = count > MAX_ROUTES
         routesCache = routes
         routesAdapter.items = routes.take(MAX_ROUTES)
+        switchExpand(true)
     }
 
     private fun switchExpand(expanded: Boolean) {

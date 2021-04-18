@@ -28,6 +28,11 @@ class UserDetailsFragment : BaseFragment(R.layout.fragment_user_details) {
     private val entriesView: EntriesView by lazyView(R.id.entries_view)
     private val logOutButton: Button by lazyView(R.id.log_out_button)
 
+    override fun fillViews() {
+        super.fillViews()
+        animateLayoutChanges = true
+    }
+
     override fun bind() {
         logOutButton.setOnClickListener { viewModel.logOut() }
         baseDetailsView.setOnClickListener { viewModel.editBasicInfo() }

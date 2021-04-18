@@ -77,10 +77,10 @@ class EntriesView @JvmOverloads constructor(
             }
         )
         val count = entries.size
-        switchExpand(true)
         showAllTextView.isVisible = count > MAX_ENTRIES
         entriesCache = entries
         entriesAdapter.items = entries.take(MAX_ENTRIES)
+        switchExpand(true)
     }
 
     private fun switchExpand(expanded: Boolean) {

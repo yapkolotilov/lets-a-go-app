@@ -9,8 +9,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.slider.Slider
 import me.kolotilov.lets_a_go.R
+import me.kolotilov.lets_a_go.models.ErrorCode
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.presentation.Constants
+import me.kolotilov.lets_a_go.presentation.base.ButtonData
+import me.kolotilov.lets_a_go.presentation.base.showDialog
 import me.kolotilov.lets_a_go.presentation.map.EntryStatsView
 import me.kolotilov.lets_a_go.presentation.map.RouteDetailsViewModel
 import me.kolotilov.lets_a_go.ui.base.*
@@ -130,6 +133,16 @@ class RouteDetailsBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constr
                 )
             }
             expand()
+        }.autoDispose()
+
+        viewModel.errorDialog.subscribe {
+            if (it == ErrorCode.TOO_FAR_FROM_ROUTE) {
+                showDialog(
+                    title = getString(R.string.too_far_from_route_title),
+                    message = getString(R.string.too_far_from_route_message),
+                    positiveButton = ButtonData(getString(R.string.ok_button))
+                )
+            }
         }.autoDispose()
     }
 }

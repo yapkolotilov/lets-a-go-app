@@ -3,6 +3,8 @@ package me.kolotilov.lets_a_go.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.location.Location
 import android.os.Bundle
@@ -18,11 +20,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.textfield.TextInputLayout
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.models.Route
+import me.kolotilov.lets_a_go.presentation.map.UserLocation
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormat
@@ -39,6 +44,8 @@ fun Point.toLatLng() = LatLng(latitude, longitude)
 fun Location.toPoint() = Point(latitude, longitude, altitude, DateTime(time))
 
 fun Location.toLatLng() = LatLng(latitude, longitude)
+
+fun UserLocation.toLatLng() = LatLng(latitude, longitude)
 
 //endregion
 
@@ -136,6 +143,23 @@ fun Context.getDrawableCompat(@DrawableRes drawable: Int): Drawable {
 
 fun View.getString(@StringRes stringRes: Int): String {
     return context.getString(stringRes)
+}
+
+@Suppress("SameParameterValue")
+fun Context.bitmapDescriptorFromVector(
+    @DrawableRes vectorDrawableResourceId: Int
+): BitmapDescriptor {
+    val vectorDrawable = ContextCompat.getDrawable(this, vectorDrawableResourceId)
+    val bitmap = Bitmap.createBitmap(
+        vectorDrawable!!.intrinsicWidth,
+        vectorDrawable.intrinsicHeight,
+        Bitmap.Config.ARGB_8888
+    )
+    val canvas = Canvas(bitmap)
+    vectorDrawable.setBounds(0, 0, canvas.width, canvas.height)
+    vectorDrawable.draw(canvas)
+
+    return BitmapDescriptorFactory.fromBitmap(bitmap)
 }
 
 //endregion

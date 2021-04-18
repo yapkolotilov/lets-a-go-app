@@ -98,7 +98,7 @@ abstract class BaseBottomSheetFragment(
     final override fun onDestroyView() {
         super.onDestroyView()
         compositeDisposable.clear()
-        delegates.forEach { it.dispose() }
+        delegates.forEach { it.clear() }
     }
 
     override fun onDismiss(dialog: DialogInterface) {

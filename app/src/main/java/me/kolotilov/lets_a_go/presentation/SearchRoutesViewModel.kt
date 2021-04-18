@@ -8,6 +8,8 @@ import me.kolotilov.lets_a_go.models.Filter
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.models.RouteItem
 import me.kolotilov.lets_a_go.network.Repository
+import me.kolotilov.lets_a_go.presentation.details.UserDetailsResult
+import me.kolotilov.lets_a_go.ui.base.sendResult
 import org.joda.time.Duration
 import ru.terrakok.cicerone.Router
 import java.util.concurrent.TimeUnit
@@ -119,7 +121,7 @@ class SearchRoutesViewModel(
     }
 
     fun openRoute(routeId: Int) {
+        router.sendResult(Results.USER_DETAILS, UserDetailsResult.Route(routeId))
         router.exit()
-        router.replaceScreen(Screens.map(routeId = routeId, entryId = null))
     }
 }

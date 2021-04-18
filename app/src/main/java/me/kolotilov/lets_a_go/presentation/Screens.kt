@@ -44,9 +44,9 @@ object Screens {
 
     fun onboarding() = LetsScreen { OnboardingTitleFragment() }
 
-    fun map(routeId: Int?, entryId: Int?, animation: ScreenAnimation? = null): LetsScreen {
+    fun map( animation: ScreenAnimation? = null): LetsScreen {
         return LetsScreen(animation) {
-            MapFragment.newInstance(routeId, entryId)
+            MapFragment()
         }
     }
 

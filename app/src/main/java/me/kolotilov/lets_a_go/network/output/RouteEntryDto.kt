@@ -23,6 +23,6 @@ fun RouteEntryDto.toRouteEntry() = RouteEntry(
     date = date.toDateTime(),
     duration = duration.toDuration(),
     passed = passed,
-    routeId = routeId,
+    routeId = routeId ?: 0,
     id = id
 )

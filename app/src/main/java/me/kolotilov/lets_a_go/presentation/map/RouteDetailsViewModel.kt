@@ -1,7 +1,9 @@
 package me.kolotilov.lets_a_go.presentation.map
 
 import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.BehaviorSubject
+import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.models.RouteDetails
 import me.kolotilov.lets_a_go.models.RouteEntry
@@ -38,8 +40,9 @@ class RouteDetailsViewModel(
     val data: Observable<Data> get() = dataSubject
     private val dataSubject = BehaviorSubject.create<Data>()
 
-    private var result: Boolean = false
+    private var result: RouteDetailsResult = RouteDetailsResult.LoadRoutes
     private var id: Int = 0
+    private var startEntryDisposable: Disposable? = null
 
     override fun attach() {
         repository.getRoute(id)
@@ -47,13 +50,16 @@ class RouteDetailsViewModel(
             .doOnSuccess {
                 parseRoute(it)
             }
+            .doOnError {
+                router.exit()
+            }
             .emptySubscribe()
             .autoDispose()
     }
 
     override fun detach() {
         super.detach()
-        router.sendResult(Results.LOAD_ROUTES, result)
+        router.sendResult(Results.ROUTE_DETAILS, result)
     }
 
     fun init(id: Int) {
@@ -61,8 +67,18 @@ class RouteDetailsViewModel(
     }
 
     fun go() {
-        result = true
-        router.exit()
+        repository.startEntry(id, repository.lastLocation!!)
+            .load()
+            .doOnSuccess {
+                result = RouteDetailsResult.StartEntry(
+                    id = it.id,
+                    name = it.name,
+                    points = it.points
+                )
+                router.exit()
+            }
+            .emptySubscribe()
+            .autoDispose()
     }
 
     fun edit() {
@@ -93,4 +109,14 @@ class RouteDetailsViewModel(
     fun openEntryDetails(item: RouteEntry) {
         router.navigateTo(Screens.entryDetails(item.id))
     }
+}
+
+sealed class RouteDetailsResult {
+
+    object LoadRoutes : RouteDetailsResult()
+    data class StartEntry(
+        val id: Int,
+        val points: List<Point>,
+        val name: String?
+    ) : RouteDetailsResult()
 }

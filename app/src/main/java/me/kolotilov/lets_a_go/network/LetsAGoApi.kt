@@ -54,6 +54,9 @@ interface LetsAGoApi {
     @POST("$MAP/entries/preview")
     fun entryPreview(@Body entry: CreateEntryPreviewDto): Single<EntryPreviewDto>
 
+    @POST("$MAP/routes/{id}/startEntry")
+    fun startEntry(@Path("id") routeId: Int, @Body location: CreatePointDto): Single<StartEntryDto>
+
     @POST("/$MAP/routes/{id}/entries")
     fun createEntry(@Path("id") id: Int, @Body createEntryDto: CreateEntryDto): Single<RouteDetailsDto>
 

@@ -10,6 +10,8 @@ interface LocalRepository {
     var token: String
 
     var lastLocation: Point?
+
+    var filterMap: Boolean
 }
 
 class LocalRepositoryImpl(
@@ -23,6 +25,8 @@ class LocalRepositoryImpl(
         const val LATITUDE = "LATITUDE"
         const val LONGITUDE = "LONGITUDE"
         const val ALTITUDE = "ALTITUDE"
+
+        const val FILTER_MAP = "FILTER_MAP"
     }
 
     override var token: String
@@ -48,6 +52,14 @@ class LocalRepositoryImpl(
                 putFloat(LATITUDE, value?.latitude?.toFloat() ?: -1f)
                 putFloat(LONGITUDE, value?.longitude?.toFloat() ?: -1f)
                 putFloat(ALTITUDE, value?.altitude?.toFloat() ?: -1f)
+            }
+        }
+
+    override var filterMap: Boolean
+        get() = sharedPreferences.getBoolean(FILTER_MAP, false)
+        set(value) {
+            sharedPreferences.edit {
+                putBoolean(FILTER_MAP, value)
             }
         }
 }

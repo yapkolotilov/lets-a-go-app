@@ -57,6 +57,8 @@ interface NetworkRepository {
 
     fun getAllRoutes(filter: Boolean): Single<List<RoutePoint>>
 
+    fun startEntry(routeId: Int, location: Point): Single<StartEntry>
+
     fun createEntry(routeId: Int, points: List<Point>): Single<RouteDetails>
 
     fun searchRoutes(name: String?, filter: Filter?, location: Point?): Single<List<RouteItem>>
@@ -188,6 +190,12 @@ class NetworkRepositoryImpl(
     override fun getAllRoutes(filter: Boolean): Single<List<RoutePoint>> {
         return api.getRoutes(filter)
             .map { routes -> routes.map { it.toRoutePoint() } }
+            .parseError()
+    }
+
+    override fun startEntry(routeId: Int, location: Point): Single<StartEntry> {
+        return api.startEntry(routeId, location.toCreatePointDto())
+            .map { it.toStartEntry() }
             .parseError()
     }
 

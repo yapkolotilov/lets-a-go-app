@@ -15,7 +15,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/padding_content"
+        android:layout_marginHorizontal="@dimen/margin_content"
         android:orientation="horizontal">
 
         <androidx.appcompat.widget.SearchView
@@ -50,10 +50,10 @@
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/enabled_switch"
+            style="@style/LetsFilterSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            style="@style/LetsFilterSwitch"
             android:textColor="@color/black"
             android:textSize="16sp" />
 

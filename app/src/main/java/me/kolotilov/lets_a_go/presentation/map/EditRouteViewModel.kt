@@ -75,7 +75,7 @@ class EditRouteViewModel(
 
     override fun detach() {
         super.detach()
-        router.sendResult(Results.LOAD_ROUTES, false)
+        router.sendResult(Results.EDIT_ROUTE, Unit)
     }
 
     fun init(preview: RoutePreview?, points: List<Point>?, id: Int?) {

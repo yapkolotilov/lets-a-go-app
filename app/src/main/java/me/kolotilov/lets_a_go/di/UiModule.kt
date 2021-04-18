@@ -10,6 +10,8 @@ import me.kolotilov.lets_a_go.presentation.details.*
 import me.kolotilov.lets_a_go.presentation.details.onboarding.OnboardingEndViewModel
 import me.kolotilov.lets_a_go.presentation.details.onboarding.OnboardingTitleViewModel
 import me.kolotilov.lets_a_go.presentation.map.*
+import me.kolotilov.lets_a_go.ui.map.DebugLocationServiceImpl
+import me.kolotilov.lets_a_go.ui.map.LocationService
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.kodein.di.DI
@@ -25,6 +27,7 @@ fun uiModule() = DI.Module("App") {
     bind<DateTimeFormatter>(Tags.RECORDING_TIME) with provider { recordTimeFormatter() }
     bind<DateTimeFormatter>(Tags.ENTRY_DATE) with provider { entryDateFormatter() }
     bind<DecimalFormat>(Tags.DISTANCE) with provider { distanceFormatter() }
+    bind<LocationService>() with provider { DebugLocationServiceImpl(instance()) }
 
     bind<EmptyViewModel>() with provider { EmptyViewModel() }
     bind<LoginViewModel>() with provider { LoginViewModel(instance(), instance()) }

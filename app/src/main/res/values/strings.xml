@@ -123,6 +123,9 @@
     <string name="entrying_title">Записывается поход</string>
     <string name="notification_text">Не выключайте интернет и геолокацию.</string>
     <string name="notification_text_content">Продолжительность: %s\nРасстояние:        %s</string>
+    <string name="route_hint">Маршрут</string>
+    <string name="too_far_from_route_title">Вы слишком далеко от маршрута</string>
+    <string name="too_far_from_route_message">Подойдите поближе к стартовой точке, чтобы начать</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>

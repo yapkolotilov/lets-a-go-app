@@ -6,7 +6,9 @@ import io.reactivex.subjects.Subject
 import me.kolotilov.lets_a_go.models.*
 import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
+import me.kolotilov.lets_a_go.presentation.Results
 import me.kolotilov.lets_a_go.presentation.Screens
+import me.kolotilov.lets_a_go.ui.base.sendResult
 import me.kolotilov.lets_a_go.ui.details.EditDetailsType
 import org.joda.time.DateTime
 import ru.terrakok.cicerone.Router
@@ -101,12 +103,24 @@ class UserDetailsViewModel(
     }
 
     fun openRoute(routeId: Int) {
+        router.sendResult(Results.USER_DETAILS, UserDetailsResult.Route(routeId))
         router.exit()
-        router.replaceScreen(Screens.map(routeId, null, null))
     }
 
-    fun openEntry(entryId: Int, routeId: Int?) {
+    fun openEntry(entryId: Int, routeId: Int) {
+        router.sendResult(Results.USER_DETAILS, UserDetailsResult.Entry(entryId, routeId))
         router.exit()
-        router.replaceScreen(Screens.map(routeId, entryId, null))
     }
+}
+
+sealed class UserDetailsResult {
+
+    data class Route(
+        val id: Int
+    ) : UserDetailsResult()
+
+    data class Entry(
+        val id: Int,
+        val routeId: Int
+    ) : UserDetailsResult()
 }

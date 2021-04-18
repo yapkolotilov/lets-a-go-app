@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.Screens
-import me.kolotilov.lets_a_go.ui.map.MapFragment
 import me.kolotilov.lets_a_go.ui.map.Recording
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -29,7 +28,7 @@ class MainActivity : AppCompatActivity(), DIAware {
         setContentView(R.layout.activity_main)
 
         val rootScreen =
-            if (repository.token.isNotEmpty()) Screens.map(null, null, null) else Screens.login()
+            if (repository.token.isNotEmpty()) Screens.map() else Screens.login()
         router.newRootScreen(rootScreen)
 
     }
@@ -52,11 +51,5 @@ class MainActivity : AppCompatActivity(), DIAware {
             return true
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        val mapFragment = supportFragmentManager.fragments.first { it is MapFragment } as? MapFragment
-        mapFragment?.onActivityStop()
     }
 }

@@ -9,6 +9,6 @@ class OnboardingEndViewModel(
 ) : BaseViewModel() {
 
     fun go() {
-        router.navigateTo(Screens.map(null, null))
+        router.navigateTo(Screens.map())
     }
 }
