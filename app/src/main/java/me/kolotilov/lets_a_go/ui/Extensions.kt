@@ -25,12 +25,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.tasks.Task
 import com.google.android.material.textfield.TextInputLayout
+import io.reactivex.Single
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.presentation.map.UserLocation
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormat
 import java.text.DecimalFormat
@@ -49,9 +52,22 @@ fun Location.toLatLng() = LatLng(latitude, longitude)
 
 fun UserLocation.toLatLng() = LatLng(latitude, longitude)
 
+fun <T> Task<T>.toSingle(): Single<T> {
+    return Single.create { emitter ->
+        addOnSuccessListener {
+            if (it != null) emitter.onSuccess(it)
+            else emitter.onError(NullPointerException())
+        }
+        addOnFailureListener {
+            emitter.onError(it)
+        }
+    }
+}
+
 //endregion
 
 //region Android
+
 
 /**
  * Возвращает текст внутри поля.
@@ -191,7 +207,7 @@ fun Double.distance(context: Context): String {
 }
 
 fun Duration.duration(): String {
-    return DateTimeFormat.forPattern("HH:mm:ss").print(DateTime(millis))
+    return DateTimeFormat.forPattern("HH:mm:ss").withZone(DateTimeZone.UTC).print(DateTime(millis))
 }
 
 fun Double.speed(context: Context): String {

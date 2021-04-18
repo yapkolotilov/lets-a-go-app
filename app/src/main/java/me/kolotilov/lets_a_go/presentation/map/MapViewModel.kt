@@ -1,5 +1,7 @@
 package me.kolotilov.lets_a_go.presentation.map
 
+import android.util.Log
+import com.google.android.gms.location.LocationRequest
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -13,6 +15,7 @@ import me.kolotilov.lets_a_go.presentation.Results
 import me.kolotilov.lets_a_go.presentation.Screens
 import me.kolotilov.lets_a_go.presentation.details.UserDetailsResult
 import me.kolotilov.lets_a_go.ui.base.setResultListener
+import me.kolotilov.lets_a_go.ui.map.RecordingData
 import me.kolotilov.lets_a_go.ui.toEditRouteParams
 import org.joda.time.DateTime
 import org.joda.time.Duration
@@ -30,9 +33,13 @@ class MapViewModel(
 
     private abstract inner class State {
 
+        open fun start() = Unit
+
         abstract fun onLocationUpdate(location: Point)
 
         abstract fun onRecordClick(location: Point)
+
+        open fun stop() = Unit
     }
 
     private inner class Idle : State() {
@@ -46,10 +53,17 @@ class MapViewModel(
         }
 
         override fun onRecordClick(location: Point) {
-            recordedPoints.add(location.copy(timestamp = DateTime.now()))
             state = Routing()
             staticDataSubject.onNext(StaticData.Routing())
+        }
+    }
 
+    private inner class Routing : State() {
+
+        private var timerDisposable: Disposable? = null
+
+        override fun start() {
+            recordedPoints.add(currentLocation!!.copy(timestamp = DateTime.now()))
             timerDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
@@ -64,9 +78,6 @@ class MapViewModel(
                 }
                 .emptySubscribe()
         }
-    }
-
-    private inner class Routing : State() {
 
         override fun onLocationUpdate(location: Point) {
             recordedPoints.add(location)
@@ -82,7 +93,6 @@ class MapViewModel(
 
         override fun onRecordClick(location: Point) {
             state = Idle()
-            timerDisposable?.dispose()
             val recordedPoints = recordedPoints.toList()
             staticDataSubject.onNext(
                 StaticData.RoutePreview(
@@ -91,15 +101,22 @@ class MapViewModel(
             )
             this@MapViewModel.recordedPoints.clear()
         }
+
+        override fun stop() {
+            timerDisposable?.dispose()
+        }
     }
 
     private inner class Entrying(
-        private val id: Int,
-        private val name: String?,
-        private val points: List<Point>
+        val id: Int,
+        val name: String?,
+        val points: List<Point>
     ) : State() {
 
-        init {
+        private var timerDisposable: Disposable? = null
+
+        override fun start() {
+            LocationRequest.create()
             recordedPoints.add(currentLocation!!.copy(timestamp = DateTime.now()))
             timerDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -130,7 +147,6 @@ class MapViewModel(
 
         override fun onRecordClick(location: Point) {
             state = Idle()
-            timerDisposable?.dispose()
             val recordedPoints = recordedPoints.toList()
             repository.entryPreview(id, recordedPoints)
                 .load()
@@ -145,6 +161,10 @@ class MapViewModel(
                 }
                 .emptySubscribe()
                 .autoDispose()
+        }
+
+        override fun stop() {
+            timerDisposable?.dispose()
         }
     }
 
@@ -177,14 +197,18 @@ class MapViewModel(
 
     private var state: State = Idle()
         set(value) {
+            if (field === value)
+                return
+            field.stop()
             field = value
+            value.start()
             isRecordingSubject.onNext(value !is Idle)
         }
     private var previousLocation: Point? = null
     private var currentLocation: Point? = null
     private var recordedPoints: MutableList<Point> = mutableListOf()
-    private var timerDisposable: Disposable? = null
     private var isInitialized: Boolean = false
+    private var bearing: Double = 0.0
 
     fun proceedArguments(entryId: Int?, routeId: Int) {
         showRouteImpl(routeId, entryId)
@@ -217,12 +241,50 @@ class MapViewModel(
         }
     }
 
+    fun getRecordingData(): RecordingData? {
+        state.stop()
+        return when (val state = state) {
+            is Routing -> RecordingData.Routing(
+                points = recordedPoints
+            )
+            is Entrying -> RecordingData.Entrying(
+                routeId = state.id,
+                routeName = state.name,
+                routePoints = state.points,
+                points = recordedPoints
+            )
+            else -> null
+        }
+    }
+
+    fun proceedRecordingData(data: RecordingData) {
+        when (data) {
+            is RecordingData.Routing -> {
+                recordedPoints = data.points.toMutableList()
+                val newState = Routing()
+                Log.d("BRUH", "$newState()")
+                state = newState
+                staticDataSubject.onNext(StaticData.Routing())
+            }
+            is RecordingData.Entrying -> {
+                recordedPoints = data.points.toMutableList()
+                state = Entrying(
+                    id = data.routeId,
+                    name = data.routeName,
+                    points = data.routePoints
+                )
+                staticDataSubject.onNext(StaticData.Entrying(data.routePoints))
+            }
+        }
+    }
+
     fun setFilterMap(filterMap: Boolean) {
         repository.filterMap = filterMap
         loadRoutes()
     }
 
-    fun onLocationUpdate(location: Point) {
+    fun onLocationUpdate(location: Point, bearing: Double) {
+        this.bearing = bearing
         onLocationUpdateImpl(location, true)
     }
 
@@ -326,7 +388,7 @@ class MapViewModel(
     private fun Point.toUserLocation() = UserLocation(
         latitude = latitude,
         longitude = longitude,
-        bearing = bearing()
+        bearing = bearing
     )
 }
 

@@ -1,13 +1,12 @@
 package me.kolotilov.lets_a_go.ui.base
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.Screens
-import me.kolotilov.lets_a_go.ui.map.Recording
+import me.kolotilov.lets_a_go.ui.map.MapFragment
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -35,8 +34,6 @@ class MainActivity : AppCompatActivity(), DIAware {
     override fun onResume() {
         super.onResume()
         navigatorHolder.setNavigator(navigator)
-        val stopServiceIntent = Intent(Recording.Action.STOP_RECORDING)
-        sendBroadcast(stopServiceIntent)
     }
 
     override fun onPause() {
@@ -50,5 +47,11 @@ class MainActivity : AppCompatActivity(), DIAware {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        val mapFragment = supportFragmentManager.fragments.first { it is MapFragment } as? MapFragment
+        mapFragment?.onActivityStop()
     }
 }

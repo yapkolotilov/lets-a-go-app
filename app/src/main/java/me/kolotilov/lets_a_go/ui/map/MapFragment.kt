@@ -1,5 +1,9 @@
 package me.kolotilov.lets_a_go.ui.map
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
 import android.widget.GridLayout
@@ -29,6 +33,7 @@ import me.kolotilov.lets_a_go.ui.base.BaseFragment
 import me.kolotilov.lets_a_go.ui.base.Grid
 import me.kolotilov.lets_a_go.ui.base.KeyValueFactory
 import me.kolotilov.lets_a_go.ui.base.toKeyValueModel
+import me.kolotilov.lets_a_go.utils.castTo
 import org.kodein.di.instance
 
 
@@ -41,6 +46,13 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         private const val OVERVIEW_ZOOM = 15f
         private const val RECORDING_ZOOM = 17f
         private const val RECORDING_TILT = 60f
+
+        fun start(context: Context, data: RecordingData) {
+            val intent = Intent(Recording.Action.RECOVER).apply {
+                putExtra(Recording.RECORDING, data.toRecordingParam())
+            }
+            context.sendBroadcast(intent)
+        }
     }
 
     private inner class DialogHelper {
@@ -93,8 +105,10 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             errorRequests.clear()
         }
 
-        private fun animate(cameraUpdate: CameraUpdate,
-                            callback: () -> Unit = {}) {
+        private fun animate(
+            cameraUpdate: CameraUpdate,
+            callback: () -> Unit = {}
+        ) {
             dialogHelper.animationStarted()
             map.animateCamera(cameraUpdate, object : GoogleMap.CancelableCallback {
 
@@ -152,6 +166,19 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private val dialogHelper = DialogHelper()
     private var userRotation: Float = 0f
 
+    private val resumeListener = object : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            val data = intent.getSerializableExtra(Recording.RECORDING)!!.castTo<RecordingParam>().toRecordingData()
+            viewModel.proceedRecordingData(data)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireContext().registerReceiver(resumeListener, IntentFilter(Recording.Action.RECOVER))
+    }
+
     override fun onDestroyView() {
         locationMarker.remove()
         routePolyline.remove()
@@ -161,8 +188,20 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         super.onDestroyView()
     }
 
-    fun onActivityStop() {
+    override fun onDestroy() {
+        super.onDestroy()
+        MapService.stop(requireContext())
+    }
 
+    override fun onStart() {
+        super.onStart()
+        MapService.stop(requireContext())
+    }
+
+    fun onActivityStop() {
+        viewModel.getRecordingData()?.let {
+            MapService.start(requireContext(), it)
+        }
     }
 
     override fun fillViews() {
@@ -410,7 +449,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
 
     private fun onMapLoaded() {
         locationService.startListen {
-            viewModel.onLocationUpdate(it.toPoint())
+            viewModel.onLocationUpdate(it.toPoint(), it.bearing.toDouble())
         }
         map.setOnCameraIdleListener(routesClusterManager)
         map.setOnCameraMoveListener {
