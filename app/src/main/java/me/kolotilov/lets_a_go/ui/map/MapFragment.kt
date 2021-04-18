@@ -47,13 +47,39 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private inner class DialogHelper {
 
         var isAnimating: Boolean = false
+            private set
+        var isDialogShown: Boolean = false
+            private set
         val errorRequests: MutableList<ErrorCode> = mutableListOf()
+        val animationRequests: MutableList<() -> Unit> = mutableListOf()
 
         fun requestError(errorCode: ErrorCode) {
             if (isAnimating)
                 errorRequests.add(errorCode)
             else
                 parseErrorImpl(errorCode)
+        }
+
+        fun requestAnimation(
+            cameraUpdate: CameraUpdate,
+            callback: () -> Unit = {}
+        ) {
+            if (isDialogShown)
+                animationRequests.add { animate(cameraUpdate, callback) }
+            else
+                animate(cameraUpdate, callback)
+        }
+
+        fun dialogShown() {
+            isDialogShown = true
+        }
+
+        fun dialogHidden() {
+            isDialogShown = false
+            animationRequests.forEach {
+                it()
+            }
+            animationRequests.clear()
         }
 
         fun animationStarted() {
@@ -66,6 +92,23 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                 parseErrorImpl(it)
             }
             errorRequests.clear()
+        }
+
+        private fun animate(cameraUpdate: CameraUpdate,
+                            callback: () -> Unit = {}) {
+            dialogHelper.animationStarted()
+            map.animateCamera(cameraUpdate, object : GoogleMap.CancelableCallback {
+
+                override fun onFinish() {
+                    dialogHelper.animationStopped()
+                    callback()
+                }
+
+                override fun onCancel() {
+                    dialogHelper.animationStopped()
+                    callback()
+                }
+            })
         }
     }
 
@@ -288,7 +331,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             }
             val bounds = builder.build()
             val padding = 100.dp(requireContext())
-            map.smartAnimateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding,), force) {
+            map.smartAnimateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding), force) {
                 callback()
             }
         } else {
@@ -297,23 +340,29 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     }
 
     private fun parseError(it: ErrorCode) {
+        Log.d("BRUH", "error")
         dialogHelper.requestError(it)
     }
 
     private fun parseErrorImpl(it: ErrorCode) {
+        val okButton = ButtonData(getString(R.string.ok_button)) {
+            dialogHelper.dialogHidden()
+        }
         when (it) {
             ErrorCode.ENTRY_TOO_SHORT -> {
+                dialogHelper.dialogShown()
                 showDialog(
                     title = getString(R.string.route_too_short_title),
                     message = getString(R.string.route_too_short_message),
-                    positiveButton = ButtonData(getString(R.string.ok_button))
+                    positiveButton = okButton
                 )
             }
             ErrorCode.SPEED_TOO_FAST -> {
+                dialogHelper.dialogShown()
                 showDialog(
                     title = getString(R.string.speed_too_fast_title),
                     message = getString(R.string.speed_too_fast_message),
-                    positiveButton = ButtonData(getString(R.string.ok_button))
+                    positiveButton = okButton
                 )
             }
             else -> Unit
@@ -399,19 +448,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             callback()
             return
         }
-        dialogHelper.animationStarted()
-        animateCamera(cameraUpdate, object : GoogleMap.CancelableCallback {
-
-            override fun onFinish() {
-                dialogHelper.animationStopped()
-                callback()
-            }
-
-            override fun onCancel() {
-                dialogHelper.animationStopped()
-                callback()
-            }
-        })
+        dialogHelper.requestAnimation(cameraUpdate, callback)
     }
 
     private fun setRecordPanelVisibility(visibility: Boolean) {
