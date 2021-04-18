@@ -22,6 +22,10 @@ data class Point(
     infix fun distance(other: Point): Double {
         return distance(latitude, other.latitude, longitude, other.longitude)
     }
+
+    fun same(other: Point): Boolean {
+        return latitude == other.latitude && longitude == other.longitude && altitude == other.altitude
+    }
 }
 
 fun List<Point>.distance(): Double {

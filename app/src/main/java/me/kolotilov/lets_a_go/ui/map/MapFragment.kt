@@ -1,7 +1,6 @@
 package me.kolotilov.lets_a_go.ui.map
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.GridLayout
 import androidx.appcompat.widget.SwitchCompat
@@ -132,7 +131,6 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
 
     private lateinit var map: GoogleMap
     private val locationMarker by lazyProperty {
-        Log.d("BRUH", "locationMarker()")
         map.addMarker(
             MarkerOptions()
                 .position(LatLng(0.0, 0.0))
@@ -154,20 +152,19 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private val dialogHelper = DialogHelper()
     private var userRotation: Float = 0f
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
 
     override fun onDestroyView() {
         locationMarker.remove()
         routePolyline.remove()
         routesClusterManager.clearItems()
         routesClusterManager.cluster()
+        locationService.stopListen()
         super.onDestroyView()
     }
 
     override fun fillViews() {
         animateLayoutChanges = true
+        recordButton.allowClicks = false
         val mapFragment = childFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync {
@@ -215,6 +212,10 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         viewModel.userDetails.subscribe {
             parseUserDetailsResult(it)
         }.disposeOnDestroy()
+
+        viewModel.isRecording.subscribe {
+            recordButton.setRecording(it)
+        }.autoDispose()
     }
 
     private fun parseDynamicData(data: DynamicData) {
@@ -229,7 +230,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                 .zoom(RECORDING_ZOOM)
                 .build()
             val cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition)
-            map.smartAnimateCamera(cameraUpdate)
+            smartAnimateCamera(cameraUpdate)
         }
 
         when (data) {
@@ -263,7 +264,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                     .zoom(RECORDING_ZOOM)
                     .build()
                 val cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition)
-                map.smartAnimateCamera(cameraUpdate, force = true)
+                smartAnimateCamera(cameraUpdate, force = false)
             }
             is StaticData.Idle -> {
                 val cameraPosition = CameraPosition.Builder()
@@ -273,7 +274,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                     .zoom(OVERVIEW_ZOOM)
                     .build()
                 val cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition)
-                map.smartAnimateCamera(cameraUpdate, force = true)
+                smartAnimateCamera(cameraUpdate, force = true)
             }
             else -> Unit
         }
@@ -314,6 +315,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     }
 
     private fun updateLocation(location: UserLocation) {
+        recordButton.allowClicks = true
         userRotation = location.bearing.toFloat()
         locationMarker.position = location.toLatLng()
         locationMarker.rotation = calculateUserRotation()
@@ -331,7 +333,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             }
             val bounds = builder.build()
             val padding = 100.dp(requireContext())
-            map.smartAnimateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding), force) {
+            smartAnimateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding), force) {
                 callback()
             }
         } else {
@@ -340,7 +342,6 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     }
 
     private fun parseError(it: ErrorCode) {
-        Log.d("BRUH", "error")
         dialogHelper.requestError(it)
     }
 
@@ -372,13 +373,15 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private fun parseUserDetailsResult(userDetailsResult: UserDetailsResult) {
         when (userDetailsResult) {
             is UserDetailsResult.Entry -> {
-                arguments = Bundle().apply {
+                requireArguments().apply {
+                    clear()
                     putInt(ROUTE_ID, userDetailsResult.routeId)
                     putInt(ENTRY_ID, userDetailsResult.id)
                 }
             }
             is UserDetailsResult.Route -> {
-                arguments = Bundle().apply {
+                requireArguments().apply {
+                    clear()
                     putInt(ROUTE_ID, userDetailsResult.id)
                 }
             }
@@ -403,7 +406,6 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     }
 
     private fun onMapLoaded() {
-        recordButton.isClickable = true
         locationService.startListen {
             viewModel.onLocationUpdate(it.toPoint())
         }
@@ -430,8 +432,8 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             val routeId = getInt(ROUTE_ID, -1)
             val entryId = getInt(ENTRY_ID, -1).takeIf { it >= 0 }
             viewModel.proceedArguments(entryId, routeId)
+            clear()
         }
-        arguments = Bundle()
     }
 
     private fun calculateUserRotation(): Float {
@@ -439,7 +441,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         return (userRotation + 360 - cameraRotation).rem(360)
     }
 
-    private fun GoogleMap.smartAnimateCamera(
+    private fun smartAnimateCamera(
         cameraUpdate: CameraUpdate,
         force: Boolean = false,
         callback: () -> Unit = {}

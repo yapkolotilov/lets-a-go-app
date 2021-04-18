@@ -1,5 +1,6 @@
 package me.kolotilov.lets_a_go.ui
 
+import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -11,6 +12,7 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -60,6 +62,12 @@ var TextInputLayout.text: String
         editText?.setText(value)
     }
 
+var ViewGroup.animateLayoutChanges: Boolean get() = layoutTransition != null
+    set(value) {
+        layoutTransition = LayoutTransition().apply {
+            enableTransitionType(LayoutTransition.CHANGING)
+        }
+    }
 
 /**
  * [doAfterTextChanged].

@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity(), DIAware {
         val rootScreen =
             if (repository.token.isNotEmpty()) Screens.map() else Screens.login()
         router.newRootScreen(rootScreen)
-
     }
 
     override fun onResume() {

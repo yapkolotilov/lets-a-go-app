@@ -1,6 +1,5 @@
 package me.kolotilov.lets_a_go.ui.base
 
-import android.animation.LayoutTransition
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.pm.PackageManager
@@ -25,6 +24,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
+import me.kolotilov.lets_a_go.ui.animateLayoutChanges
 import me.kolotilov.lets_a_go.utils.castTo
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -45,9 +45,7 @@ abstract class BaseBottomSheetFragment(
         set(value) {
             field = value
             if (value)
-                requireView().castTo<ViewGroup>().layoutTransition = LayoutTransition().apply {
-                    enableTransitionType(LayoutTransition.CHANGING)
-                }
+                requireView().castTo<ViewGroup>().animateLayoutChanges = true
         }
 
     override val di: DI by closestDI()

@@ -172,7 +172,14 @@ class MapViewModel(
     val camLocation: Observable<Point> get() = camLocationSubject
     private val camLocationSubject: Subject<Point> = PublishSubject.create()
 
+    val isRecording: Observable<Boolean> get() = isRecordingSubject
+    private val isRecordingSubject: Subject<Boolean> = BehaviorSubject.create()
+
     private var state: State = Idle()
+        set(value) {
+            field = value
+            isRecordingSubject.onNext(value !is Idle)
+        }
     private var previousLocation: Point? = null
     private var currentLocation: Point? = null
     private var recordedPoints: MutableList<Point> = mutableListOf()
@@ -224,9 +231,11 @@ class MapViewModel(
     }
 
     private fun onLocationUpdateImpl(location: Point, notify: Boolean = false) {
-        previousLocation = currentLocation
-        currentLocation = location
-        repository.lastLocation = location
+        if (currentLocation?.same(location) != true) {
+            previousLocation = currentLocation
+            currentLocation = location
+            repository.lastLocation = location
+        }
         if (notify)
             state.onLocationUpdate(currentLocation!!)
     }

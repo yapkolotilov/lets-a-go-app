@@ -21,7 +21,8 @@ class DebugLocationServiceImpl(
 
     @SuppressLint("MissingPermission")
     override fun startListen(callback: (Location) -> Unit) {
-        client.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0.1f, callback)
+        this.callback = callback
+        client.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0.1f, this.callback)
     }
 
     override fun stopListen() {

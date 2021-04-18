@@ -17,6 +17,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -82,7 +83,7 @@ class MapService : Service(), LocationListener {
         val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startMyOwnForeground()
         } else {
-            Notification.Builder(this)
+            NotificationCompat.Builder(this)
         }
         notification = builder
             .setSmallIcon(R.drawable.ic_gps_marker)
@@ -138,17 +139,16 @@ class MapService : Service(), LocationListener {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun startMyOwnForeground(): Notification.Builder {
-        val channelId = "LETS_A_GO"
+    private fun startMyOwnForeground(): NotificationCompat.Builder {
         val channelName = "Lets'a go!"
         val chan = NotificationChannel(
-            channelId,
+            CHANNEL_ID,
             channelName,
             NotificationManager.IMPORTANCE_HIGH
         )
         val manager = (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
         manager.createNotificationChannel(chan)
-        return Notification.Builder(this, channelId)
+        return NotificationCompat.Builder(this, CHANNEL_ID)
     }
 }
 
@@ -163,9 +163,11 @@ object Recording {
 
     object Action {
 
-        const val START_RECORDING = "LETS_A_GO_START_RECORDING"
-        const val STOP_RECORDING = "LETS_A_GO_STOP_RECORDING"
-        const val RECOVER = "LETS_A_GO_RECOVER"
+        private const val PREFIX = "LETS_A_GO"
+
+        const val START_RECORDING = "${PREFIX}_START_RECORDING"
+        const val STOP_RECORDING = "${PREFIX}_STOP_RECORDING"
+        const val RECOVER = "${PREFIX}_RECOVER"
     }
 
     enum class Type {
