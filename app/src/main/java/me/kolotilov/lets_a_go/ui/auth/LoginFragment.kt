@@ -60,7 +60,6 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
                 )
                 else -> Unit
             }
-
         }.autoDispose()
     }
 

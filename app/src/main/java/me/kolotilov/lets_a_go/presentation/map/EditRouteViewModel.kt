@@ -111,7 +111,8 @@ class EditRouteViewModel(
                 .load()
                 .doOnSuccess {
                     router {
-                        replaceScreen(Screens.routeDetails(it.id))
+                        exit()
+                        navigateTo(Screens.routeDetails(it.id))
                     }
                 }
                 .emptySubscribe()
@@ -122,7 +123,8 @@ class EditRouteViewModel(
                 .load()
                 .doOnSuccess {
                     router {
-                        replaceScreen(Screens.routeDetails(it.id))
+                        exit()
+                        navigateTo(Screens.routeDetails(it.id))
                     }
                 }
                 .emptySubscribe()

@@ -82,7 +82,8 @@ class RouteDetailsViewModel(
     }
 
     fun edit() {
-        router.replaceScreen(Screens.editRoute(id = id))
+        router.exit()
+        router.navigateTo(Screens.editRoute(id = id))
     }
 
     private fun parseRoute(route: RouteDetails) {

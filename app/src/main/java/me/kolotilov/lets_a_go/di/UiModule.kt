@@ -9,6 +9,7 @@ import me.kolotilov.lets_a_go.presentation.auth.RegisterViewModel
 import me.kolotilov.lets_a_go.presentation.details.*
 import me.kolotilov.lets_a_go.presentation.details.onboarding.OnboardingEndViewModel
 import me.kolotilov.lets_a_go.presentation.details.onboarding.OnboardingTitleViewModel
+import me.kolotilov.lets_a_go.presentation.details.onboarding.PermissionViewModel
 import me.kolotilov.lets_a_go.presentation.map.*
 import me.kolotilov.lets_a_go.ui.map.LocationService
 import me.kolotilov.lets_a_go.ui.map.MapServiceViewModel
@@ -33,7 +34,7 @@ fun uiModule() = DI.Module("App") {
     bind<LocationService>() with provider { getLocationService(instance()) }
 
     bind<EmptyViewModel>() with provider { EmptyViewModel() }
-    bind<LoginViewModel>() with provider { LoginViewModel(instance(), instance()) }
+    bind<LoginViewModel>() with provider { LoginViewModel(instance(), instance(), instance()) }
     bind<EditBasicInfoViewModel>() with provider { EditBasicInfoViewModel(instance(), instance()) }
     bind<UserDetailsViewModel>() with provider { UserDetailsViewModel(instance(), instance()) }
     bind<RegisterViewModel>() with provider { RegisterViewModel(instance(), instance()) }
@@ -41,7 +42,7 @@ fun uiModule() = DI.Module("App") {
         ChooseIllnessesViewModel(instance(), instance())
     }
     bind<ChooseSymptomsViewModel>() with provider {
-        ChooseSymptomsViewModel(instance(), instance())
+        ChooseSymptomsViewModel(instance(), instance(), instance())
     }
     bind<OnboardingTitleViewModel>() with provider { OnboardingTitleViewModel(instance()) }
     bind<MapViewModel>() with provider { MapViewModel(instance(), instance()) }
@@ -53,6 +54,7 @@ fun uiModule() = DI.Module("App") {
     bind<OnboardingEndViewModel>() with provider { OnboardingEndViewModel(instance()) }
     bind<SearchRoutesViewModel>() with provider { SearchRoutesViewModel(instance(), instance()) }
     bind<MapServiceViewModel>() with provider { MapServiceViewModel() }
+    bind<PermissionViewModel>() with provider { PermissionViewModel(instance()) }
 }
 
 private fun recordTimeFormatter(): DateTimeFormatter {

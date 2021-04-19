@@ -64,11 +64,11 @@ open class AppNavigator(
             super.fragmentForward(command)
     }
 
-    override fun fragmentReplace(command: Replace) {
-        if (currentFragment != null)
-            fragmentBack()
-        fragmentForward(Forward(command.screen))
-    }
+//    override fun fragmentReplace(command: Replace) {
+//        if (currentFragment != null)
+//            fragmentBack()
+//        fragmentForward(Forward(command.screen))
+//    }
 
     override fun fragmentBack() {
         val lastFragment = currentFragment

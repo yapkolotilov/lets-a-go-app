@@ -80,8 +80,7 @@
     <string name="distance_hint">Расстояние</string>
     <string name="duration_hint">Продолжительность</string>
     <string name="grounds_hint">Типы покрытия</string>
-    <string name="enabled_hint"></string>
-    <string name="go_button">Перейти</string>
+    <string name="go_button">Пошли!</string>
     <string name="enter_details_end">Спасибо! Можете пользоваться приложением.</string>
     <string name="give_permission_title">Пожалуйста, дайте приложению разрешение на геолокацию</string>
     <string name="give_permission_message">Без него вы не сможете записывать ваши маршруты</string>
@@ -128,6 +127,8 @@
     <string name="too_far_from_route_message">Подойдите поближе к стартовой точке, чтобы начать</string>
     <string name="channel_name">@string/app_name</string>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyByWF2iOBPBsy0u5SJnj-PMT8qkyUa62pA</string>
+    <string name="permission_button">Дать доступ</string>
+    <string name="give_permission_text">Остался лишь один шаг - дать доступ к вашей геолокации. Он нужен нам, чтобы записывать ваши маршруты. Ваша геолокация будет использоваться только пока работает приложение.</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>

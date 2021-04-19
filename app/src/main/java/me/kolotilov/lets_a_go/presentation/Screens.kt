@@ -12,13 +12,14 @@ import me.kolotilov.lets_a_go.ui.auth.RegisterFragment
 import me.kolotilov.lets_a_go.ui.details.*
 import me.kolotilov.lets_a_go.ui.details.onboarding.OnboardingEndFragment
 import me.kolotilov.lets_a_go.ui.details.onboarding.OnboardingTitleFragment
+import me.kolotilov.lets_a_go.ui.details.onboarding.PermissionFragment
 import me.kolotilov.lets_a_go.ui.details.user.UserDetailsFragment
 import me.kolotilov.lets_a_go.ui.map.*
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
 
-    fun login(animate: Boolean = false): LetsScreen {
+    fun login(animate: Boolean = true): LetsScreen {
         return LetsScreen(animation = if (animate) ScreenAnimation.SLIDE_LEFT else null) {
             LoginFragment()
         }
@@ -44,8 +45,8 @@ object Screens {
 
     fun onboarding() = LetsScreen { OnboardingTitleFragment() }
 
-    fun map( animation: ScreenAnimation? = null): LetsScreen {
-        return LetsScreen(animation) {
+    fun map(animate: Boolean = true): LetsScreen {
+        return LetsScreen(animation = if (animate) ScreenAnimation.SLIDE_RIGHT else null) {
             MapFragment()
         }
     }
@@ -66,6 +67,8 @@ object Screens {
     fun onboardingEnd() = LetsScreen { OnboardingEndFragment() }
 
     fun searchRoutes() = LetsScreen(animation = ScreenAnimation.SLIDE_LEFT) { SearchRoutesFragment() }
+
+    fun permission() = LetsScreen { PermissionFragment() }
 }
 
 class LetsScreen(

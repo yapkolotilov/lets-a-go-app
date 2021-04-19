@@ -7,6 +7,7 @@ import me.kolotilov.lets_a_go.network.NetworkRepository
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
 import me.kolotilov.lets_a_go.presentation.Constants
 import me.kolotilov.lets_a_go.presentation.Screens
+import me.kolotilov.lets_a_go.presentation.base.PermissionService
 import ru.terrakok.cicerone.Router
 
 /**
@@ -14,7 +15,8 @@ import ru.terrakok.cicerone.Router
  */
 class LoginViewModel(
     private val networkRepository: NetworkRepository,
-    private val router: Router
+    private val router: Router,
+    private val permissionService: PermissionService
 ) : BaseViewModel() {
 
     /**
@@ -44,7 +46,10 @@ class LoginViewModel(
         networkRepository.login(email, password)
             .load()
             .doOnComplete {
-                router.newRootScreen(Screens.onboarding())
+                if (permissionService.isLocationEnabled())
+                    router.newRootScreen(Screens.map())
+                else
+                    router.navigateTo(Screens.permission())
             }
             .emptySubscribe()
             .autoDispose()
@@ -54,6 +59,6 @@ class LoginViewModel(
      * Переход на страницу регистрации.
      */
     fun register() {
-        router.navigateTo(Screens.onboarding())
+        router.navigateTo(Screens.register())
     }
 }

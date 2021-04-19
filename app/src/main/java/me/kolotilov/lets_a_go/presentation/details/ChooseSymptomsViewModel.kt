@@ -4,11 +4,13 @@ import io.reactivex.Single
 import me.kolotilov.lets_a_go.models.Symptom
 import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.Screens
+import me.kolotilov.lets_a_go.presentation.base.PermissionService
 import ru.terrakok.cicerone.Router
 
 class ChooseSymptomsViewModel(
     private val repository: Repository,
-    private val router: Router
+    private val router: Router,
+    private val permissionService: PermissionService
 ) : BaseChooseViewModel<Symptom>() {
 
     override fun loadItems(): Single<List<String>> {
@@ -28,7 +30,10 @@ class ChooseSymptomsViewModel(
         )
             .load()
             .doOnSuccess {
-                router.navigateTo(Screens.onboardingEnd())
+                if (permissionService.isLocationEnabled())
+                    router.navigateTo(Screens.onboardingEnd())
+                else
+                    router.navigateTo(Screens.permission())
             }
             .emptySubscribe()
             .autoDispose()
