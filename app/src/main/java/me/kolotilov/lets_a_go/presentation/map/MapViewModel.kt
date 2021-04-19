@@ -1,6 +1,5 @@
 package me.kolotilov.lets_a_go.presentation.map
 
-import android.util.Log
 import com.google.android.gms.location.LocationRequest
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -261,9 +260,7 @@ class MapViewModel(
         when (data) {
             is RecordingData.Routing -> {
                 recordedPoints = data.points.toMutableList()
-                val newState = Routing()
-                Log.d("BRUH", "$newState()")
-                state = newState
+                state = Routing()
                 staticDataSubject.onNext(StaticData.Routing())
             }
             is RecordingData.Entrying -> {

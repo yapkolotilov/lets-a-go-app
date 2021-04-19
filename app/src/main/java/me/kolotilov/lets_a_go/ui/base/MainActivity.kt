@@ -1,12 +1,19 @@
 package me.kolotilov.lets_a_go.ui.base
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.Screens
 import me.kolotilov.lets_a_go.ui.map.MapFragment
+import me.kolotilov.lets_a_go.ui.map.Recording
+import me.kolotilov.lets_a_go.ui.map.RecordingData
+import me.kolotilov.lets_a_go.ui.map.RecordingParam
+import me.kolotilov.lets_a_go.utils.castTo
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -15,6 +22,20 @@ import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 
 class MainActivity : AppCompatActivity(), DIAware {
+
+    companion object {
+
+        private const val DATA = "DATA"
+
+        fun start(context: Context, data: RecordingData) {
+            val intent = Intent(context, MainActivity::class.java).apply {
+                action = Recording.RECORDING
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                putExtra(DATA, data.toRecordingParam())
+            }
+            context.startActivity(intent)
+        }
+    }
 
     override val di: DI by closestDI()
     private val navigator = AppNavigator(this, R.id.fragment_container)
@@ -52,6 +73,15 @@ class MainActivity : AppCompatActivity(), DIAware {
     override fun onStop() {
         super.onStop()
         val mapFragment = supportFragmentManager.fragments.first { it is MapFragment } as? MapFragment
+        Log.d("BRUH", mapFragment.toString())
         mapFragment?.onActivityStop()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.action == Recording.RECORDING) {
+            val data = intent.getSerializableExtra(DATA)!!.castTo<RecordingParam>().toRecordingData()
+            MapFragment.start(this, data)
+        }
     }
 }

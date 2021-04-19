@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -17,6 +18,7 @@ import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.ui.PointParam
 import me.kolotilov.lets_a_go.ui.base.BaseService
+import me.kolotilov.lets_a_go.ui.base.MainActivity
 import me.kolotilov.lets_a_go.ui.toPoint
 import me.kolotilov.lets_a_go.ui.toPointParam
 import me.kolotilov.lets_a_go.utils.castTo
@@ -55,7 +57,7 @@ class MapService : BaseService() {
 
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == Recording.Action.STOP_RECORDING) {
-                MapFragment.start(context, viewModel.getRecordingData())
+                MainActivity.start(context, viewModel.getRecordingData())
                 stopSelf()
             }
         }
@@ -100,6 +102,8 @@ class MapService : BaseService() {
             .setSmallIcon(R.drawable.ic_gps_marker)
             .setContentTitle(title)
             .setContentText(getString(R.string.notification_text))
+            .setContentIntent(PendingIntent.getBroadcast(this, 0, Intent(Recording.Action.STOP_RECORDING), 0))
+            .setNotificationSilent()
             .build()
     }
 
