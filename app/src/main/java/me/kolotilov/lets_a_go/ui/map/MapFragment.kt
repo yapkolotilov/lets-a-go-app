@@ -9,7 +9,6 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.GridLayout
 import androidx.appcompat.widget.SwitchCompat
@@ -332,19 +331,6 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
 
         when (data) {
             is StaticData.Routing, is StaticData.Entrying -> {
-//                val bearing = when(data) {
-//                    is StaticData.Routing -> data.bearing
-//                    is StaticData.Entrying -> data.bearing
-//                    else -> 0f
-//                }.toFloat()
-//                val cameraPosition = CameraPosition.Builder()
-//                    .target(locationMarker.position)
-//                    .bearing(bearing)
-//                    .tilt(RECORDING_TILT)
-//                    .zoom(RECORDING_ZOOM)
-//                    .build()
-//                val cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition)
-//                smartAnimateCamera(cameraUpdate, force = false)
             }
             is StaticData.Idle -> {
                 val cameraPosition = CameraPosition.Builder()
@@ -354,7 +340,6 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                     .zoom(OVERVIEW_ZOOM)
                     .build()
                 val cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition)
-                Log.d("BRUH", "StaticData.Idle")
                 smartAnimateCamera(cameraUpdate, force = true)
             }
             else -> Unit
