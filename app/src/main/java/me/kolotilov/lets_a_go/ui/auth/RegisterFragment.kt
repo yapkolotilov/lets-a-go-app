@@ -50,6 +50,10 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
         viewModel.errorDialog.subscribe {
             val okButton = ButtonData(getString(R.string.ok_button))
             when (it) {
+                ErrorCode.INVALID_USERNAME -> showDialog(
+                    title = getString(R.string.invalid_email),
+                    positiveButton = okButton
+                )
                 ErrorCode.INVALID_PASSWORD -> showDialog(
                     title = getString(R.string.min_password_characters_error_title),
                     positiveButton = okButton

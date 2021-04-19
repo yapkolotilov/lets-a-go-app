@@ -36,6 +36,11 @@ enum class ErrorCode {
     USER_NOT_EXISTS,
 
     /**
+     * Неправильный email.
+     */
+    INVALID_USERNAME,
+
+    /**
      * Неправильный пароль.
      */
     INVALID_PASSWORD,
