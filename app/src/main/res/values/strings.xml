@@ -129,7 +129,10 @@
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyByWF2iOBPBsy0u5SJnj-PMT8qkyUa62pA</string>
     <string name="permission_button">Дать доступ</string>
     <string name="give_permission_text">Остался лишь один шаг - дать доступ к вашей геолокации. Он нужен нам, чтобы записывать ваши маршруты. Ваша геолокация будет использоваться только пока работает приложение.</string>
+    <string name="confirm_email_text">Мы отправили письмо на %s. Перейдите по ссылке для подтверждения почты.</string>
     <string name="invalid_email">Неправильный e-mail!</string>
+    <string name="location_permission_title">Дайте доступ к геолокации</string>
+    <string name="confirm_email_title">Подтвердите свой e-mail</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>

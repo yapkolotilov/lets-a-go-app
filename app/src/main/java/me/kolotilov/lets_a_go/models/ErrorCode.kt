@@ -64,4 +64,6 @@ enum class ErrorCode {
      * Слишком далеко от маршрута.
      */
     TOO_FAR_FROM_ROUTE,
+
+    CONFIRM_EMAIL
 }

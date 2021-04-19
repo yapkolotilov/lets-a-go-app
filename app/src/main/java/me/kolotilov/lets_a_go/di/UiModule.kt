@@ -4,6 +4,7 @@ import me.kolotilov.lets_a_go.App
 import me.kolotilov.lets_a_go.presentation.EmptyViewModel
 import me.kolotilov.lets_a_go.presentation.SearchRoutesViewModel
 import me.kolotilov.lets_a_go.presentation.Tags
+import me.kolotilov.lets_a_go.presentation.auth.EmailViewModel
 import me.kolotilov.lets_a_go.presentation.auth.LoginViewModel
 import me.kolotilov.lets_a_go.presentation.auth.RegisterViewModel
 import me.kolotilov.lets_a_go.presentation.details.*
@@ -55,6 +56,7 @@ fun uiModule() = DI.Module("App") {
     bind<SearchRoutesViewModel>() with provider { SearchRoutesViewModel(instance(), instance()) }
     bind<MapServiceViewModel>() with provider { MapServiceViewModel() }
     bind<PermissionViewModel>() with provider { PermissionViewModel(instance()) }
+    bind<EmailViewModel>() with provider { EmailViewModel(instance(), instance()) }
 }
 
 private fun recordTimeFormatter(): DateTimeFormatter {

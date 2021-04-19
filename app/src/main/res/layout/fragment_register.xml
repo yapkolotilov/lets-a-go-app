@@ -7,9 +7,9 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
-        app:title="@string/register_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:title="@string/register_title" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -60,7 +60,8 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -74,7 +75,8 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

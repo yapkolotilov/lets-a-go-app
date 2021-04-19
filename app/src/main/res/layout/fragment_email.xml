@@ -8,12 +8,6 @@
     android:paddingTop="32dp"
     android:paddingBottom="@dimen/margin_content">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        app:title="@string/location_permission_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -33,19 +27,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/margin_content"
-        android:text="@string/give_permission_text" />
+        android:text="@string/confirm_email_text" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2" />
-
-    <Button
-        android:id="@+id/permission_button"
-        style="@style/LetsButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_content"
-        android:text="@string/permission_button" />
 
 </LinearLayout>

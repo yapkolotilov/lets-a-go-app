@@ -7,6 +7,7 @@ import me.kolotilov.lets_a_go.models.EntryPreview
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.ui.EditRouteParams
 import me.kolotilov.lets_a_go.ui.SearchRoutesFragment
+import me.kolotilov.lets_a_go.ui.auth.EmailFragment
 import me.kolotilov.lets_a_go.ui.auth.LoginFragment
 import me.kolotilov.lets_a_go.ui.auth.RegisterFragment
 import me.kolotilov.lets_a_go.ui.details.*
@@ -69,6 +70,8 @@ object Screens {
     fun searchRoutes() = LetsScreen(animation = ScreenAnimation.SLIDE_LEFT) { SearchRoutesFragment() }
 
     fun permission() = LetsScreen { PermissionFragment() }
+
+    fun confirmEmail(email: String, password: String) = LetsScreen { EmailFragment.newInstance(email, password) }
 }
 
 class LetsScreen(
