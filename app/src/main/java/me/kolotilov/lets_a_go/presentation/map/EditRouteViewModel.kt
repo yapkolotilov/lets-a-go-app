@@ -21,12 +21,14 @@ class EditRouteViewModel(
 ) : BaseViewModel() {
 
     class Data(
+        val name: String?,
         val distance: Double,
         val duration: Duration,
         val speed: Double,
         val kiloCaloriesBurnt: Int?,
         val altitudeDelta: Double,
         val type: Route.Type?,
+        val ground: Route.Ground?,
         val difficulty: Int?
     )
 
@@ -58,12 +60,14 @@ class EditRouteViewModel(
                 .load()
                 .doOnSuccess {
                     val data = Data(
+                        name = it.name,
                         distance = it.distance,
                         duration = it.duration,
                         speed = it.speed,
                         kiloCaloriesBurnt = it.kilocaloriesBurnt,
                         altitudeDelta = it.altitudeDelta,
                         type = it.type,
+                        ground = it.ground,
                         difficulty = it.difficulty
                     )
                     dataSubject.onNext(data)
@@ -146,12 +150,14 @@ class EditRouteViewModel(
     }
 
     private fun RoutePreview.toData() = Data(
+        name = name,
         distance = distance,
         duration = duration,
         speed = speed,
         kiloCaloriesBurnt = kiloCaloriesBurnt,
         altitudeDelta = altitudeDelta,
         type = type,
+        ground = ground,
         difficulty = difficulty
     )
 }

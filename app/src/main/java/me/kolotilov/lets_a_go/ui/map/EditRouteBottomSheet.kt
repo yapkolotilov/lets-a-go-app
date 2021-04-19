@@ -119,7 +119,9 @@ class EditRouteBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) construct
                 altitudeDelta = it.altitudeDelta,
                 date = null
             )
+            nameEditText.text = it.name ?: ""
             typeAdapter.selectedItem = it.type
+            groundAdapter.selectedItem = it.ground
             if (it.difficulty != null)
                 difficultySlider.value = it.difficulty.toFloat()
             expand()
