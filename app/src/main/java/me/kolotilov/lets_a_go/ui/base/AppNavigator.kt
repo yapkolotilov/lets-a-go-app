@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import me.kolotilov.lets_a_go.presentation.LetsScreen
+import me.kolotilov.lets_a_go.ui.map.MapFragment
 import me.kolotilov.lets_a_go.utils.castToOrNull
 import ru.terrakok.cicerone.android.support.SupportAppNavigator
 import ru.terrakok.cicerone.android.support.SupportAppScreen
@@ -19,6 +20,9 @@ open class AppNavigator(
     containerId: Int
 ) : SupportAppNavigator(activity, containerId) {
 
+    var mapFragment: MapFragment? = null
+        private set
+
     private val currentFragment: Fragment? get() = fragmentManager.fragments.lastOrNull()
 
     override fun setupFragmentTransaction(
@@ -27,6 +31,11 @@ open class AppNavigator(
         nextFragment: Fragment?,
         fragmentTransaction: FragmentTransaction
     ) {
+        if (currentFragment is MapFragment)
+            mapFragment = currentFragment
+        if (nextFragment is MapFragment)
+            mapFragment = nextFragment
+
         val animation = when (command) {
             is Replace -> command.screen
             is BackTo -> command.screen

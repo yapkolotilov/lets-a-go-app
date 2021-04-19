@@ -299,9 +299,14 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
 
         when (data) {
             is StaticData.Routing, is StaticData.Entrying -> {
+                val bearing = when(data) {
+                    is StaticData.Routing -> data.bearing
+                    is StaticData.Entrying -> data.bearing
+                    else -> 0f
+                }.toFloat()
                 val cameraPosition = CameraPosition.Builder()
                     .target(locationMarker.position)
-                    .bearing(locationMarker.rotation)
+                    .bearing(bearing)
                     .tilt(RECORDING_TILT)
                     .zoom(RECORDING_ZOOM)
                     .build()

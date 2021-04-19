@@ -3,7 +3,6 @@ package me.kolotilov.lets_a_go.ui.base
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import me.kolotilov.lets_a_go.R
@@ -72,8 +71,7 @@ class MainActivity : AppCompatActivity(), DIAware {
 
     override fun onStop() {
         super.onStop()
-        val mapFragment = supportFragmentManager.fragments.first { it is MapFragment } as? MapFragment
-        Log.d("BRUH", mapFragment.toString())
+        val mapFragment = navigator.mapFragment
         mapFragment?.onActivityStop()
     }
 

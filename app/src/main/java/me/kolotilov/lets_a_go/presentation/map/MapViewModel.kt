@@ -53,7 +53,7 @@ class MapViewModel(
 
         override fun onRecordClick(location: Point) {
             state = Routing()
-            staticDataSubject.onNext(StaticData.Routing())
+            staticDataSubject.onNext(StaticData.Routing(bearing()))
         }
     }
 
@@ -261,7 +261,9 @@ class MapViewModel(
             is RecordingData.Routing -> {
                 recordedPoints = data.points.toMutableList()
                 state = Routing()
-                staticDataSubject.onNext(StaticData.Routing())
+                staticDataSubject.onNext(StaticData.Routing(
+                    bearing = bearing()
+                ))
             }
             is RecordingData.Entrying -> {
                 recordedPoints = data.points.toMutableList()
@@ -270,7 +272,10 @@ class MapViewModel(
                     name = data.routeName,
                     points = data.routePoints
                 )
-                staticDataSubject.onNext(StaticData.Entrying(data.routePoints))
+                staticDataSubject.onNext(StaticData.Entrying(
+                    bearing = bearing(),
+                    points = data.routePoints
+                ))
             }
         }
     }
@@ -424,9 +429,12 @@ sealed class StaticData {
         val routes: List<RoutePoint>
     ) : StaticData()
 
-    class Routing : StaticData()
+    class Routing(
+        val bearing: Double
+    ) : StaticData()
 
     data class Entrying(
+        val bearing: Double,
         val points: List<Point>
     ) : StaticData()
 

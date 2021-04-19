@@ -30,7 +30,7 @@ class App : Application(), DIAware {
     override fun onCreate() {
         super.onCreate()
         INSTANCE = this
-        cicerone = Cicerone.create()
+        cicerone = Cicerone.create(AppRouter())
     }
 
     fun getNavigatorHolder(): NavigatorHolder {
@@ -38,6 +38,6 @@ class App : Application(), DIAware {
     }
 
     fun getRouter(): Router {
-        return AppRouter(cicerone.router)
+        return cicerone.router
     }
 }
