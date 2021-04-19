@@ -62,7 +62,7 @@ class MapViewModel(
         private var timerDisposable: Disposable? = null
 
         override fun start() {
-            recordedPoints.add(currentLocation!!.copy(timestamp = DateTime.now()))
+            recordedPoints.addDistinct(currentLocation!!.copy(timestamp = DateTime.now()))
             timerDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
@@ -79,7 +79,7 @@ class MapViewModel(
         }
 
         override fun onLocationUpdate(location: Point) {
-            recordedPoints.add(location)
+            recordedPoints.addDistinct(location)
             dynamicDataSubject.onNext(
                 DynamicData.Routing(
                     location = location.toUserLocation(),
@@ -116,7 +116,7 @@ class MapViewModel(
 
         override fun start() {
             LocationRequest.create()
-            recordedPoints.add(currentLocation!!.copy(timestamp = DateTime.now()))
+            recordedPoints.addDistinct(currentLocation!!.copy(timestamp = DateTime.now()))
             timerDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
@@ -133,7 +133,7 @@ class MapViewModel(
         }
 
         override fun onLocationUpdate(location: Point) {
-            recordedPoints.add(location)
+            recordedPoints.addDistinct(location)
             dynamicDataSubject.onNext(
                 DynamicData.Entrying(
                     location = location.toUserLocation(),
@@ -285,9 +285,14 @@ class MapViewModel(
         loadRoutes()
     }
 
-    fun onLocationUpdate(location: Point, bearing: Double) {
-        this.bearing = bearing
+    fun onLocationUpdate(location: Point) {
         onLocationUpdateImpl(location, true)
+    }
+
+    fun setBearing(bearing: Double) {
+        this.bearing = bearing
+        val location = currentLocation ?: return
+        state.onLocationUpdate(location)
     }
 
     fun openEntryPreview(entryPreview: EntryPreview, points: List<Point>) {
@@ -392,6 +397,11 @@ class MapViewModel(
         longitude = longitude,
         bearing = bearing
     )
+
+    private fun <T> MutableList<T>.addDistinct(item: T) {
+        if (lastOrNull() != item)
+            add(item)
+    }
 }
 
 data class UserLocation(

@@ -4,7 +4,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.GridLayout
 import androidx.appcompat.widget.SwitchCompat
@@ -62,7 +67,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         var isDialogShown: Boolean = false
             private set
         val errorRequests: MutableList<ErrorCode> = mutableListOf()
-        val animationRequests: MutableList<() -> Unit> = mutableListOf()
+        var animationRequests: MutableList<() -> Unit> = mutableListOf()
 
         fun requestError(errorCode: ErrorCode) {
             if (isAnimating)
@@ -73,12 +78,20 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
 
         fun requestAnimation(
             cameraUpdate: CameraUpdate,
+            force: Boolean,
             callback: () -> Unit = {}
         ) {
-            if (isDialogShown)
-                animationRequests.add { animate(cameraUpdate, callback) }
-            else
-                animate(cameraUpdate, callback)
+            if (isAnimating) {
+                if (force)
+                    animate(cameraUpdate, callback)
+                else
+                    animationRequests.add { animate(cameraUpdate, callback) }
+            } else {
+                if (isDialogShown)
+                    animationRequests.add { animate(cameraUpdate, callback) }
+                else
+                    animate(cameraUpdate, callback)
+            }
         }
 
         fun dialogShown() {
@@ -162,6 +175,9 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private val routesClusterManager: ClusterManager<RouteMarker> by lazyProperty {
         ClusterManager(requireContext(), map)
     }
+    private val sensorManager: SensorManager by lazyProperty {
+        requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    }
 
     private val dialogHelper = DialogHelper()
     private var userRotation: Float = 0f
@@ -169,9 +185,23 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private val resumeListener = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-            val data = intent.getSerializableExtra(Recording.RECORDING)!!.castTo<RecordingParam>().toRecordingData()
+            val data = intent.getSerializableExtra(Recording.RECORDING)!!.castTo<RecordingParam>()
+                .toRecordingData()
             viewModel.proceedRecordingData(data)
         }
+    }
+    private val rotationListener = object : SensorEventListener {
+
+        override fun onSensorChanged(event: SensorEvent) {
+            val bearing = event.values.firstOrNull()?.minus(45) ?: return
+            if (this@MapFragment::map.isInitialized) {
+                userRotation = bearing
+                locationMarker.rotation = calculateUserRotation()
+            }
+            viewModel.setBearing(bearing.toDouble())
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -180,11 +210,14 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     }
 
     override fun onDestroyView() {
-        locationMarker.remove()
-        routePolyline.remove()
-        routesClusterManager.clearItems()
-        routesClusterManager.cluster()
-        locationService.stopListen()
+        if (this::map.isInitialized) {
+            locationMarker.remove()
+            routePolyline.remove()
+            routesClusterManager.clearItems()
+            routesClusterManager.cluster()
+            locationService.stopListen()
+            sensorManager.unregisterListener(rotationListener)
+        }
         super.onDestroyView()
     }
 
@@ -299,19 +332,19 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
 
         when (data) {
             is StaticData.Routing, is StaticData.Entrying -> {
-                val bearing = when(data) {
-                    is StaticData.Routing -> data.bearing
-                    is StaticData.Entrying -> data.bearing
-                    else -> 0f
-                }.toFloat()
-                val cameraPosition = CameraPosition.Builder()
-                    .target(locationMarker.position)
-                    .bearing(bearing)
-                    .tilt(RECORDING_TILT)
-                    .zoom(RECORDING_ZOOM)
-                    .build()
-                val cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition)
-                smartAnimateCamera(cameraUpdate, force = false)
+//                val bearing = when(data) {
+//                    is StaticData.Routing -> data.bearing
+//                    is StaticData.Entrying -> data.bearing
+//                    else -> 0f
+//                }.toFloat()
+//                val cameraPosition = CameraPosition.Builder()
+//                    .target(locationMarker.position)
+//                    .bearing(bearing)
+//                    .tilt(RECORDING_TILT)
+//                    .zoom(RECORDING_ZOOM)
+//                    .build()
+//                val cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition)
+//                smartAnimateCamera(cameraUpdate, force = false)
             }
             is StaticData.Idle -> {
                 val cameraPosition = CameraPosition.Builder()
@@ -321,6 +354,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                     .zoom(OVERVIEW_ZOOM)
                     .build()
                 val cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition)
+                Log.d("BRUH", "StaticData.Idle")
                 smartAnimateCamera(cameraUpdate, force = true)
             }
             else -> Unit
@@ -454,8 +488,13 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
 
     private fun onMapLoaded() {
         locationService.startListen {
-            viewModel.onLocationUpdate(it.toPoint(), it.bearing.toDouble())
+            viewModel.onLocationUpdate(it.toPoint())
         }
+        sensorManager.registerListener(
+            rotationListener,
+            sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+            SensorManager.SENSOR_DELAY_GAME
+        )
         map.setOnCameraIdleListener(routesClusterManager)
         map.setOnCameraMoveListener {
             locationMarker.rotation = calculateUserRotation()
@@ -493,11 +532,11 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         force: Boolean = false,
         callback: () -> Unit = {}
     ) {
-        if (dialogHelper.isAnimating && !force) {
+        if ((dialogHelper.isAnimating || dialogHelper.isDialogShown) && !force) {
             callback()
             return
         }
-        dialogHelper.requestAnimation(cameraUpdate, callback)
+        dialogHelper.requestAnimation(cameraUpdate, force, callback)
     }
 
     private fun setRecordPanelVisibility(visibility: Boolean) {

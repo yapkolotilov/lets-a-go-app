@@ -32,7 +32,7 @@ fun Fragment.showDialog(
     positiveButton: ButtonData,
     negativeButton: ButtonData? = null,
     neutralButton: ButtonData? = null,
-    cancelable: Boolean = true
+    cancelable: Boolean = false
 ) {
     AlertDialog.Builder(requireContext())
         .apply {
