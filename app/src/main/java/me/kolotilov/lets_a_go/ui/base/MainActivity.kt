@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.Screens
+import me.kolotilov.lets_a_go.presentation.base.PermissionService
 import me.kolotilov.lets_a_go.ui.map.MapFragment
 import me.kolotilov.lets_a_go.ui.map.Recording
 import me.kolotilov.lets_a_go.ui.map.RecordingData
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity(), DIAware {
     }
 
     override val di: DI by closestDI()
+    private val permissionService: PermissionService by instance()
     private val navigator = AppNavigator(this, R.id.fragment_container)
     private val router: Router by instance()
     private val navigatorHolder: NavigatorHolder by instance()
@@ -46,8 +48,11 @@ class MainActivity : AppCompatActivity(), DIAware {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val rootScreen =
-            if (repository.token.isNotEmpty()) Screens.map(animate = false) else Screens.login(animate = false)
+        val rootScreen = when {
+            !permissionService.isLocationEnabled() -> Screens.permission()
+            repository.token.isNotEmpty() ->Screens.map(animate = false)
+            else -> Screens.login(animate = false)
+        }
         router.newRootScreen(rootScreen)
     }
 

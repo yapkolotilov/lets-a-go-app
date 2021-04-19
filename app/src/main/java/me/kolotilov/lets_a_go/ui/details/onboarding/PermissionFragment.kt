@@ -3,7 +3,6 @@ package me.kolotilov.lets_a_go.ui.details.onboarding
 import android.Manifest
 import android.content.pm.PackageManager
 import android.widget.Button
-import androidx.appcompat.widget.Toolbar
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.presentation.base.ButtonData
 import me.kolotilov.lets_a_go.presentation.base.showDialog
@@ -14,7 +13,6 @@ import org.kodein.di.instance
 class PermissionFragment : BaseFragment(R.layout.fragment_permission) {
 
     override val viewModel: PermissionViewModel by instance()
-    override val toolbar: Toolbar by lazyView(R.id.toolbar)
 
     private val permissionButton: Button by lazyView(R.id.permission_button)
 

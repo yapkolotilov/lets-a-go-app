@@ -43,12 +43,43 @@ private class DebugLocationServiceImpl(
     @SuppressLint("MissingPermission")
     override fun startListen(callback: (Location) -> Unit) {
         this.listener = callback
-        client.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0.1f, this.listener)
+        client.requestLocationUpdates(LocationManager.GPS_PROVIDER, INTERVAL, DISTANCE, this.listener)
     }
 
     override fun stopListen() {
         client.removeUpdates(listener)
         listener = {}
+    }
+}
+
+private class ReleaseLocationServiceImpl(
+    context: Context
+) : LocationService {
+
+    private val client = LocationServices.getFusedLocationProviderClient(context)
+    private var callback: (Location) -> Unit = {}
+    private val listener = object : LocationCallback() {
+
+        override fun onLocationResult(result: LocationResult) {
+            val location = result.lastLocation ?: return
+            callback(location)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun startListen(callback: (Location) -> Unit) {
+        this.callback = callback
+        val request = LocationRequest.create()
+            .setInterval(INTERVAL)
+            .setFastestInterval(1000)
+            .setSmallestDisplacement(DISTANCE)
+            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+        client.requestLocationUpdates(request, listener, Looper.getMainLooper())
+    }
+
+    override fun stopListen() {
+        client.removeLocationUpdates(listener)
+        callback = {}
     }
 }
 
@@ -107,37 +138,6 @@ private class RxLocationServiceImpl(
 
     override fun stopListen() {
         locationDisposable?.dispose()
-        callback = {}
-    }
-}
-
-private class ReleaseLocationServiceImpl(
-    context: Context
-) : LocationService {
-
-    private val client = LocationServices.getFusedLocationProviderClient(context)
-    private var callback: (Location) -> Unit = {}
-    private val listener = object : LocationCallback() {
-
-        override fun onLocationResult(result: LocationResult) {
-            val location = result.lastLocation ?: return
-            callback(location)
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    override fun startListen(callback: (Location) -> Unit) {
-        this.callback = callback
-        val request = LocationRequest.create()
-            .setInterval(INTERVAL)
-            .setFastestInterval(1000)
-            .setSmallestDisplacement(DISTANCE)
-            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-        client.requestLocationUpdates(request, listener, Looper.getMainLooper())
-    }
-
-    override fun stopListen() {
-        client.removeLocationUpdates(listener)
         callback = {}
     }
 }

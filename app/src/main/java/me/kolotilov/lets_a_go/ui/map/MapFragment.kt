@@ -330,8 +330,6 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         setRecordPanelVisibility(data is StaticData.Routing || data is StaticData.Entrying)
 
         when (data) {
-            is StaticData.Routing, is StaticData.Entrying -> {
-            }
             is StaticData.Idle -> {
                 val cameraPosition = CameraPosition.Builder()
                     .target(map.cameraPosition.target)
