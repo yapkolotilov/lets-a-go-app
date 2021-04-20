@@ -202,7 +202,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             viewModel.setBearing(bearing.toDouble())
             if (this@MapFragment::map.isInitialized) {
                 userRotation = viewModel.bearing().toFloat()
-                locationMarker.rotation = calculateUserRotation()
+                locationMarker.animateRotation(calculateUserRotation())
             }
         }
 
@@ -212,7 +212,10 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requireContext().registerReceiver(resumeReceiver, IntentFilter(Recording.Action.RECOVER))
-        requireContext().registerReceiver(strictToRouteDismissReceiver, IntentFilter(Recording.Action.DISMISS_STRICT_TO_ROUTE))
+        requireContext().registerReceiver(
+            strictToRouteDismissReceiver,
+            IntentFilter(Recording.Action.DISMISS_STRICT_TO_ROUTE)
+        )
     }
 
     override fun onDestroyView() {
@@ -390,8 +393,8 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private fun updateLocation(location: UserLocation) {
         recordButton.allowClicks = true
         userRotation = location.bearing.toFloat()
-        locationMarker.position = location.toLatLng()
-        locationMarker.rotation = calculateUserRotation()
+        locationMarker.animateMove(location.toLatLng())
+        locationMarker.animateRotation(calculateUserRotation())
     }
 
     private fun centerCamera(
@@ -497,7 +500,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         )
         map.setOnCameraIdleListener(routesClusterManager)
         map.setOnCameraMoveListener {
-            locationMarker.rotation = calculateUserRotation()
+            locationMarker.animateRotation(calculateUserRotation())
         }
         routesClusterManager.renderer = RouteRenderer(requireContext(), map, routesClusterManager)
         routesClusterManager.setOnClusterItemClickListener {
@@ -552,5 +555,20 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                 }
             }
         filterSwitch.isVisible = !visibility
+    }
+
+    // https://stackoverflow.com/questions/28967821/animate-the-rotation-of-the-marker-in-google-map-v2
+    private fun Marker.animateRotation(toRotation: Float) {
+        rotation = toRotation
+        return
+    }
+
+    private var targetLocation: LatLng? = null
+    private fun Marker.animateMove(toLocation: LatLng) {
+//        position = toLocation
+        if (targetLocation == toLocation)
+            return
+        targetLocation = toLocation
+        MarkerAnimation.animateMarkerToICS(this, toLocation, LatLngInterpolator.Spherical())
     }
 }
