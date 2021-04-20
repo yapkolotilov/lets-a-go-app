@@ -185,5 +185,6 @@ object Recording {
         const val START_RECORDING = "${PREFIX}_START_RECORDING"
         const val STOP_RECORDING = "${PREFIX}_STOP_RECORDING"
         const val RECOVER = "${PREFIX}_RECOVER"
+        const val DISMISS_STRICT_TO_ROUTE = "${PREFIX}_DISMISS_STRICT_TO_ROUTE"
     }
 }

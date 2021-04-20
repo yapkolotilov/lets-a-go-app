@@ -49,7 +49,7 @@ fun presentationModule() = DI.Module("Presentation") {
     bind<Repository>() with singleton { RepositoryImpl(instance(), instance()) }
     bind<UserDetailsContainer>() with singleton { UserDetailsContainer() }
     bind<PermissionService>() with singleton { getPermissionService(instance()) }
-    bind<NotificationService>() with singleton { getNotificationService(instance()) }
+    bind<NotificationService>() with singleton { getNotificationService(instance(), instance()) }
 }
 
 private fun provideOkHttpClient(sharedPreferences: SharedPreferences): OkHttpClient {

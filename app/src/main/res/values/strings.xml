@@ -124,7 +124,7 @@
     <string name="notification_text_content">Продолжительность: %s\nРасстояние:        %s</string>
     <string name="route_hint">Маршрут</string>
     <string name="too_far_from_route_title">Вы слишком далеко от маршрута</string>
-    <string name="too_far_from_route_message">Подойдите поближе к стартовой точке, чтобы начать</string>
+    <string name="too_far_from_route_message">Подойдите поближе к нему, чтобы продолжить.</string>
     <string name="channel_name">@string/app_name</string>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyByWF2iOBPBsy0u5SJnj-PMT8qkyUa62pA</string>
     <string name="permission_button">Дать доступ</string>

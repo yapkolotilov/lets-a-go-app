@@ -1,5 +1,6 @@
 package me.kolotilov.lets_a_go.presentation.map
 
+import android.util.Log
 import com.google.android.gms.location.LocationRequest
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -105,11 +106,11 @@ class MapViewModel(
                     points = recordedPoints
                 )
             )
-            this@MapViewModel.recordedPoints.clear()
         }
 
         override fun stop() {
             timerDisposable?.dispose()
+            recordedPoints.clear()
         }
     }
 
@@ -168,7 +169,9 @@ class MapViewModel(
                             points = points
                         )
                     )
-                    this@MapViewModel.recordedPoints.clear()
+                }
+                .doOnError {
+                    loadRoutes()
                 }
                 .emptySubscribe()
                 .autoDispose()
@@ -176,6 +179,7 @@ class MapViewModel(
 
         override fun stop() {
             timerDisposable?.dispose()
+            recordedPoints.clear()
         }
     }
 
@@ -234,6 +238,8 @@ class MapViewModel(
             when (it) {
                 is RouteDetailsResult.LoadRoutes -> loadRoutes()
                 is RouteDetailsResult.StartEntry -> {
+                    Log.d("BRUH", "startEntry()")
+                    repository.showStickToRoute = true
                     state = Entrying(it.id, it.name, it.points)
                 }
             }
@@ -416,6 +422,10 @@ class MapViewModel(
     private fun <T> MutableList<T>.addDistinct(item: T) {
         if (lastOrNull() != item)
             add(item)
+    }
+
+    fun disableStrictToRoute() {
+        repository.showStickToRoute = false
     }
 }
 

@@ -181,12 +181,18 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private val dialogHelper = DialogHelper()
     private var userRotation: Float = 0f
 
-    private val resumeListener = object : BroadcastReceiver() {
+    private val resumeReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
             val data = intent.getSerializableExtra(Recording.RECORDING)!!.castTo<RecordingParam>()
                 .toRecordingData()
             viewModel.proceedRecordingData(data)
+        }
+    }
+    private val strictToRouteDismissReceiver = object : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            viewModel.disableStrictToRoute()
         }
     }
     private val rotationListener = object : SensorEventListener {
@@ -205,7 +211,8 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requireContext().registerReceiver(resumeListener, IntentFilter(Recording.Action.RECOVER))
+        requireContext().registerReceiver(resumeReceiver, IntentFilter(Recording.Action.RECOVER))
+        requireContext().registerReceiver(strictToRouteDismissReceiver, IntentFilter(Recording.Action.DISMISS_STRICT_TO_ROUTE))
     }
 
     override fun onDestroyView() {
@@ -223,6 +230,8 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     override fun onDestroy() {
         super.onDestroy()
         MapService.stop(requireContext())
+        requireContext().unregisterReceiver(resumeReceiver)
+        requireContext().unregisterReceiver(strictToRouteDismissReceiver)
     }
 
     override fun onStart() {
@@ -427,6 +436,14 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                 showDialog(
                     title = getString(R.string.speed_too_fast_title),
                     message = getString(R.string.speed_too_fast_message),
+                    positiveButton = okButton
+                )
+            }
+            ErrorCode.TOO_FAR_FROM_ROUTE -> {
+                dialogHelper.dialogShown()
+                showDialog(
+                    title = getString(R.string.too_far_from_route_title),
+                    message = getString(R.string.too_far_from_route_message),
                     positiveButton = okButton
                 )
             }

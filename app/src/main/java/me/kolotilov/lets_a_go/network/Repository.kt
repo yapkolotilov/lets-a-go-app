@@ -1,6 +1,7 @@
 package me.kolotilov.lets_a_go.network
 
-interface Repository : LocalRepository, NetworkRepository
+interface Repository : LocalRepository, NetworkRepository {
+}
 
 class RepositoryImpl(
     private val localRepository: LocalRepository,

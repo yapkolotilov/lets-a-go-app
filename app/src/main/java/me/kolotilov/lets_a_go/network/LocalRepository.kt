@@ -12,6 +12,8 @@ interface LocalRepository {
     var lastLocation: Point?
 
     var filterMap: Boolean
+
+    var showStickToRoute: Boolean
 }
 
 class LocalRepositoryImpl(
@@ -21,12 +23,11 @@ class LocalRepositoryImpl(
     private companion object {
 
         const val TOKEN = "TOKEN"
-
         const val LATITUDE = "LATITUDE"
         const val LONGITUDE = "LONGITUDE"
         const val ALTITUDE = "ALTITUDE"
-
         const val FILTER_MAP = "FILTER_MAP"
+        const val STICK_TO_ROUTE = "STICK_TO_ROUTE"
     }
 
     override var token: String
@@ -60,6 +61,14 @@ class LocalRepositoryImpl(
         set(value) {
             sharedPreferences.edit {
                 putBoolean(FILTER_MAP, value)
+            }
+        }
+
+    override var showStickToRoute: Boolean
+        get() = sharedPreferences.getBoolean(STICK_TO_ROUTE, true)
+        set(value) {
+            sharedPreferences.edit {
+                putBoolean(STICK_TO_ROUTE, value)
             }
         }
 }
