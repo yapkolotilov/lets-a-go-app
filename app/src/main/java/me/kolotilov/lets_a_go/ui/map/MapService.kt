@@ -161,10 +161,10 @@ sealed class RecordingParam : Serializable {
 
     fun toRecordingData(): RecordingData {
         return when (this) {
-            is RecordingParam.Routing -> RecordingData.Routing(
+            is Routing -> RecordingData.Routing(
                 points = points.map { it.toPoint() }
             )
-            is RecordingParam.Entrying -> RecordingData.Entrying(
+            is Entrying -> RecordingData.Entrying(
                 routeId = routeId,
                 routeName = routeName,
                 routePoints = routePoints.map { it.toPoint() },

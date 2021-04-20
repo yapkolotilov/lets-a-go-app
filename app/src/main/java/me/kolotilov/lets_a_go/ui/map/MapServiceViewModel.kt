@@ -2,8 +2,12 @@ package me.kolotilov.lets_a_go.ui.map
 
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
+import me.kolotilov.lets_a_go.presentation.Constants
+import me.kolotilov.lets_a_go.presentation.base.NotificationService
 
-class MapServiceViewModel : BaseViewModel() {
+class MapServiceViewModel(
+    private val notificationService: NotificationService
+) : BaseViewModel() {
 
     enum class Type {
 
@@ -51,7 +55,14 @@ class MapServiceViewModel : BaseViewModel() {
         }
     }
 
-    fun onLocationUpdate(point: Point) {
-        recordedPoints.add(point)
+    fun onLocationUpdate(location: Point) {
+        recordedPoints.add(location)
+        if (type == Type.ENTRYING) {
+            val distance = routePoints.minOf { it distance location }
+            if (distance > Constants.MIN_DISTANCE_TO_ROUTE)
+                notificationService.showStickToRouteNotification()
+            else
+                notificationService.hideStickToRouteNotification()
+        }
     }
 }

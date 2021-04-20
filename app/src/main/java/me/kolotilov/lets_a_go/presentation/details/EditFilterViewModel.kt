@@ -86,6 +86,8 @@ class EditFilterViewModel(
         edited = true
         if (selectedGroundsCache.contains(ground))
             selectedGroundsCache.remove(ground)
+        else
+            selectedGroundsCache.add(ground)
         selectedGroundsCache.add(ground)
         groundsSubject.onNext(groundsCache to selectedGroundsCache)
     }

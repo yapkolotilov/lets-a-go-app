@@ -46,7 +46,7 @@ fun uiModule() = DI.Module("App") {
         ChooseSymptomsViewModel(instance(), instance(), instance())
     }
     bind<OnboardingTitleViewModel>() with provider { OnboardingTitleViewModel(instance()) }
-    bind<MapViewModel>() with provider { MapViewModel(instance(), instance()) }
+    bind<MapViewModel>() with provider { MapViewModel(instance(), instance(), instance()) }
     bind<EditRouteViewModel>() with provider { EditRouteViewModel(instance(), instance()) }
     bind<EntryPreviewViewModel>() with provider { EntryPreviewViewModel(instance(), instance()) }
     bind<EntryDetailsViewModel>() with provider { EntryDetailsViewModel(instance()) }
@@ -54,7 +54,7 @@ fun uiModule() = DI.Module("App") {
     bind<EditFilterViewModel>() with provider { EditFilterViewModel(instance(), instance()) }
     bind<OnboardingEndViewModel>() with provider { OnboardingEndViewModel(instance()) }
     bind<SearchRoutesViewModel>() with provider { SearchRoutesViewModel(instance(), instance()) }
-    bind<MapServiceViewModel>() with provider { MapServiceViewModel() }
+    bind<MapServiceViewModel>() with provider { MapServiceViewModel(instance()) }
     bind<PermissionViewModel>() with provider { PermissionViewModel(instance()) }
     bind<EmailViewModel>() with provider { EmailViewModel(instance(), instance()) }
 }

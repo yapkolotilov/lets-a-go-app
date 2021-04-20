@@ -14,4 +14,6 @@ object Constants {
      * Параметр для [Deprecated]
      */
     const val NEW_INSTANCE_MESSAGE = "Используйте newInstance()"
+
+    const val MIN_DISTANCE_TO_ROUTE = 100.0
 }

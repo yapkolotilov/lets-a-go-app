@@ -6,7 +6,9 @@ import android.util.Log
 import com.google.gson.GsonBuilder
 import me.kolotilov.lets_a_go.App
 import me.kolotilov.lets_a_go.network.*
+import me.kolotilov.lets_a_go.presentation.base.NotificationService
 import me.kolotilov.lets_a_go.presentation.base.PermissionService
+import me.kolotilov.lets_a_go.presentation.base.getNotificationService
 import me.kolotilov.lets_a_go.presentation.base.getPermissionService
 import me.kolotilov.lets_a_go.presentation.details.UserDetailsContainer
 import okhttp3.OkHttpClient
@@ -47,6 +49,7 @@ fun presentationModule() = DI.Module("Presentation") {
     bind<Repository>() with singleton { RepositoryImpl(instance(), instance()) }
     bind<UserDetailsContainer>() with singleton { UserDetailsContainer() }
     bind<PermissionService>() with singleton { getPermissionService(instance()) }
+    bind<NotificationService>() with singleton { getNotificationService(instance()) }
 }
 
 private fun provideOkHttpClient(sharedPreferences: SharedPreferences): OkHttpClient {

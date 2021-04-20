@@ -1,6 +1,5 @@
 package me.kolotilov.lets_a_go.presentation.auth
 
-import android.util.Log
 import io.reactivex.Observable
 import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
@@ -27,7 +26,6 @@ class EmailViewModel(
             .load()
             .retry()
             .doOnNext {
-                Log.d("BRUH", "success")
                 router.newRootScreen(Screens.onboarding())
             }
             .emptySubscribe()

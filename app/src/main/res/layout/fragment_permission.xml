@@ -14,11 +14,11 @@
         android:layout_weight="1" />
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="104dp"
+        android:layout_height="104dp"
         android:layout_gravity="center"
         android:contentDescription="@string/icon"
-        android:src="@drawable/ic_registration" />
+        android:src="@drawable/ic_gps_marker_black" />
 
     <TextView
         android:id="@+id/title_text_view"

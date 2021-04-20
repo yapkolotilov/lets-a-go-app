@@ -133,6 +133,9 @@
     <string name="invalid_email">Неправильный e-mail!</string>
     <string name="location_permission_title">Дайте доступ к геолокации</string>
     <string name="confirm_email_title">Подтвердите свой e-mail</string>
+    <string name="strict_to_route">Напоминания о маршруте</string>
+    <string name="strict_to_route_text">Не срезайте маршрут, чтобы ваш поход засчитался.</string>
+    <string name="strict_to_route_title">Пожалуйста, не отходите далеко от маршрута</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>

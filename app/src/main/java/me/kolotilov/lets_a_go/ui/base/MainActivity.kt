@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), DIAware {
         setContentView(R.layout.activity_main)
 
         val rootScreen = when {
-            !permissionService.isLocationEnabled() -> Screens.permission()
+            repository.token.isNotEmpty() && !permissionService.isLocationEnabled() -> Screens.permission()
             repository.token.isNotEmpty() ->Screens.map(animate = false)
             else -> Screens.login(animate = false)
         }

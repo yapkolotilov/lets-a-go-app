@@ -4,6 +4,7 @@ import org.joda.time.Duration
 
 data class RouteDetails(
     val name: String?,
+    val public: Boolean,
     val distance: Double,
     val duration: Duration,
     val altitudeDelta: Double,

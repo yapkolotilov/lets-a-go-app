@@ -10,8 +10,10 @@ import io.reactivex.subjects.Subject
 import me.kolotilov.lets_a_go.models.*
 import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
+import me.kolotilov.lets_a_go.presentation.Constants
 import me.kolotilov.lets_a_go.presentation.Results
 import me.kolotilov.lets_a_go.presentation.Screens
+import me.kolotilov.lets_a_go.presentation.base.NotificationService
 import me.kolotilov.lets_a_go.presentation.details.UserDetailsResult
 import me.kolotilov.lets_a_go.ui.base.setResultListener
 import me.kolotilov.lets_a_go.ui.map.RecordingData
@@ -27,7 +29,8 @@ import kotlin.math.sin
 
 class MapViewModel(
     private val repository: Repository,
-    private val router: Router
+    private val router: Router,
+    private val notificationService: NotificationService
 ) : BaseViewModel() {
 
     private abstract inner class State {
@@ -44,6 +47,10 @@ class MapViewModel(
     private inner class Idle : State() {
 
         override fun onLocationUpdate(location: Point) {
+            if (!locationUpdated) {
+                camLocationSubject.onNext(location)
+                locationUpdated = true
+            }
             dynamicDataSubject.onNext(
                 DynamicData.Idle(
                     location = location.toUserLocation(),
@@ -142,6 +149,11 @@ class MapViewModel(
                     distance = recordedPoints.distance(),
                 )
             )
+            val distance = points.minOf { it distance location }
+            if (distance > Constants.MIN_DISTANCE_TO_ROUTE)
+                notificationService.showStickToRouteNotification()
+            else
+                notificationService.hideStickToRouteNotification()
         }
 
         override fun onRecordClick(location: Point) {
@@ -208,6 +220,7 @@ class MapViewModel(
     private var recordedPoints: MutableList<Point> = mutableListOf()
     private var isInitialized: Boolean = false
     private var bearing: Double = 0.0
+    private var locationUpdated: Boolean = false
 
     fun proceedArguments(entryId: Int?, routeId: Int) {
         showRouteImpl(routeId, entryId)
@@ -292,7 +305,8 @@ class MapViewModel(
     fun setBearing(bearing: Double) {
         this.bearing = bearing
         val location = currentLocation ?: return
-        state.onLocationUpdate(location)
+        if (state !is Idle)
+            state.onLocationUpdate(location)
     }
 
     fun openEntryPreview(entryPreview: EntryPreview, points: List<Point>) {
@@ -374,7 +388,8 @@ class MapViewModel(
             .autoDispose()
     }
 
-    private fun bearing(): Double {
+    fun bearing(): Double {
+        if (state is Idle) return bearing
         val previousLocation = previousLocation
         val currentLocation = currentLocation
         if (previousLocation == null || currentLocation == null)
@@ -395,7 +410,7 @@ class MapViewModel(
     private fun Point.toUserLocation() = UserLocation(
         latitude = latitude,
         longitude = longitude,
-        bearing = bearing
+        bearing = bearing()
     )
 
     private fun <T> MutableList<T>.addDistinct(item: T) {

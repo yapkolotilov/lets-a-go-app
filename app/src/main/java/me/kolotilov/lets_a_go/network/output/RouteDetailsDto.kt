@@ -9,6 +9,8 @@ import java.util.*
 class RouteDetailsDto(
     @SerializedName("name")
     val name: String?,
+    @SerializedName("public")
+    val public: Boolean,
     @SerializedName("distance")
     val distance: Double,
     @SerializedName("duration")
@@ -39,6 +41,7 @@ class RouteDetailsDto(
 
 fun RouteDetailsDto.toRouteDetails() = RouteDetails(
     name = name,
+    public = public,
     distance = distance,
     duration = duration.toDuration(),
     altitudeDelta = altitudeDelta,

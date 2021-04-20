@@ -22,6 +22,7 @@ class EditRouteViewModel(
 
     class Data(
         val name: String?,
+        val public: Boolean,
         val distance: Double,
         val duration: Duration,
         val speed: Double,
@@ -61,6 +62,7 @@ class EditRouteViewModel(
                 .doOnSuccess {
                     val data = Data(
                         name = it.name,
+                        public = it.public,
                         distance = it.distance,
                         duration = it.duration,
                         speed = it.speed,
@@ -151,6 +153,7 @@ class EditRouteViewModel(
 
     private fun RoutePreview.toData() = Data(
         name = name,
+        public = public,
         distance = distance,
         duration = duration,
         speed = speed,

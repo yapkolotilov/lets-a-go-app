@@ -193,11 +193,11 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
 
         override fun onSensorChanged(event: SensorEvent) {
             val bearing = event.values.firstOrNull()?.minus(45) ?: return
+            viewModel.setBearing(bearing.toDouble())
             if (this@MapFragment::map.isInitialized) {
-                userRotation = bearing
+                userRotation = viewModel.bearing().toFloat()
                 locationMarker.rotation = calculateUserRotation()
             }
-            viewModel.setBearing(bearing.toDouble())
         }
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
