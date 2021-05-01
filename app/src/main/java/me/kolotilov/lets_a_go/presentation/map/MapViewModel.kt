@@ -251,7 +251,7 @@ class MapViewModel(
         if (!isInitialized) {
             val lastLocation = repository.lastLocation
             if (lastLocation != null) {
-                onLocationUpdateImpl(lastLocation, false)
+                onLocationUpdateImpl(lastLocation, notify = true)
                 camLocationSubject.onNext(lastLocation)
             }
             filterMapSubject.onNext(repository.filterMap)
@@ -320,10 +320,10 @@ class MapViewModel(
     }
 
     private fun onLocationUpdateImpl(location: Point, notify: Boolean = false) {
+        repository.lastLocation = location
         if (currentLocation?.same(location) != true) {
             previousLocation = currentLocation
             currentLocation = location
-            repository.lastLocation = location
         }
         if (notify)
             state.onLocationUpdate(currentLocation!!)

@@ -212,7 +212,7 @@ class NetworkRepositoryImpl(
             userLocation = location?.toCreatePointDto()
         )
         return api.searchRoutes(queryDto)
-            .map { routes -> routes.map { it.toRouteItem() } }
+            .map { routes -> routes.map { it.toRouteItem() }.sortedBy { it.distanceToRoute } }
             .parseError()
     }
 

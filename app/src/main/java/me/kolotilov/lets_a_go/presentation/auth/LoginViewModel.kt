@@ -49,7 +49,7 @@ class LoginViewModel(
             .load()
             .doOnComplete {
                 if (permissionService.isLocationEnabled())
-                    router.newRootScreen(Screens.map())
+                    router.newRootScreen(Screens.onboarding())
                 else
                     router.navigateTo(Screens.permission())
             }

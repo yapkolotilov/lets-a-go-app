@@ -9,3 +9,4 @@ fun mainModule(app: App) = DI.Module("Main") {
     import(uiModule())
     import(presentationModule())
 }
+
