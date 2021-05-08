@@ -1,6 +1,5 @@
 package me.kolotilov.lets_a_go.presentation.map
 
-import android.util.Log
 import com.google.android.gms.location.LocationRequest
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -19,6 +18,7 @@ import me.kolotilov.lets_a_go.presentation.details.UserDetailsResult
 import me.kolotilov.lets_a_go.ui.base.setResultListener
 import me.kolotilov.lets_a_go.ui.map.RecordingData
 import me.kolotilov.lets_a_go.ui.toEditRouteParams
+import me.kolotilov.lets_a_go.utils.copy
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import ru.terrakok.cicerone.Router
@@ -67,6 +67,7 @@ class MapViewModel(
 
     private inner class Routing : State() {
 
+        val recordedPoints: MutableList<Point> = mutableListOf()
         private var timerDisposable: Disposable? = null
 
         override fun start() {
@@ -99,18 +100,17 @@ class MapViewModel(
         }
 
         override fun onRecordClick(location: Point) {
-            state = Idle()
-            val recordedPoints = recordedPoints.toList()
+            val recordedPoints = recordedPoints.copy()
             staticDataSubject.onNext(
                 StaticData.RoutePreview(
                     points = recordedPoints
                 )
             )
+            state = Idle()
         }
 
         override fun stop() {
             timerDisposable?.dispose()
-            recordedPoints.clear()
         }
     }
 
@@ -120,6 +120,7 @@ class MapViewModel(
         val points: List<Point>
     ) : State() {
 
+        val recordedPoints: MutableList<Point> = mutableListOf()
         private var timerDisposable: Disposable? = null
 
         override fun start() {
@@ -158,8 +159,7 @@ class MapViewModel(
         }
 
         override fun onRecordClick(location: Point) {
-            state = Idle()
-            val recordedPoints = recordedPoints.toList()
+            val recordedPoints = recordedPoints.copy()
             repository.entryPreview(id, recordedPoints)
                 .load()
                 .doOnSuccess {
@@ -175,11 +175,11 @@ class MapViewModel(
                 }
                 .emptySubscribe()
                 .autoDispose()
+            state = Idle()
         }
 
         override fun stop() {
             timerDisposable?.dispose()
-            recordedPoints.clear()
         }
     }
 
@@ -221,7 +221,6 @@ class MapViewModel(
         }
     private var previousLocation: Point? = null
     private var currentLocation: Point? = null
-    private var recordedPoints: MutableList<Point> = mutableListOf()
     private var isInitialized: Boolean = false
     private var bearing: Double = 0.0
     private var locationUpdated: Boolean = false
@@ -238,7 +237,6 @@ class MapViewModel(
             when (it) {
                 is RouteDetailsResult.LoadRoutes -> loadRoutes()
                 is RouteDetailsResult.StartEntry -> {
-                    Log.d("BRUH", "startEntry()")
                     repository.showStickToRoute = true
                     state = Entrying(it.id, it.name, it.points)
                 }
@@ -263,13 +261,13 @@ class MapViewModel(
         state.stop()
         return when (val state = state) {
             is Routing -> RecordingData.Routing(
-                points = recordedPoints
+                points = state.recordedPoints.copy()
             )
             is Entrying -> RecordingData.Entrying(
                 routeId = state.id,
                 routeName = state.name,
                 routePoints = state.points,
-                points = recordedPoints
+                points = state.recordedPoints.copy()
             )
             else -> null
         }
@@ -278,19 +276,21 @@ class MapViewModel(
     fun proceedRecordingData(data: RecordingData) {
         when (data) {
             is RecordingData.Routing -> {
-                recordedPoints = data.points.toMutableList()
-                state = Routing()
+                state = Routing().apply {
+                    recordedPoints.addAll(data.points)
+                }
                 staticDataSubject.onNext(StaticData.Routing(
                     bearing = bearing()
                 ))
             }
             is RecordingData.Entrying -> {
-                recordedPoints = data.points.toMutableList()
                 state = Entrying(
                     id = data.routeId,
                     name = data.routeName,
                     points = data.routePoints
-                )
+                ).apply {
+                    recordedPoints.addAll(data.points)
+                }
                 staticDataSubject.onNext(StaticData.Entrying(
                     bearing = bearing(),
                     points = data.routePoints
@@ -487,4 +487,8 @@ sealed class StaticData {
         val preview: me.kolotilov.lets_a_go.models.EntryPreview,
         val points: List<Point>
     ) : StaticData()
+}
+
+fun List<Point>.speed(): Double {
+    return (distance() / 1000) / (duration().millis.toDouble() / (60 * 60 * 1000))
 }

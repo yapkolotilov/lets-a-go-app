@@ -28,6 +28,12 @@ fun <T> Any.castToOrNull(): T? {
     return this as? T
 }
 
+fun <T> List<T>.copy(): List<T> {
+    val original = this
+    return mutableListOf<T>().apply { addAll(original) }
+}
+
+
 //endregion
 
 //region RxJava

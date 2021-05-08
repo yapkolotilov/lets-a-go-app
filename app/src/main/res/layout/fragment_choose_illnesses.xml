@@ -3,21 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginHorizontal="32dp"
     android:layout_marginTop="@dimen/margin_content"
     android:orientation="vertical"
     android:paddingBottom="@dimen/margin_content">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
-        app:title="foo"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:title="foo" />
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_illness_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="24dp"
         app:iconifiedByDefault="false"
         app:queryHint="@string/search_illness_hint" />
 
@@ -25,6 +26,7 @@
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginHorizontal="32dp"
         android:layout_weight="1"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
@@ -33,6 +35,7 @@
         style="@style/LetsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
         android:text="@string/next_button" />
 
     <Button
@@ -40,6 +43,7 @@
         style="@style/LetsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
         android:text="@string/save_button"
         android:visibility="gone" />
 

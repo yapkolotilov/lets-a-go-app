@@ -27,7 +27,7 @@ interface LocationService {
 }
 
 fun getLocationService(context: Context): LocationService {
-    return RxLocationServiceImpl(context)
+    return DebugLocationServiceImpl(context)
 }
 
 private const val INTERVAL = 2000L

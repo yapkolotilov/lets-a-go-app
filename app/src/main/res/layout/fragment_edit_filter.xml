@@ -52,7 +52,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_content"
-                    android:text="@string/distance_hint"
                     android:textColor="@color/grey"
                     android:textSize="16sp" />
 
@@ -81,7 +80,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_content"
-                    android:text="@string/duration_hint"
                     android:textColor="@color/grey"
                     android:textSize="16sp" />
 

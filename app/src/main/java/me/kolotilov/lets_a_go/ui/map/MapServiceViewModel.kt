@@ -1,5 +1,6 @@
 package me.kolotilov.lets_a_go.ui.map
 
+import android.util.Log
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
 import me.kolotilov.lets_a_go.presentation.Constants
@@ -25,14 +26,14 @@ class MapServiceViewModel(
         when(data) {
             is RecordingData.Routing -> {
                 type = Type.ROUTING
-                this.recordedPoints = data.points.toMutableList()
+                this.recordedPoints = data.points.toMutableList().also { Log.d("BRUH", "fragment: ${it.size}") }
             }
             is RecordingData.Entrying -> {
                 type = Type.ENTRYING
                 this.routeId = data.routeId
                 this.routeName = data.routeName
                 this.routePoints = data.routePoints
-                this.recordedPoints = data.points.toMutableList()
+                this.recordedPoints = data.points.toMutableList().also { Log.d("BRUH", "fragment: ${it.size}") }
             }
         }
     }
@@ -41,7 +42,7 @@ class MapServiceViewModel(
         return when(type) {
             Type.ROUTING -> {
                 RecordingData.Routing(
-                    points = recordedPoints
+                    points = recordedPoints.also { Log.d("BRUH", "service: ${it.size}") }
                 )
             }
             Type.ENTRYING -> {
@@ -49,7 +50,7 @@ class MapServiceViewModel(
                     routeId = routeId,
                     routeName = routeName,
                     routePoints = routePoints,
-                    points = recordedPoints
+                    points = recordedPoints.also { Log.d("BRUH", "service: ${it.size}") }
                 )
             }
         }
