@@ -119,6 +119,7 @@ class EditRouteBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) construct
                 altitudeDelta = it.altitudeDelta,
                 date = null
             )
+            publicSwitch.isEnabled = it.public
             nameEditText.text = it.name ?: ""
             typeAdapter.selectedItem = it.type
             groundAdapter.selectedItem = it.ground

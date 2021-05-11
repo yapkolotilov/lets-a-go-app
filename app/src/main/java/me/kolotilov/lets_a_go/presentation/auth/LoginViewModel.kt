@@ -51,7 +51,7 @@ class LoginViewModel(
                 if (permissionService.isLocationEnabled())
                     router.newRootScreen(Screens.map())
                 else
-                    router.navigateTo(Screens.permission())
+                    router.newRootScreen(Screens.permission())
             }
             .doOnError {
                 if (it is ServiceException && it.code == ErrorCode.CONFIRM_EMAIL)
