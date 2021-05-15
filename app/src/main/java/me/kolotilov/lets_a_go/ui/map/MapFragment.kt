@@ -121,16 +121,16 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             cameraUpdate: CameraUpdate,
             callback: () -> Unit = {}
         ) {
-            dialogHelper.animationStarted()
+            animationStarted()
             map.animateCamera(cameraUpdate, object : GoogleMap.CancelableCallback {
 
                 override fun onFinish() {
-                    dialogHelper.animationStopped()
+                    animationStopped()
                     callback()
                 }
 
                 override fun onCancel() {
-                    dialogHelper.animationStopped()
+                    animationStopped()
                     callback()
                 }
             })
