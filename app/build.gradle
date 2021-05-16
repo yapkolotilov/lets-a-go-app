@@ -4,6 +4,13 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        sign {
+            storePassword 'LETS_A_GO_PASSWORD'
+            keyAlias 'LETS_A_GO_ALIAS'
+            keyPassword 'LETS_A_GO_PASSWORD'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
@@ -21,6 +28,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.sign
         }
     }
     compileOptions {

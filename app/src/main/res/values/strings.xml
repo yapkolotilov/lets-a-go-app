@@ -136,6 +136,8 @@
     <string name="strict_to_route">Напоминания о маршруте</string>
     <string name="strict_to_route_text">Не срезайте маршрут, чтобы ваш поход засчитался.</string>
     <string name="strict_to_route_title">Пожалуйста, не отходите далеко от маршрута</string>
+    <string name="give_background_permission_title">Для правильной работы приложения ему нужен доступ к геолокации в фоне</string>
+    <string name="give_background_permission_message">Выберите пункт %s в настройках</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>
