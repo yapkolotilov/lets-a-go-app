@@ -18,6 +18,10 @@ import java.util.concurrent.TimeUnit
 
 interface NotificationService {
 
+    fun showRecordingNotification(type: RecordingType)
+
+    fun hideRecordingNotification()
+
     fun showStickToRouteNotification()
 
     fun hideStickToRouteNotification()
@@ -34,32 +38,47 @@ private class NotificationServiceImpl(
 
     private companion object {
 
-        const val STRICT_TO_ROUTE_ID = 1338
-        const val STRICT_TO_ROUTE_CHANNEL = "LETS_A_GO_STRICT_TO_ROUTE"
+        const val RECORDING_ID = 1337
+        const val STICK_TO_ROUTE_ID = 1338
+        private const val CHANNEL_ID = "LETS_A_GO"
     }
 
     private val notificationManager = NotificationManagerCompat.from(context)
+    private var stickToRouteShown: Boolean = false
+
+    override fun showRecordingNotification(type: RecordingType) {
+        createNotificationChannel()
+        notificationManager.notify(RECORDING_ID, getRecodingNotification(type))
+    }
+
+    override fun hideRecordingNotification() {
+        notificationManager.cancel(RECORDING_ID)
+    }
 
     override fun showStickToRouteNotification() {
         createNotificationChannel()
-        Completable.complete()
-            .delay(100, TimeUnit.MILLISECONDS)
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnComplete {
-                if (repository.showStickToRoute)
-                    notificationManager.notify(STRICT_TO_ROUTE_ID, getNotification())
-            }
-            .subscribe({}, {}).let { }
+
+        if (repository.showStickToRoute && !stickToRouteShown) {
+            Completable.complete()
+                .delay(100, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnComplete {
+                    notificationManager.notify(STICK_TO_ROUTE_ID, getStickToRouteNotification())
+                    stickToRouteShown = true
+                }
+                .subscribe({}, {}).let { }
+        }
     }
 
     override fun hideStickToRouteNotification() {
-        notificationManager.cancel(STRICT_TO_ROUTE_ID)
+        notificationManager.cancel(STICK_TO_ROUTE_ID)
+        stickToRouteShown = false
     }
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                STRICT_TO_ROUTE_CHANNEL,
+                CHANNEL_ID,
                 context.getString(R.string.strict_to_route),
                 NotificationManager.IMPORTANCE_HIGH
             )
@@ -68,9 +87,9 @@ private class NotificationServiceImpl(
     }
 
     @Suppress("DEPRECATION")
-    private fun getNotification(): Notification {
+    private fun getStickToRouteNotification(): Notification {
         val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationCompat.Builder(context, STRICT_TO_ROUTE_CHANNEL)
+            NotificationCompat.Builder(context, CHANNEL_ID)
         } else {
             NotificationCompat.Builder(context)
         }
@@ -86,7 +105,42 @@ private class NotificationServiceImpl(
                     0
                 )
             )
-//            .setNotificationSilent()
+            .setOngoing(true)
             .build()
     }
+
+    private fun getRecodingNotification(type: RecordingType): Notification {
+        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationCompat.Builder(context, CHANNEL_ID)
+        } else {
+            NotificationCompat.Builder(context)
+        }
+        val title = when(type) {
+            RecordingType.ROUTING -> context.getString(R.string.routing_title)
+            RecordingType.ENTRYING -> context.getString(R.string.entrying_title)
+        }
+
+        return builder
+            .setSmallIcon(R.drawable.ic_gps_marker)
+            .setContentTitle(title)
+            .setContentText(context.getString(R.string.notification_text))
+            .setDeleteIntent(
+                PendingIntent.getBroadcast(
+                    context,
+                    0,
+                    Intent(Recording.Action.DISMISS_STRICT_TO_ROUTE),
+                    0
+                )
+            )
+            .setOngoing(true)
+            .setNotificationSilent()
+            .build()
+    }
+
+}
+
+enum class RecordingType {
+
+    ROUTING,
+    ENTRYING
 }

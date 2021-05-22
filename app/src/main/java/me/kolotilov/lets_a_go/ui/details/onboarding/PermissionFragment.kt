@@ -40,7 +40,13 @@ class PermissionFragment : BaseFragment(R.layout.fragment_permission) {
             FINE_LOCATION_REQUEST_CODE -> {
                 if (grantResults.all { it.isGranted() }) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        requestBackgroundLocation()
+                        showDialog(
+                            title = getString(R.string.background_location_request_title),
+                            message = getString(R.string.background_location_request_message),
+                            positiveButton = ButtonData(getString(R.string.ok_button)) {
+                                requestBackgroundLocation()
+                            }
+                        )
                     } else {
                         viewModel.go()
                     }

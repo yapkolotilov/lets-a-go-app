@@ -14,6 +14,7 @@ import me.kolotilov.lets_a_go.presentation.Constants
 import me.kolotilov.lets_a_go.presentation.Results
 import me.kolotilov.lets_a_go.presentation.Screens
 import me.kolotilov.lets_a_go.presentation.base.NotificationService
+import me.kolotilov.lets_a_go.presentation.base.RecordingType
 import me.kolotilov.lets_a_go.presentation.details.UserDetailsResult
 import me.kolotilov.lets_a_go.ui.base.setResultListener
 import me.kolotilov.lets_a_go.ui.map.RecordingData
@@ -71,6 +72,7 @@ class MapViewModel(
         private var timerDisposable: Disposable? = null
 
         override fun start() {
+            notificationService.showRecordingNotification(RecordingType.ROUTING)
             recordedPoints.addDistinct(currentLocation!!.copy(timestamp = DateTime.now()))
             timerDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -111,6 +113,8 @@ class MapViewModel(
 
         override fun stop() {
             timerDisposable?.dispose()
+            notificationService.hideRecordingNotification()
+            notificationService.hideStickToRouteNotification()
         }
     }
 
@@ -124,6 +128,7 @@ class MapViewModel(
         private var timerDisposable: Disposable? = null
 
         override fun start() {
+            notificationService.showRecordingNotification(RecordingType.ENTRYING)
             LocationRequest.create()
             recordedPoints.addDistinct(currentLocation!!.copy(timestamp = DateTime.now()))
             timerDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
@@ -180,6 +185,8 @@ class MapViewModel(
 
         override fun stop() {
             timerDisposable?.dispose()
+            notificationService.hideRecordingNotification()
+            notificationService.hideStickToRouteNotification()
         }
     }
 

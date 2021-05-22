@@ -138,6 +138,8 @@
     <string name="strict_to_route_title">Пожалуйста, не отходите далеко от маршрута</string>
     <string name="give_background_permission_title">Для правильной работы приложения ему нужен доступ к геолокации в фоне</string>
     <string name="give_background_permission_message">Выберите пункт %s в настройках</string>
+    <string name="background_location_request_title">Пожалуйста, дайте доступ к геолокации в фоне</string>
+    <string name="background_location_request_message">Для этого выберите опцию \'Разрешить в любом режиме\' на следующем меню</string>
     <plurals name="age">
         <item quantity="one">год</item>
         <item quantity="few">года</item>

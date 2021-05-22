@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.network.Repository
 import me.kolotilov.lets_a_go.presentation.Screens
@@ -47,10 +48,11 @@ class MainActivity : AppCompatActivity(), DIAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         val rootScreen = when {
             repository.token.isNotEmpty() && !permissionService.isLocationEnabled() -> Screens.permission()
-            repository.token.isNotEmpty() ->Screens.map(animate = false)
+            repository.token.isNotEmpty() -> Screens.map(animate = false)
             else -> Screens.login(animate = false)
         }
         router.newRootScreen(rootScreen)
