@@ -31,7 +31,8 @@ data class RouteMarker(
 class RouteRenderer(
     private val context: Context,
     map: GoogleMap,
-    clusterManager: ClusterManager<RouteMarker>
+    private val clusterManager: ClusterManager<RouteMarker>,
+    private val clusterInterceptor: ClusterInterceptor
 ) :
     DefaultClusterRenderer<RouteMarker>(context, map, clusterManager) {
 
@@ -43,7 +44,18 @@ class RouteRenderer(
         markerOptions.icon(context.bitmapDescriptorFromVector(item.route.type.mapIcon()))
     }
 
+
     override fun getColor(clusterSize: Int): Int {
         return context.getColorCompat(R.color.blue_primary)
     }
+
+    override fun onClustersChanged(clusters: MutableSet<out Cluster<RouteMarker>>?) {
+        clusterInterceptor.onClustersChanged(clusters.orEmpty())
+        super.onClustersChanged(clusters)
+    }
+}
+
+interface ClusterInterceptor {
+
+    fun onClustersChanged(clusters: Set<Cluster<RouteMarker>>)
 }

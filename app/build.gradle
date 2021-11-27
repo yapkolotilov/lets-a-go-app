@@ -9,6 +9,7 @@ android {
             storePassword 'LETS_A_GO_PASSWORD'
             keyAlias 'LETS_A_GO_ALIAS'
             keyPassword 'LETS_A_GO_PASSWORD'
+            storeFile file(var)
         }
     }
     compileSdkVersion 30
@@ -25,10 +26,25 @@ android {
     }
 
     buildTypes {
+        def LOCATION_SERVICE = "LOCATION_SERVICE"
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.sign
+            signingConfig signingConfigs.debug
+            buildConfigField "String", LOCATION_SERVICE, '"DEVICE"'
+        }
+        local {
+            debuggable  true
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+            buildConfigField "String", LOCATION_SERVICE, '"LOCAL"'
+        }
+        debug {
+            debuggable  true
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+            buildConfigField "String", LOCATION_SERVICE, '"DEVICE"'
         }
     }
     compileOptions {

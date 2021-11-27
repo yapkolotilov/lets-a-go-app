@@ -55,7 +55,7 @@ interface NetworkRepository {
 
     fun deleteRoute(id: Int): Completable
 
-    fun getAllRoutes(filter: Boolean): Single<List<RoutePoint>>
+    fun getAllRoutes(filter: Boolean): Single<List<RouteLine>>
 
     fun startEntry(routeId: Int, location: Point): Single<StartEntry>
 
@@ -187,9 +187,13 @@ class NetworkRepositoryImpl(
             .parseError()
     }
 
-    override fun getAllRoutes(filter: Boolean): Single<List<RoutePoint>> {
-        return api.getRoutes(filter)
-            .map { routes -> routes.map { it.toRoutePoint() } }
+    override fun getAllRoutes(filter: Boolean): Single<List<RouteLine>> {
+        val coordinatesDto = CoordinatesDto(
+            topLeft = CoordinateDto(0, 0),
+            bottomRight = CoordinateDto(0, 0)
+        )
+        return api.getRoutes(filter, coordinatesDto)
+            .map { routes -> routes.map { it.toRouteLine() } }
             .parseError()
     }
 

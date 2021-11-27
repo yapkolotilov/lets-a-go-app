@@ -3,7 +3,9 @@ package me.kolotilov.lets_a_go.ui.map
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Bundle
 import android.os.Looper
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -14,6 +16,7 @@ import com.google.android.gms.tasks.OnTokenCanceledListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import me.kolotilov.lets_a_go.BuildConfig
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.ui.toPoint
 import me.kolotilov.lets_a_go.ui.toSingle
@@ -27,7 +30,11 @@ interface LocationService {
 }
 
 fun getLocationService(context: Context): LocationService {
-    return ReleaseLocationServiceImpl(context)
+    return when (BuildConfig.LOCATION_SERVICE) {
+        "LOCAL"  -> DebugLocationServiceImpl(context)
+        "DEVICE" -> DebugLocationServiceImpl(context)
+        else     -> ReleaseLocationServiceImpl(context)
+    }
 }
 
 private const val INTERVAL = 2000L
@@ -37,18 +44,35 @@ private class DebugLocationServiceImpl(
     context: Context
 ) : LocationService {
 
+    private class Listener(
+        private var callback: (Location) -> Unit
+    ) : LocationListener {
+
+        fun setCallback(callback: (Location) -> Unit) {
+            this.callback = callback
+        }
+
+        override fun onLocationChanged(location: Location) {
+            callback(location)
+        }
+
+        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) = Unit
+        override fun onProviderDisabled(provider: String) = Unit
+        override fun onProviderEnabled(provider: String) = Unit
+    }
+
     private val client = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    private var listener: (Location) -> Unit = {}
+    private var listener: Listener = Listener {}
 
     @SuppressLint("MissingPermission")
     override fun startListen(callback: (Location) -> Unit) {
-        this.listener = callback
+        this.listener.setCallback(callback)
         client.requestLocationUpdates(LocationManager.GPS_PROVIDER, INTERVAL, DISTANCE, this.listener)
     }
 
     override fun stopListen() {
         client.removeUpdates(listener)
-        listener = {}
+        listener.setCallback {  }
     }
 }
 
@@ -103,8 +127,6 @@ private class RxLocationServiceImpl(
     @SuppressLint("MissingPermission")
     override fun startListen(callback: (Location) -> Unit) {
         this.callback = callback
-        val request = LocationRequest.create()
-            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
         locationDisposable = Observable.interval(0, INTERVAL, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .flatMap {

@@ -359,6 +359,11 @@ class MapViewModel(
                 staticDataSubject.onNext(
                     StaticData.RouteDetails(
                         id = it.id,
+                        startPoint = RoutePoint(
+                            type = it.type,
+                            startPoint = it.points.firstOrNull() ?: Point.default(),
+                            id = it.id
+                        ),
                         points = it.points,
                         entryId = entryId
                     )
@@ -468,7 +473,7 @@ sealed class DynamicData {
 sealed class StaticData {
 
     data class Idle(
-        val routes: List<RoutePoint>
+        val routes: List<RouteLine>
     ) : StaticData()
 
     class Routing(
@@ -482,6 +487,7 @@ sealed class StaticData {
 
     data class RouteDetails(
         val id: Int,
+        val startPoint: RoutePoint?,
         val points: List<Point>,
         val entryId: Int?
     ) : StaticData()

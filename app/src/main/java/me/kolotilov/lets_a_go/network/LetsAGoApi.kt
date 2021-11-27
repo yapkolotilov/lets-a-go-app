@@ -36,8 +36,11 @@ interface LetsAGoApi {
     @DELETE("/$MAP/entries/{id}")
     fun deleteEntry(@Path("id") id: Int): Completable
 
-    @GET("/$MAP/routes")
-    fun getRoutes(@Query("filter") filter: Boolean): Single<List<RoutePointDto>>
+    @POST("/$MAP/getroutes")
+    fun getRoutes(
+        @Query("filter") filter: Boolean,
+        @Body coordinatesDto: CoordinatesDto
+    ): Single<List<RouteLineDto>>
 
     @POST("/$MAP/routes")
     fun createRoute(@Body route: CreateRouteDto): Single<RouteDetailsDto>

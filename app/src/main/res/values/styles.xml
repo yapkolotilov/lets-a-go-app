@@ -40,16 +40,20 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
-    <style name="LetsBottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/LetsBottomSheet</item>
-    </style>
-
-    <style name="LetsBottomSheet" parent="Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@android:color/transparent</item>
-    </style>
-
     <style name="LetsFilterSwitch">
         <item name="switchMinWidth">72dp</item>
         <item name="android:thumb">@drawable/filter_thumb</item>
+    </style>
+
+    <style name="LetsBottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/LetsBottomSheet</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
+    <style name="LetsBottomSheet" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="android:background">@drawable/bg_bottom_sheet</item>
+        <item name="shapeAppearance">@null</item>
+        <item name="shapeAppearanceOverlay">@null</item>
     </style>
 </resources>

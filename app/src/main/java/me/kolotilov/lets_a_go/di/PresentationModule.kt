@@ -83,7 +83,7 @@ private fun provideRetrofit(client: OkHttpClient): Retrofit {
         .addConverterFactory(
             GsonConverterFactory.create(
                 GsonBuilder()
-                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ssX")
+                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ssz")
                     .create()
             )
         )

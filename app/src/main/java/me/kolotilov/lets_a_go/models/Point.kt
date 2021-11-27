@@ -19,6 +19,13 @@ data class Point(
     val timestamp: DateTime
 ) {
 
+    companion object {
+
+        fun default(): Point {
+            return Point(0.0, 0.0, 0.0, DateTime.now())
+        }
+    }
+
     infix fun distance(other: Point): Double {
         return distance(latitude, other.latitude, longitude, other.longitude)
     }

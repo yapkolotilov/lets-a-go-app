@@ -9,6 +9,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.GridLayout
 import androidx.appcompat.widget.SwitchCompat
@@ -19,12 +20,10 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import me.kolotilov.lets_a_go.R
-import me.kolotilov.lets_a_go.models.ErrorCode
-import me.kolotilov.lets_a_go.models.Point
-import me.kolotilov.lets_a_go.models.RoutePoint
-import me.kolotilov.lets_a_go.models.distance
+import me.kolotilov.lets_a_go.models.*
 import me.kolotilov.lets_a_go.presentation.base.ButtonData
 import me.kolotilov.lets_a_go.presentation.base.showDialog
 import me.kolotilov.lets_a_go.presentation.details.UserDetailsResult
@@ -137,6 +136,13 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         }
     }
 
+    private inner class ClusterInterceptorImpl : ClusterInterceptor {
+
+        override fun onClustersChanged(clusters: Set<Cluster<RouteMarker>>) {
+            renderRoutePolylines(routesCache, clusters)
+        }
+    }
+
     init {
         arguments = Bundle()
     }
@@ -177,6 +183,8 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private val sensorManager: SensorManager by lazyProperty {
         requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
+    private var routePolylines: List<Polyline> = emptyList()
+    private var routesCache: List<RouteLine> = emptyList()
 
     private val dialogHelper = DialogHelper()
     private var userRotation: Float = 0f
@@ -363,10 +371,10 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                 clearMap()
             }
             is StaticData.Entrying -> {
-                drawRoute(data.points)
+                drawRoute(null, data.points)
             }
             is StaticData.RoutePreview -> {
-                drawRoute(data.points)
+                drawRoute(null, data.points)
                 if (data.points.distance() >= 100f) {
                     centerCamera(data.points.map { it.toLatLng() }, force = true) {
                         viewModel.openRoutePreview(data.points)
@@ -376,13 +384,13 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                 }
             }
             is StaticData.EntryPreview -> {
-                drawRoute(data.points)
+                drawRoute(null, data.points)
                 centerCamera(data.points.map { it.toLatLng() }, force = true) {
                     viewModel.openEntryPreview(data.preview, data.points)
                 }
             }
             is StaticData.RouteDetails -> {
-                drawRoute(data.points)
+                drawRoute(data.startPoint, data.points)
                 centerCamera(data.points.map { it.toLatLng() }, force = true) {
                     viewModel.openRouteDetails(data.id)
                 }
@@ -476,17 +484,54 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         routesClusterManager.clearItems()
         routesClusterManager.cluster()
         routePolyline.points = emptyList()
+        routePolylines.forEach { it.remove() }
+        routePolylines = emptyList()
     }
 
-    private fun drawRoute(route: List<Point>) {
+    private fun drawRoute(startPoint: RoutePoint?, route: List<Point>) {
         clearMap()
+        if (startPoint != null) {
+            routesClusterManager.addItem(RouteMarker(startPoint))
+        }
         routePolyline.points = route.map { it.toLatLng() }
     }
 
-    private fun drawRoutes(routes: List<RoutePoint>) {
+    private fun drawRoutes(routes: List<RouteLine>) {
         clearMap()
-        routesClusterManager.addItems(routes.map { RouteMarker(it) })
+        routesCache = routes
+        routesClusterManager.addItems(routes.map { route ->
+            val routePoint = RoutePoint(
+                type = route.type,
+                startPoint = route.points.firstOrNull()
+                    ?: Point.default(),
+                id = route.id
+            )
+            RouteMarker(routePoint)
+        })
         routesClusterManager.cluster()
+    }
+
+    private fun renderRoutePolylines(routes: List<RouteLine>, clusters: Set<Cluster<RouteMarker>>) {
+        val allowedIds = clusters
+            .filter { it.size == 1 }
+            .flatMap { it.items }
+            .map { it.route.id }
+        val newPolylines = routes
+            .filter { route ->
+                allowedIds.contains(route.id)
+            }
+            .map { route ->
+                map.addPolyline(
+                    PolylineOptions()
+                        .color(requireContext().getColorCompat(R.color.blue_primary))
+                        .width(15f)
+                        .addAll(route.points.map { it.toLatLng() })
+                ).also {
+                    it.tag = route
+                }
+            }
+        routePolylines.forEach { it.remove() }
+        routePolylines = newPolylines
     }
 
     private fun onMapLoaded() {
@@ -500,9 +545,17 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         )
         map.setOnCameraIdleListener(routesClusterManager)
         map.setOnCameraMoveListener {
+            val zoom = map.cameraPosition.zoom
+            Log.e("BRUH", "zoom = $zoom")
             locationMarker.animateRotation(calculateUserRotation())
         }
-        routesClusterManager.renderer = RouteRenderer(requireContext(), map, routesClusterManager)
+        map.setOnPolylineClickListener { polyline ->
+            val route = polyline.tag as? RouteLine ?: return@setOnPolylineClickListener
+            viewModel.showRoute(route.id)
+        }
+        routesClusterManager.renderer = RouteRenderer(
+            requireContext(), map, routesClusterManager, ClusterInterceptorImpl()
+        )
         routesClusterManager.setOnClusterItemClickListener {
             viewModel.showRoute(it.route.id)
             true
