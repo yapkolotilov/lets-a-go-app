@@ -23,6 +23,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.presentation.BaseViewModel
 import me.kolotilov.lets_a_go.ui.animateLayoutChanges
 import me.kolotilov.lets_a_go.utils.castTo
@@ -49,6 +50,14 @@ abstract class BaseBottomSheetFragment(
         }
 
     override val di: DI by closestDI()
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        val touchOutsideView = dialog!!.window
+            ?.decorView
+            ?.findViewById<View>(R.id.touch_outside)
+        touchOutsideView?.setOnClickListener(null)
+    }
 
     override fun onStart() {
         super.onStart()

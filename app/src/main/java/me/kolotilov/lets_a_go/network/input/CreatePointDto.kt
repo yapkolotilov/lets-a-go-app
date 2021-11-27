@@ -9,6 +9,8 @@ data class CreatePointDto(
     val latitude: Double,
     @SerializedName("longitude")
     val longitude: Double,
+    @SerializedName("altitude")
+    val altitude: Double,
     @SerializedName("timestamp")
     val timestamp: Date
 )
@@ -16,5 +18,6 @@ data class CreatePointDto(
 fun Point.toCreatePointDto() = CreatePointDto(
     latitude = latitude,
     longitude = longitude,
+    altitude = altitude,
     timestamp = timestamp.toDate()
 )

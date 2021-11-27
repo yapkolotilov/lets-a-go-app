@@ -44,6 +44,10 @@ class EntryPreviewViewModel(
         )
     }
 
+    override fun detach() {
+        super.detach()
+    }
+
     fun init(entryPreview: EntryPreview, points: List<Point>) {
         this.entryPreview = entryPreview
         this.points = points

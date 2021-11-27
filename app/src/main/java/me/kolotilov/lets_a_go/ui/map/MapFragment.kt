@@ -9,7 +9,6 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.GridLayout
 import androidx.appcompat.widget.SwitchCompat
@@ -22,6 +21,10 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
+import io.reactivex.Completable
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.*
 import me.kolotilov.lets_a_go.presentation.base.ButtonData
@@ -37,7 +40,10 @@ import me.kolotilov.lets_a_go.ui.base.Grid
 import me.kolotilov.lets_a_go.ui.base.KeyValueFactory
 import me.kolotilov.lets_a_go.ui.base.toKeyValueModel
 import me.kolotilov.lets_a_go.utils.castTo
+import me.kolotilov.lets_a_go.utils.castToOrNull
 import org.kodein.di.instance
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class MapFragment : BaseFragment(R.layout.fragment_map) {
@@ -49,6 +55,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         private const val OVERVIEW_ZOOM = 15f
         private const val RECORDING_ZOOM = 17f
         private const val RECORDING_TILT = 60f
+        private const val ANIMATION_DURATION = 700
 
         fun start(context: Context, data: RecordingData) {
             val intent = Intent(Recording.Action.RECOVER).apply {
@@ -167,6 +174,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             MarkerOptions()
                 .position(LatLng(0.0, 0.0))
                 .icon(requireContext().bitmapDescriptorFromVector(R.drawable.ic_navigation))
+                .zIndex(Float.MAX_VALUE)
         )
     }
     private val routePolyline: Polyline by lazyProperty {
@@ -233,6 +241,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             routesClusterManager.clearItems()
             routesClusterManager.cluster()
             locationService.stopListen()
+            routePolylines.forEach { it.remove() }
             sensorManager.unregisterListener(rotationListener)
         }
         super.onDestroyView()
@@ -335,6 +344,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                     getString(R.string.distance_hint) to data.distance.distance(requireContext())
                 ).map { it.toKeyValueModel() }
                 routePolyline.points = data.points.map { it.toLatLng() }
+                routePolyline.tag = null
             }
             is DynamicData.Entrying -> {
                 recordAdapter.items = listOf(
@@ -481,10 +491,10 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     }
 
     private fun clearMap() {
+        routePolyline.clearAnimated(remove = false)
         routesClusterManager.clearItems()
         routesClusterManager.cluster()
-        routePolyline.points = emptyList()
-        routePolylines.forEach { it.remove() }
+        routePolylines.forEach { it.clearAnimated() }
         routePolylines = emptyList()
     }
 
@@ -492,12 +502,26 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         clearMap()
         if (startPoint != null) {
             routesClusterManager.addItem(RouteMarker(startPoint))
+            routePolyline.tag = startPoint.id
+            routesClusterManager.cluster()
         }
         routePolyline.points = route.map { it.toLatLng() }
     }
 
     private fun drawRoutes(routes: List<RouteLine>) {
         clearMap()
+        val previousRoute = routes.find { it.id == routePolyline.tag }
+        if (previousRoute != null) {
+            map.addPolyline(
+                PolylineOptions()
+                    .color(requireContext().getColorCompat(R.color.blue_primary))
+                    .width(15f)
+                    .addAll(previousRoute.points.map { it.toLatLng() })
+            ).also {
+                it.tag = previousRoute
+                routePolylines = listOf(it)
+            }
+        }
         routesCache = routes
         routesClusterManager.addItems(routes.map { route ->
             val routePoint = RoutePoint(
@@ -516,25 +540,34 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             .filter { it.size == 1 }
             .flatMap { it.items }
             .map { it.route.id }
+        val validRouteIds = (routePolylines)
+            .map { it.routeId() }
+            .filter { allowedIds.contains(it) }
+            .toSet()
         val newPolylines = routes
             .filter { route ->
-                allowedIds.contains(route.id)
+                allowedIds.contains(route.id) && !validRouteIds.contains(route.id)
             }
             .map { route ->
                 map.addPolyline(
                     PolylineOptions()
                         .color(requireContext().getColorCompat(R.color.blue_primary))
                         .width(15f)
-                        .addAll(route.points.map { it.toLatLng() })
                 ).also {
                     it.tag = route
+                    it.setPointsAnimated(route.points.map { it.toLatLng() })
                 }
             }
-        routePolylines.forEach { it.remove() }
-        routePolylines = newPolylines
+        val validPolylines = routePolylines
+            .filter { validRouteIds.contains(it.routeId()) }
+        routePolylines
+            .filter { !validPolylines.contains(it) }
+            .forEach { it.clearAnimated() }
+        routePolylines = newPolylines + validPolylines
     }
 
     private fun onMapLoaded() {
+        map.uiSettings.isMapToolbarEnabled = false
         locationService.startListen {
             viewModel.onLocationUpdate(it.toPoint())
         }
@@ -545,8 +578,6 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         )
         map.setOnCameraIdleListener(routesClusterManager)
         map.setOnCameraMoveListener {
-            val zoom = map.cameraPosition.zoom
-            Log.e("BRUH", "zoom = $zoom")
             locationMarker.animateRotation(calculateUserRotation())
         }
         map.setOnPolylineClickListener { polyline ->
@@ -624,4 +655,46 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         targetLocation = toLocation
         MarkerAnimation.animateMarkerToICS(this, toLocation, LatLngInterpolator.Spherical())
     }
+
+    private fun Polyline.setPointsAnimated(points: List<LatLng>) {
+        val polyline = this
+        val interval = ANIMATION_DURATION / points.size
+        Observable.interval(interval.toLong(), TimeUnit.MILLISECONDS)
+            .take(points.size.toLong())
+            .schedule()
+            .subscribe{ i ->
+                polyline.points = polyline.points + points[i.toInt()]
+            }
+            .autoDispose()
+    }
+
+    private fun Polyline.clearAnimated(remove: Boolean = true) {
+        val polyline = this
+        val size = polyline.points.size
+        val interval = ANIMATION_DURATION / (if (size > 0) size else 1)
+        Observable.interval(interval.toLong(), TimeUnit.MILLISECONDS)
+            .take(points.size.toLong())
+            .schedule()
+            .subscribe { i ->
+                polyline.points = polyline.points.take(points.size - 1)
+                if (polyline.points.isEmpty() && remove) {
+                    routePolylines = routePolylines - this
+                }
+            }
+            .autoDispose()
+    }
+
+    private fun Polyline.routeId(): Int? {
+        return tag?.castToOrNull<RouteLine>()?.id
+    }
+}
+
+fun <T> Observable<T>.schedule(): Observable<T> {
+    return subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+}
+
+fun Completable.schedule(): Completable {
+    return subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
 }

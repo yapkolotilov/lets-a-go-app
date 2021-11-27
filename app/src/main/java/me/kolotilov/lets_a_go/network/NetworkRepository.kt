@@ -1,5 +1,6 @@
 package me.kolotilov.lets_a_go.network
 
+import android.util.Log
 import io.reactivex.Completable
 import io.reactivex.Single
 import me.kolotilov.lets_a_go.models.*
@@ -253,14 +254,18 @@ class NetworkRepositoryImpl(
             retrofit.responseBodyConverter(ErrorDto::class.java, emptyArray())
 
         if (throwable is HttpException) runCatching {
-            val error = throwable.response()?.errorBody()?.let { converter.convert(it) }
-            if (error != null)
+            val error = throwable.response()?.errorBody()?.let {  converter.convert(it) }
+            if (error != null) {
+                Log.e("ERROR", error.toString())
                 return error.toServiceException()
+            }
         }
         if (throwable is retrofit2.adapter.rxjava2.HttpException) runCatching {
             val error = throwable.response()?.errorBody()?.let { converter.convert(it) }
-            if (error != null)
+            if (error != null) {
+                Log.e("ERROR", error.toString())
                 return error.toServiceException()
+            }
         }
         return throwable
     }
