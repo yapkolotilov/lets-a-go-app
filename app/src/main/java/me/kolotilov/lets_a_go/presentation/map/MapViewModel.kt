@@ -194,6 +194,7 @@ class MapViewModel(
      * Данные для карты.
      */
     val dynamicData: Observable<DynamicData> get() = dynamicDataSubject
+        .distinctUntilChanged { a, b -> a.location == b.location && a.duration == b.duration }
     private val dynamicDataSubject: Subject<DynamicData> = BehaviorSubject.create()
 
     /**
@@ -237,8 +238,22 @@ class MapViewModel(
     }
 
     fun onMapLoaded() {
-        router.setResultListener<Unit>(Results.EDIT_ROUTE) {
-            loadRoutes()
+        router.setResultListener<EntryPreviewResult>(Results.ENTRY_PREVIEW) {
+            when (it) {
+                is EntryPreviewResult.LoadRoutes -> {
+                    loadRoutes()
+                }
+                is EntryPreviewResult.DoNothing -> Unit
+            }
+        }
+        router.setResultListener<EditRouteResult>(Results.EDIT_ROUTE) {
+            when (it) {
+                is EditRouteResult.NewRoute -> Unit
+                is EditRouteResult.Edited -> {
+                    loadRoutes()
+                }
+                is EditRouteResult.Nothing -> Unit
+            }
         }
         router.setResultListener<RouteDetailsResult>(Results.ROUTE_DETAILS) {
             when (it) {
@@ -450,6 +465,7 @@ data class UserLocation(
 sealed class DynamicData {
 
     abstract val location: UserLocation
+    open val duration: Duration? = null
 
     data class Idle(
         override val location: UserLocation,
@@ -458,14 +474,14 @@ sealed class DynamicData {
     data class Routing(
         override val location: UserLocation,
         val points: List<Point>,
-        val duration: Duration,
+        override val duration: Duration,
         val distance: Double,
     ) : DynamicData()
 
     data class Entrying(
         override val location: UserLocation,
         val routeName: String?,
-        val duration: Duration,
+        override val duration: Duration,
         val distance: Double,
     ) : DynamicData()
 }

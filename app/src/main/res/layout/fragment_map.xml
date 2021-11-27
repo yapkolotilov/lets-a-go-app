@@ -9,7 +9,9 @@
         android:id="@+id/map"
         class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
 
     <FrameLayout
         android:id="@+id/record_panel"
@@ -29,52 +31,83 @@
 
     </FrameLayout>
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/filter_switch"
-        style="@style/LetsFilterSwitch"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/top_menu"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/record_panel" />
+        app:layout_constraintTop_toBottomOf="@id/record_panel">
 
-    <ImageButton
-        android:id="@+id/user_details_button"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="@dimen/padding_content"
-        android:background="@drawable/bg_image_view"
-        android:contentDescription="@string/icon"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_user"
-        app:layout_constraintBottom_toBottomOf="@id/record_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/record_button" />
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/filter_switch"
+            style="@style/LetsFilterSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
-        android:id="@+id/search_button"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="@dimen/padding_content"
-        android:background="@drawable/bg_image_view"
-        android:contentDescription="@string/icon"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_search"
-        app:layout_constraintBottom_toBottomOf="@id/record_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/record_button" />
+        <ImageButton
+            android:id="@+id/center_button"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="@dimen/padding_content"
+            android:background="@drawable/bg_image_view"
+            android:contentDescription="@string/icon"
+            android:padding="8dp"
+            android:layout_marginEnd="@dimen/padding_content"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_navigation"
+            app:layout_constraintTop_toTopOf="@id/filter_switch"
+            app:layout_constraintBottom_toBottomOf="@id/filter_switch"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <me.kolotilov.lets_a_go.ui.map.RecordButton
-        android:id="@+id/record_button"
-        android:layout_width="wrap_content"
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottom_menu"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_content"
-        android:clickable="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageButton
+            android:id="@+id/user_details_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="@dimen/padding_content"
+            android:background="@drawable/bg_image_view"
+            android:contentDescription="@string/icon"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_user"
+            app:layout_constraintBottom_toBottomOf="@id/record_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/record_button" />
+
+        <ImageButton
+            android:id="@+id/search_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="@dimen/padding_content"
+            android:background="@drawable/bg_image_view"
+            android:contentDescription="@string/icon"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_search"
+            app:layout_constraintBottom_toBottomOf="@id/record_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/record_button" />
+
+        <me.kolotilov.lets_a_go.ui.map.RecordButton
+            android:id="@+id/record_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_content"
+            android:clickable="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,6 +3,7 @@ package me.kolotilov.lets_a_go.ui.map
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import io.reactivex.Completable
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.EntryPreview
 import me.kolotilov.lets_a_go.models.Point
@@ -13,6 +14,7 @@ import me.kolotilov.lets_a_go.ui.*
 import me.kolotilov.lets_a_go.ui.base.BaseBottomSheetFragment
 import me.kolotilov.lets_a_go.utils.castTo
 import org.kodein.di.instance
+import java.util.concurrent.TimeUnit
 
 class EntryPreviewBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
     BaseBottomSheetFragment(R.layout.fragment_edit_entry) {
@@ -62,7 +64,13 @@ class EntryPreviewBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constr
                 altitudeDelta = it.altitudeDelta,
                 date = null,
             )
-            expand()
+            Completable.complete()
+                .delay(50, TimeUnit.MILLISECONDS)
+                .schedule()
+                .subscribe {
+                    expand()
+                }
+                .autoDispose()
         }.autoDispose()
     }
 }

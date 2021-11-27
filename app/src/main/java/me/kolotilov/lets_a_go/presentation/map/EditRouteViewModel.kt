@@ -48,6 +48,7 @@ class EditRouteViewModel(
     private var preview: RoutePreview? = null
     private var points: List<Point>? = null
     private var id: Int? = null
+    private var result: EditRouteResult = EditRouteResult.Nothing
 
     override fun attach() {
         val preview = preview
@@ -81,7 +82,7 @@ class EditRouteViewModel(
 
     override fun detach() {
         super.detach()
-        router.sendResult(Results.EDIT_ROUTE, Unit)
+        router.sendResult(Results.EDIT_ROUTE, result)
     }
 
     fun init(preview: RoutePreview?, points: List<Point>?, id: Int?) {
@@ -113,6 +114,7 @@ class EditRouteViewModel(
 
     fun save() {
         if (id == null) {
+            result = EditRouteResult.NewRoute(type)
             repository.createRoute(name, type, difficulty, ground, public,  points ?: emptyList())
                 .load()
                 .doOnSuccess {
@@ -125,6 +127,7 @@ class EditRouteViewModel(
                 .autoDispose()
         } else {
             val id = id ?: 0
+            result = EditRouteResult.Edited
             repository.editRoute(id, name, difficulty, type, ground)
                 .load()
                 .doOnSuccess {
@@ -139,6 +142,7 @@ class EditRouteViewModel(
     }
 
     fun delete() {
+        result = EditRouteResult.Edited
         if (id == null) {
             router.exit()
         } else
@@ -163,4 +167,15 @@ class EditRouteViewModel(
         ground = ground,
         difficulty = difficulty
     )
+}
+
+sealed class EditRouteResult {
+
+    data class NewRoute(
+        val type: Route.Type?
+    ) : EditRouteResult()
+
+    object Edited : EditRouteResult()
+
+    object Nothing : EditRouteResult()
 }

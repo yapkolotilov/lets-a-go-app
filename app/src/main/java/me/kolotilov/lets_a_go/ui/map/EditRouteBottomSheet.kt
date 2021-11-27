@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout
+import io.reactivex.Completable
 import me.kolotilov.lets_a_go.R
 import me.kolotilov.lets_a_go.models.Route
 import me.kolotilov.lets_a_go.presentation.Constants
@@ -22,6 +23,7 @@ import me.kolotilov.lets_a_go.ui.base.TypeFactory
 import me.kolotilov.lets_a_go.utils.castTo
 import org.kodein.di.instance
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class EditRouteBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constructor() :
     BaseBottomSheetFragment(R.layout.fragment_edit_route) {
@@ -125,7 +127,12 @@ class EditRouteBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) construct
             groundAdapter.selectedItem = it.ground
             if (it.difficulty != null)
                 difficultySlider.value = it.difficulty.toFloat()
-            expand()
+            Completable.complete()
+                .delay(50, TimeUnit.MILLISECONDS)
+                .schedule()
+                .subscribe {
+                    expand()
+                }.autoDispose()
         }.autoDispose()
 
         viewModel.isNew.subscribe {

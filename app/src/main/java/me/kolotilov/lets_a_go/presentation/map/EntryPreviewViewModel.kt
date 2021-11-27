@@ -5,8 +5,10 @@ import io.reactivex.subjects.BehaviorSubject
 import me.kolotilov.lets_a_go.models.EntryPreview
 import me.kolotilov.lets_a_go.models.Point
 import me.kolotilov.lets_a_go.network.Repository
+import me.kolotilov.lets_a_go.presentation.Results
 import me.kolotilov.lets_a_go.presentation.Screens
 import me.kolotilov.lets_a_go.presentation.base.BaseBottomSheetViewModel
+import me.kolotilov.lets_a_go.ui.base.sendResult
 import me.kolotilov.lets_a_go.utils.invoke
 import org.joda.time.Duration
 import ru.terrakok.cicerone.Router
@@ -30,6 +32,7 @@ class EntryPreviewViewModel(
 
     private lateinit var entryPreview: EntryPreview
     private lateinit var points: List<Point>
+    private var result: EntryPreviewResult = EntryPreviewResult.LoadRoutes
 
     override fun attach() {
         dataSubject.onNext(
@@ -46,6 +49,7 @@ class EntryPreviewViewModel(
 
     override fun detach() {
         super.detach()
+        router.sendResult(Results.ENTRY_PREVIEW, result)
     }
 
     fun init(entryPreview: EntryPreview, points: List<Point>) {
@@ -54,6 +58,7 @@ class EntryPreviewViewModel(
     }
 
     fun save() {
+        result = EntryPreviewResult.DoNothing
         repository.createEntry(entryPreview.routeId, points)
             .load()
             .doOnSuccess {
@@ -65,4 +70,10 @@ class EntryPreviewViewModel(
             .emptySubscribe()
             .autoDispose()
     }
+}
+
+ sealed class EntryPreviewResult {
+
+    object LoadRoutes : EntryPreviewResult()
+    object DoNothing : EntryPreviewResult()
 }

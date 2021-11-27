@@ -47,8 +47,6 @@
 
     <style name="LetsBottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/LetsBottomSheet</item>
-        <item name="android:windowSoftInputMode">adjustResize</item>
-        <item name="android:windowIsFloating">false</item>
     </style>
 
     <style name="LetsBottomSheet" parent="Widget.MaterialComponents.BottomSheet">

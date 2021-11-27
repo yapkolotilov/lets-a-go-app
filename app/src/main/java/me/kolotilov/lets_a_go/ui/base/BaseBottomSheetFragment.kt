@@ -30,6 +30,9 @@ import me.kolotilov.lets_a_go.utils.castTo
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.x.closestDI
+import org.kodein.di.direct
+import org.kodein.di.instance
+import ru.terrakok.cicerone.Router
 
 abstract class BaseBottomSheetFragment(
     @LayoutRes
@@ -50,6 +53,10 @@ abstract class BaseBottomSheetFragment(
         }
 
     override val di: DI by closestDI()
+
+    private val router: Router by lazy {
+        di.direct.instance()
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -78,6 +85,7 @@ abstract class BaseBottomSheetFragment(
                 behavior.peekHeight = peekHeight
                 behavior.isHideable = false
             }
+            router.sendMenuVisibility(false)
         }
         return dialog
     }
@@ -110,6 +118,7 @@ abstract class BaseBottomSheetFragment(
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
+        router.sendMenuVisibility(true)
         viewModel.detach()
     }
 

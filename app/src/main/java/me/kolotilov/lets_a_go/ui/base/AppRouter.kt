@@ -5,6 +5,7 @@ import ru.terrakok.cicerone.Router
 
 class AppRouter : Router() {
 
+    private var menuVisibilityListener: (Boolean) -> Unit = {}
     private val listeners: MutableMap<String, (Any) -> Unit> = mutableMapOf()
 
     fun <T> setResultListener(key: String, listener: (result: T) -> Unit) {
@@ -14,6 +15,14 @@ class AppRouter : Router() {
     fun <T> sendResult(key: String, value: T) {
         listeners[key]?.invoke(value as Any)
     }
+
+    fun sendMenuVisibility(isVisible: Boolean) {
+        menuVisibilityListener(isVisible)
+    }
+
+    fun setMenuVisibilityListener(listener: (Boolean) -> Unit) {
+        menuVisibilityListener = listener
+    }
 }
 
 fun <T> Router.setResultListener(key: String, listener: (result: T) -> Unit) {
@@ -22,4 +31,12 @@ fun <T> Router.setResultListener(key: String, listener: (result: T) -> Unit) {
 
 fun <T> Router.sendResult(key: String, value: T) {
     (this as AppRouter).sendResult(key, value)
+}
+
+fun  Router.setMenuVisibilityListener(listener: (Boolean) -> Unit) {
+    (this as AppRouter).setMenuVisibilityListener(listener)
+}
+
+fun Router.sendMenuVisibility(isVisible: Boolean) {
+    (this as AppRouter).sendMenuVisibility(isVisible)
 }

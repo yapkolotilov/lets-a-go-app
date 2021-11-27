@@ -35,13 +35,12 @@ import me.kolotilov.lets_a_go.presentation.map.MapViewModel
 import me.kolotilov.lets_a_go.presentation.map.StaticData
 import me.kolotilov.lets_a_go.presentation.map.UserLocation
 import me.kolotilov.lets_a_go.ui.*
-import me.kolotilov.lets_a_go.ui.base.BaseFragment
-import me.kolotilov.lets_a_go.ui.base.Grid
-import me.kolotilov.lets_a_go.ui.base.KeyValueFactory
-import me.kolotilov.lets_a_go.ui.base.toKeyValueModel
+import me.kolotilov.lets_a_go.ui.base.*
 import me.kolotilov.lets_a_go.utils.castTo
 import me.kolotilov.lets_a_go.utils.castToOrNull
+import org.kodein.di.direct
 import org.kodein.di.instance
+import ru.terrakok.cicerone.Router
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -163,6 +162,9 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     private val userDetailsButton: View by lazyView(R.id.user_details_button)
     private val recordingPanel: View by lazyView(R.id.record_panel)
     private val recordGrid: GridLayout by lazyView(R.id.record_grid)
+    private val bottomMenu: View by lazyView(R.id.bottom_menu)
+    private val topMenu: View by lazyView(R.id.top_menu)
+    private val centerButton: View by lazyView(R.id.center_button)
 
     private val recordAdapter: Grid.ListAdapter by lazyProperty {
         Grid.ListAdapter(recordGrid, KeyValueFactory())
@@ -225,6 +227,10 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
     }
 
+    private val router: Router by lazy {
+        di.direct.instance()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requireContext().registerReceiver(resumeReceiver, IntentFilter(Recording.Action.RECOVER))
@@ -274,6 +280,9 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             map = it
             onMapLoaded()
         }
+        router.setMenuVisibilityListener {
+            bottomMenu.isVisible = it
+        }
     }
 
     override fun bind() {
@@ -288,6 +297,9 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         }
         filterSwitch.setOnCheckedChangeListener { _, isChecked ->
             viewModel.setFilterMap(isChecked)
+        }
+        centerButton.setOnClickListener {
+            smartAnimateCamera(CameraUpdateFactory.newLatLngZoom(locationMarker.position, 15f))
         }
     }
 
@@ -394,7 +406,12 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                 }
             }
             is StaticData.EntryPreview -> {
-                drawRoute(null, data.points)
+                val idAndType = routePolyline.routeIdAndType()
+                val startPoint = if (idAndType != null && data.points.isNotEmpty())
+                    RoutePoint(type = idAndType.type, id = idAndType.id, startPoint = data.points.first())
+                else
+                    null
+                drawRoute(startPoint, data.points)
                 centerCamera(data.points.map { it.toLatLng() }, force = true) {
                     viewModel.openEntryPreview(data.preview, data.points)
                 }
@@ -491,7 +508,6 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     }
 
     private fun clearMap() {
-        routePolyline.clearAnimated(remove = false)
         routesClusterManager.clearItems()
         routesClusterManager.cluster()
         routePolylines.forEach { it.clearAnimated() }
@@ -502,15 +518,16 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         clearMap()
         if (startPoint != null) {
             routesClusterManager.addItem(RouteMarker(startPoint))
-            routePolyline.tag = startPoint.id
+            routePolyline.tag = RouteIdAndType(startPoint.id, startPoint.type)
             routesClusterManager.cluster()
         }
         routePolyline.points = route.map { it.toLatLng() }
     }
 
     private fun drawRoutes(routes: List<RouteLine>) {
+        routePolyline.clearAnimated(remove = false)
         clearMap()
-        val previousRoute = routes.find { it.id == routePolyline.tag }
+        val previousRoute = routes.find { it.id == routePolyline.routeIdAndType()?.id }
         if (previousRoute != null) {
             map.addPolyline(
                 PolylineOptions()
@@ -638,7 +655,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                     topToTop = -1
                 }
             }
-        filterSwitch.isVisible = !visibility
+        topMenu.isVisible = !visibility
     }
 
     // https://stackoverflow.com/questions/28967821/animate-the-rotation-of-the-marker-in-google-map-v2
@@ -648,6 +665,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
     }
 
     private var targetLocation: LatLng? = null
+
     private fun Marker.animateMove(toLocation: LatLng) {
 //        position = toLocation
         if (targetLocation == toLocation)
@@ -663,7 +681,8 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             .take(points.size.toLong())
             .schedule()
             .subscribe{ i ->
-                polyline.points = polyline.points + points[i.toInt()]
+                val point = points.getOrNull(i.toInt()) ?: return@subscribe
+                polyline.points = polyline.points + point
             }
             .autoDispose()
     }
@@ -676,7 +695,8 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             .take(points.size.toLong())
             .schedule()
             .subscribe { i ->
-                polyline.points = polyline.points.take(points.size - 1)
+                val take = if (points.size == 0) 0 else points.size - 1
+                polyline.points = polyline.points.take(take)
                 if (polyline.points.isEmpty() && remove) {
                     routePolylines = routePolylines - this
                 }
@@ -686,6 +706,10 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
 
     private fun Polyline.routeId(): Int? {
         return tag?.castToOrNull<RouteLine>()?.id
+    }
+
+    private fun Polyline.routeIdAndType(): RouteIdAndType? {
+        return tag?.castToOrNull<RouteIdAndType>()
     }
 }
 
@@ -698,3 +722,8 @@ fun Completable.schedule(): Completable {
     return subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
 }
+
+data class RouteIdAndType(
+    val id: Int,
+    val type: Route.Type?
+)
