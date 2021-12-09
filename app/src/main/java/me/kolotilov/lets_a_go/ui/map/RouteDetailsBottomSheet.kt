@@ -108,10 +108,12 @@ class RouteDetailsBottomSheet @Deprecated(Constants.NEW_INSTANCE_MESSAGE) constr
                 groundRecycler.isVisible = false
             }
 
-            if (data.difficulty == null)
-                difficultySlider.isVisible = false
-            else
+            if (data.difficulty != null) {
                 difficultySlider.value = data.difficulty.toFloat()
+            } else {
+                difficultySlider.isVisible = false
+                difficultyHint.isVisible = false
+            }
 
             statsView.setData(
                 distance = data.distance,
