@@ -417,7 +417,7 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
                 }
             }
             is StaticData.RouteDetails -> {
-                drawRoute(data.startPoint, data.points)
+                drawRoute(data.startPoint, data.points, data.animated)
                 centerCamera(data.points.map { it.toLatLng() }, force = true) {
                     viewModel.openRouteDetails(data.id)
                 }
@@ -514,14 +514,17 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
         routePolylines = emptyList()
     }
 
-    private fun drawRoute(startPoint: RoutePoint?, route: List<Point>) {
+    private fun drawRoute(startPoint: RoutePoint?, route: List<Point>, animated: Boolean = false) {
         clearMap()
         if (startPoint != null) {
             routesClusterManager.addItem(RouteMarker(startPoint))
             routePolyline.tag = RouteIdAndType(startPoint.id, startPoint.type)
             routesClusterManager.cluster()
         }
-        routePolyline.points = route.map { it.toLatLng() }
+        if (animated)
+            routePolyline.setPointsAnimated(route.map { it.toLatLng() })
+        else
+            routePolyline.points = route.map { it.toLatLng() }
     }
 
     private fun drawRoutes(routes: List<RouteLine>) {
@@ -613,7 +616,10 @@ class MapFragment : BaseFragment(R.layout.fragment_map) {
             true
         }
 
-        viewModel.onMapLoaded()
+        val loadRoutes = requireArguments().run { getInt(ROUTE_ID, -1) == -1 && getInt(ENTRY_ID, -1) == -1 }
+        viewModel.onMapLoaded(loadRoutes)
+        if (!loadRoutes)
+            clearMap()
         readArguments()
     }
 

@@ -7,7 +7,6 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
-import android.util.Log
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -35,7 +34,7 @@ fun getLocationService(context: Context): LocationService {
         "LOCAL"  -> DebugLocationServiceImpl(context)
         "DEVICE" -> ReleaseLocationServiceImpl(context)
         else     -> ReleaseLocationServiceImpl(context)
-    }.apply { Log.e("BRUH", toString()) }
+    }
 }
 
 private const val INTERVAL = 2000L

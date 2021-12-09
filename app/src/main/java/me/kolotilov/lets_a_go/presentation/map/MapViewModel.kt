@@ -234,10 +234,10 @@ class MapViewModel(
     private var locationUpdated: Boolean = false
 
     fun proceedArguments(entryId: Int?, routeId: Int) {
-        showRouteImpl(routeId, entryId)
+        showRouteImpl(routeId, entryId, animated = true)
     }
 
-    fun onMapLoaded() {
+    fun onMapLoaded(loadRoutes: Boolean) {
         router.setResultListener<EntryPreviewResult>(Results.ENTRY_PREVIEW) {
             when (it) {
                 is EntryPreviewResult.LoadRoutes -> {
@@ -275,7 +275,8 @@ class MapViewModel(
                 camLocationSubject.onNext(lastLocation)
             }
             filterMapSubject.onNext(repository.filterMap)
-            loadRoutes()
+            if (loadRoutes)
+                loadRoutes()
         }
     }
 
@@ -367,7 +368,7 @@ class MapViewModel(
         showRouteImpl(routeId, null)
     }
 
-    private fun showRouteImpl(routeId: Int, entryId: Int?) {
+    private fun showRouteImpl(routeId: Int, entryId: Int?, animated: Boolean = false) {
         repository.getRouteOnMap(routeId)
             .load()
             .doOnSuccess {
@@ -380,7 +381,8 @@ class MapViewModel(
                             id = it.id
                         ),
                         points = it.points,
-                        entryId = entryId
+                        entryId = entryId,
+                        animated = animated
                     )
                 )
             }
@@ -505,7 +507,8 @@ sealed class StaticData {
         val id: Int,
         val startPoint: RoutePoint?,
         val points: List<Point>,
-        val entryId: Int?
+        val entryId: Int?,
+        val animated: Boolean = false
     ) : StaticData()
 
     data class RoutePreview(
